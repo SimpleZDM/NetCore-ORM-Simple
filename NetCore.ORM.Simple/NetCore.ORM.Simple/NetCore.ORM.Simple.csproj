@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NetCore.ORM.ISimple\NetCore.ORM.ISimple.csproj" />
+    <ProjectReference Include="..\NetCore.ORM.Simple.Common\NetCore.ORM.Simple.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="8.0.30" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="SimpleInterface\" />
+  </ItemGroup>
+
+</Project>
