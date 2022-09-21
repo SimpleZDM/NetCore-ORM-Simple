@@ -18,7 +18,7 @@ namespace NetCore.ORM.Simple.Queryable
 {
     public class SimpleQueryable<T1,T2,T3,T4,T5>:QueryResult<T1>,ISimpleQueryable<T1,T2,T3,T4,T5>
     {
-        public SimpleQueryable(eDBType DbType, params string[] tableNames) : base(DbType, tableNames)
+        public SimpleQueryable(eDBType DbType, params string[] tableNames) 
         {
 
         }

@@ -58,7 +58,6 @@ public static class Program
                 IsAutoClose = true,
                 DBType=eDBType.Mysql
             }));
-        simpleClient.In
         return 0;
     }
 }
