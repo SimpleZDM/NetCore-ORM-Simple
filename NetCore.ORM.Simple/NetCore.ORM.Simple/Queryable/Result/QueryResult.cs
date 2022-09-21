@@ -98,5 +98,13 @@ namespace NetCore.ORM.Simple.Queryable
         {
             return this;
         }
+        public IQueryResult<TResult> Select<TNewResult>(Expression<Func<TResult,TNewResult>>expression)
+        {
+            return this;
+        }
+        public IQueryResult<TResult> Where(Expression<Func<TResult,bool>>expression)
+        {
+            return this;
+        }
     }
 }

@@ -62,4 +62,14 @@ namespace NetCore.ORM.Simple.Entity
         Query//执行查询语句 select 
         
     }
+
+    public enum eConditionType
+    {
+        Sign=0,//符号-
+        Method,//方法
+        ColumnName,//列名称
+        Constant,//常量
+        IgnoreSign//忽视的符号
+
+    }
 }

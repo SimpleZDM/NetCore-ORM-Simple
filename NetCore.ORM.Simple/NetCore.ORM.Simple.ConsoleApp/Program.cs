@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using NetCore.ORM.Simple.SqlBuilder;
 using NetCore.ORM.Simple.Queryable;
 using NetCore.ORM.Simple.Client;
+using NetCore.ORM.Simple.Common;
 
 namespace NetCore.ORM.Simple.ConsoleApp;
 public static class Program
@@ -53,16 +54,55 @@ public static class Program
         //query.Where((u,r)=>true);
         ISimpleClient simpleClient = new SimpleClient(
             new DataBaseConfiguration(false,
-            new ConnectionEntity() 
+            new ConnectionEntity("链接字符串!") 
             { 
                 IsAutoClose = true,
-                DBType=eDBType.Mysql
+                DBType=eDBType.Mysql,
+                Name="test1",
+                ReadWeight=5,
+                WriteReadType=eWriteOrReadType.ReadOrWrite
             }));
+
+        var command=simpleClient.Insert(
+            new UserEntity() {
+                CompanyId=1,
+                gIdColumn=Guid.NewGuid(),
+                Description="Test",
+                Name="Name",Role=10});
+
+          simpleClient.Update(
+          new UserEntity()
+          {
+              CompanyId = 1,
+              gIdColumn = Guid.NewGuid(),
+              Description = "Test",
+              Name = "Name",
+              Role = 10
+          });
+
+        var query = simpleClient.Queryable<UserEntity, RoleEntity, CompanyEntity>(
+            (u, r, c) =>
+                new JoinInfoEntity(
+                    new JoinMapEntity(eJoinType.Inner, u.Role == r.Id),
+                    new JoinMapEntity(eJoinType.Inner, u.CompanyId == c.Id)
+                )
+             )
+            .Where((u,r,c)=>u.Id>10&&r.Id==10&&c.Id==10)
+            .Select((u,r,c)=>new ViewView
+             {
+                 UserId=r.Id,
+                 DisplayName=u.Name,
+                 CompanyName=c.Name,
+                 RoleName=r.Name,
+             }).Select();
+        var data=query.ToList();
+
         return 0;
     }
 }
 public class UserEntity
 {
+    [Key(true)]
     public int Id { get; set; }
     public int CompanyId { get; set; }
     public string Name { get; set; }
@@ -73,12 +113,14 @@ public class UserEntity
 
 public class RoleEntity
 {
+    [Key(true)]
     public int Id { get; set; }
     public string Name { get; set; }
 }
 
 public class CompanyEntity
 {
+    [Key(true)]
     public int Id { get; set; }
     public string Name { get; set; }
 }
@@ -91,7 +133,7 @@ public class MissionDetailEntity
         //GroupID = Guid.NewGuid();
         //MissionRole = -1;
     }
-
+    [Key(false)]
     public Guid Id { get; set; }
     public Guid ProductId { get; set; }
     public Guid ProductDeviceId { get; set; }

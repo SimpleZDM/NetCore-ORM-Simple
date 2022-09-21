@@ -19,13 +19,16 @@ using NetCore.ORM.Simple.Entity;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Visitor
 {
-    public class ConditionVisitor : ExpressionVisitor,IExpressionVisitor
+    public class ConditionVisitor : ExpressionVisitor, IExpressionVisitor
     {
         /// <summary>
         /// 存放Expression表达式树的内容
         /// </summary>
         private Queue<string> qValue;
-     
+        private List<ConditionEntity> conditions;
+        private List<MapEntity> mapInfos;
+        private bool IsMultipleMap;
+
         /// <summary>
         /// 所有的表
         /// </summary>
@@ -34,16 +37,17 @@ namespace NetCore.ORM.Simple.Visitor
         /// 当前这个条件中包含的表的别称-与索引号
         /// </summary>
         private Dictionary<string, int> currentTables;
-  
+
         public ConditionVisitor(params string[] _tableNames)
         {
             if (!Check.IsNull(_tableNames))
             {
                 tableNames = _tableNames;
             }
-           
-            currentTables = new Dictionary<string,int>();
+
+            currentTables = new Dictionary<string, int>();
             qValue = new Queue<string>();
+            conditions = new List<ConditionEntity>();
         }
 
         /// <summary>
@@ -52,7 +56,7 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         public string GetValue()
         {
-            StringBuilder values=new StringBuilder();
+            StringBuilder values = new StringBuilder();
             int length = qValue.Count();
             for (int i = 0; i < length; i++)
             {
@@ -66,10 +70,17 @@ namespace NetCore.ORM.Simple.Visitor
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public Expression Modify(Expression expression)
+        public Expression Modify(Expression expression, List<MapEntity> mapInfos)
         {
             currentTables.Clear();
-            qValue.Clear();
+
+            // qValue.Clear();
+            this.mapInfos.Clear();
+            if (!Check.IsNull(mapInfos))
+            {
+                this.mapInfos = mapInfos;
+                IsMultipleMap = true;
+            }
             Visit(expression);
             return Visit(expression);
         }
@@ -242,7 +253,7 @@ namespace NetCore.ORM.Simple.Visitor
             Console.WriteLine(node.ToString());
             return base.VisitMemberMemberBinding(node);
         }
-        protected override LabelTarget ? VisitLabelTarget(LabelTarget? node)
+        protected override LabelTarget? VisitLabelTarget(LabelTarget? node)
         {
             Console.WriteLine(node.ToString());
             return base.VisitLabelTarget(node);
@@ -386,7 +397,7 @@ namespace NetCore.ORM.Simple.Visitor
             Console.WriteLine(node.ToString());
             return base.VisitTypeBinary(node);
         }
-       
+
 
         protected override CatchBlock VisitCatchBlock(CatchBlock node)
         {
@@ -411,19 +422,27 @@ namespace NetCore.ORM.Simple.Visitor
             if (node.Left is MemberExpression member)
             {
                 string mName = string.Empty;
-                if (tableNames.Length > SimpleConst.minTableCount)
+                if (IsMultipleMap)
                 {
-                    if (currentTables.ContainsKey(member.Expression.ToString()))
-                    {
-
-                        mName = $"{tableNames[currentTables[member.Expression.ToString()]]}.{member.Member.Name}";
-                    }
 
                 }
                 else
                 {
-                    mName = member.Member.Name;
+                    if (tableNames.Length > SimpleConst.minTableCount)
+                    {
+                        if (currentTables.ContainsKey(member.Expression.ToString()))
+                        {
+
+                            mName = $"{tableNames[currentTables[member.Expression.ToString()]]}.{member.Member.Name}";
+                        }
+
+                    }
+                    else
+                    {
+                        mName = member.Member.Name;
+                    }
                 }
+
                 qValue.Enqueue(mName);
 
             }
@@ -445,15 +464,42 @@ namespace NetCore.ORM.Simple.Visitor
         private void SingleLogicBinary(BinaryExpression node, Action<Queue<string>> action)
         {
             qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.LeftBracket]);
+
+            conditions.Add(
+                new ConditionEntity(eConditionType.IgnoreSign)
+                {
+                    DisplayName = SimpleConst.cStrSign[(int)eSignType.LeftBracket]
+                });
+
             base.Visit(node.Left);
             qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.RightBracket]);
+
+            conditions.Add(
+                new ConditionEntity(eConditionType.IgnoreSign)
+                {
+                    DisplayName = SimpleConst.cStrSign[(int)eSignType.RightBracket]
+                });
+
             if (!Check.IsNull(action))
             {
                 action.Invoke(qValue);
             }
             qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.LeftBracket]);
+
+            conditions.Add(
+                new ConditionEntity(eConditionType.IgnoreSign)
+                {
+                    DisplayName = SimpleConst.cStrSign[(int)eSignType.LeftBracket]
+                });
+
             base.Visit(node.Right);
             qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.RightBracket]);
+
+            conditions.Add(new
+                ConditionEntity(eConditionType.IgnoreSign)
+            {
+                DisplayName = SimpleConst.cStrSign[(int)eSignType.RightBracket]
+            });
         }
     }
 }

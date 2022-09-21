@@ -17,11 +17,12 @@ namespace NetCore.ORM.Simple.Entity
 {
     public class ConnectionEntity
     {
-        public ConnectionEntity()
+        public ConnectionEntity(string connectStr)
         {
             IsAutoClose = true;
             WriteReadType = eWriteOrReadType.ReadOrWrite;
             readWeight = 1;
+            ConnectStr = connectStr;
         }
 
         public string Name { get { return name; } set { name = value; } }

@@ -51,28 +51,7 @@ namespace NetCore.ORM.Simple.Entity
                 currentUseConnectStr = ConnectMapName[currentUseConnectName].ConnectStr;
             }
         }
-        /// <summary>
-        /// 当前连接字符串
-        /// 配置了读写分离之后将返回权重的值
-        /// </summary>
-        public string CurrentUseConnectStr
-        {
-            get
-            {
-                if (RwSplit)
-                {
-                    int rNumber = new Random().Next(int.MinValue, int.MaxValue);
-                    int rang = rNumber % rwWight;
-                    var connect = ConnectMapName.Where(c => c.Value.Start <= rang && c.Value.End > rang).FirstOrDefault();
-                    return connect.Value.ConnectStr;
-                }
-                return currentUseConnectStr;
-            }
-            private set
-            {
-                currentUseConnectStr = value;
-            }
-        }
+      
         /// <summary>
         /// 是否支持读写分离
         /// </summary>
@@ -91,15 +70,16 @@ namespace NetCore.ORM.Simple.Entity
 
             foreach (var connection in connections)
             {
+                AddConnect(connection);
                 if (rwWight == 0)
                 {
                     CurrentUseConnectName = connection.Name;
-                    CurrentUseConnectStr = connection.ConnectStr;
+                    CurrentConnectInfo = connection;
                 }
                 connection.Start = rwWight;
                 rwWight += connection.ReadWeight;
                 connection.End = rwWight;
-                AddConnect(connection);
+                
             }
         }
 

@@ -30,6 +30,7 @@ namespace NetCore.ORM.Simple.Client
         public SimpleClient(DataBaseConfiguration _configuration)
         {
             configuration=_configuration;
+            builder = new Builder(configuration.CurrentConnectInfo.DBType);
             sqls = new List<SqlEntity>();
         }
         /// <summary>

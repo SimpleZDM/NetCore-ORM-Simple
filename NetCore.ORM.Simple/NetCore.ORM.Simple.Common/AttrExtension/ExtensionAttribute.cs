@@ -104,6 +104,10 @@ namespace NetCore.ORM.Simple.Common
                     if (p.IsDefined(typeof(KeyAttribute),false))
                     {
                         KeyAttribute keyAttr=type.GetCustomAttribute<KeyAttribute>(false);
+                        if (Check.IsNull(keyAttr))
+                        {
+                            throw new Exception("请为实体配置一个主键!");
+                        }
                         value = !keyAttr.AutoIncrease;
                     }
                     return value;

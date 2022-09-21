@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,5 +19,7 @@ namespace NetCore.ORM.Simple.Queryable
     public interface IQueryResult<TResult>
     {
         public IEnumerable<TResult> ToList();
+        public IQueryResult<TResult> Select<TNewResult>(Expression<Func<TResult,TNewResult>> expression);
+        public IQueryResult<TResult> Where(Expression<Func<TResult,bool>>expression);
     }
 }
