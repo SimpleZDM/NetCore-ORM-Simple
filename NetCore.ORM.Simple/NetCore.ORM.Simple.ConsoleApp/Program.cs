@@ -2,6 +2,7 @@
 using NetCore.ORM.Simple.Visitor;
 using System.Linq.Expressions;
 using NetCore.ORM.Simple.SqlBuilder;
+using NetCore.ORM.Simple.Queryable;
 
 namespace NetCore.ORM.Simple.ConsoleApp;
 public static class Program
@@ -14,7 +15,7 @@ public static class Program
         JoinVisitor joinVisitor = new JoinVisitor("UserTable", "CompanyTable", "RoleTable"); 
         ConditionVisitor conditionVisitor = new ConditionVisitor("UserTable", "CompanyTable", "RoleTable");
         //条件解析
-        Expression<Func<UserEntity, CompanyEntity, RoleEntity, bool>> whereExpression = 
+        Expression<Func<UserEntity,CompanyEntity, RoleEntity, bool>> whereExpression = 
             (u, c, r) =>u.Id>100;
 
         conditionVisitor.Modify(whereExpression);
@@ -42,9 +43,13 @@ public static class Program
         var joinInfos=joinVisitor.GetJoinInfos();
         var condition=conditionVisitor.GetValue();
         Builder builder = new Builder(eDBType.Mysql);
-        var sql=builder.GetSelect(mpaInfos,joinInfos,condition);
+
+        //var sql=builder.GetSelect<TRe>(mpaInfos,joinInfos,condition);
 
         Console.WriteLine("Simple");
+
+        ISimpleQueryable<UserEntity,RoleEntity> query =new SimpleQueryable<UserEntity,RoleEntity>(eDBType.Mysql);
+        query.Where((u,r)=>true);
         return 0;
     }
 }

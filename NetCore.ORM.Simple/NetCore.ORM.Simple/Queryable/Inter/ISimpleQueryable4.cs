@@ -16,11 +16,10 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Queryable
 {
-    public interface ISimpleQueryable<T>:IQueryResult<T>
-    {
-        public ISimpleQueryable<T> SimpleQueryable();
-        public IQueryResult<TResult> Select<TResult>(Expression<Func<T,TResult>> expression);
-       
+    public interface ISimpleQueryable<T1,T2,T3,T4>:IQueryResult<T1>
+    {  
+        public ISimpleQueryable<T1, T2, T3, T4> Where();
+        public IQueryResult<TResult> Select<TResult>(Expression<Func<T1,T2,T3,T4,TResult>> expression);
         
     }
 }

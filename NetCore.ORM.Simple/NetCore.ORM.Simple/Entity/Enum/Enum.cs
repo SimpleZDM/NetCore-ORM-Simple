@@ -53,4 +53,13 @@ namespace NetCore.ORM.Simple.Entity
         Master=0,
         Slave
     }
+
+    public enum eDbCommandType
+    {
+        Insert=0,//执行命令-
+        Update,//执行命令-
+        Delete,//执行命令-
+        Query//执行查询语句 select 
+        
+    }
 }

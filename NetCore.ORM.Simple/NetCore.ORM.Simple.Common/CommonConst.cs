@@ -20,5 +20,7 @@ namespace NetCore.ORM.Simple.Common
         public static string[]
           cStrSign =
           new string[] { "(", ")", "=", ">=", "<=", ">", "<", "AND", "OR", "<>" };
+
+        public static int ZeroOrNull=0;
     }
 }

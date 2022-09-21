@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,19 +21,19 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.SqlBuilder
 {
-    public class MysqlBuilder: ISqlBuilder
+    public class MysqlBuilder : ISqlBuilder
     {
 
         private const int INSERTMAX = 800;
         private const char charConnectSign = '_';
-        
+
         //private JoinVisitor joinVisitor;
         //private ConditionVisitor conditionVisitor;
         //private MapVisitor mapVisitor;
-        private string[] strJoins = new string[] {"INNER JOIN","LEFT JOIN","RIGHT JOIN"};
+        private string[] strJoins = new string[] { "INNER JOIN", "LEFT JOIN", "RIGHT JOIN" };
         public MysqlBuilder()
         {
-           
+
             //joinVisitor=new JoinVisitor(); 
             //conditionVisitor = new ConditionVisitor();
             //mapVisitor = new MapVisitor();
@@ -53,7 +54,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
             sql.Sb_Sql.Append(") ");
             sql.Sb_Sql.Append(" VALUE(");
             sql.Sb_Sql.Append(string.Join(',',
-                Props.Select(p => {
+                Props.Select(p =>
+                {
                     string key = $"@{random}{p.GetColName()}";
                     sql.DbParams.Add(new MySqlParameter(key, p.GetValue(data)));
                     return key;
@@ -81,7 +83,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
             sql.Sb_Sql.Append($"UPDATE {type.GetClassName()} SET ");
 
             sql.Sb_Sql.Append(string.Join(',',
-                Props.Select(p => {
+                Props.Select(p =>
+                {
                     string key = $"@{p.GetColName()}";
                     sql.DbParams.Add(new MySqlParameter(key, p.GetValue(data)));
                     return key;
@@ -124,7 +127,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 count++;
                 sql.Sb_Sql.Append(" (");
                 sql.Sb_Sql.Append(string.Join(',',
-                  Props.Select(p => {
+                  Props.Select(p =>
+                  {
                       string key = $"@{Index}{charConnectSign}{p.GetColName()}";
                       sql.DbParams.Add(new MySqlParameter(key, p.GetValue(data)));
                       return key;
@@ -148,14 +152,39 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// </summary>
         /// <typeparam name="TData"></typeparam>
         /// <returns></returns>
-        public SqlEntity GetSelect<TData>()
+        public void GetSelect<TData>(SqlEntity sql)
         {
-            SqlEntity sql = new SqlEntity();
+            if (Check.IsNull(sql))
+            {
+                sql = new SqlEntity();
+            }   
             Type type = typeof(TData);
             sql.Sb_Sql.Append($"SELECT " +
                 $"{string.Join(',', type.GetNoIgnore())} " +
                 $"FROM {type.GetClassName()} ");
-            return sql;
+        }
+
+        public void GetSelect(SqlEntity sql,Type type)
+        {
+            if (Check.IsNull(sql))
+            {
+                sql = new SqlEntity();
+            }
+            sql.Sb_Sql.Append($"SELECT " +
+                $"{string.Join(',', type.GetNoIgnore())} " +
+                $"FROM {type.GetClassName()} ");
+        }
+
+        public void GetLastInsert<TData>(SqlEntity sql)
+        {
+            if (Check.IsNull(sql))
+            {
+                sql = new SqlEntity();
+            }
+            Type type = typeof(TData);
+            GetSelect(sql,type);
+            var Key = type.GetKey();
+            sql.Sb_Sql.Append($" Where {Key.GetColName()}=LAST_INSERT_ID();");
         }
         /// <summary>
         /// 
@@ -179,39 +208,92 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="joinInfos">连接部分</param>
         /// <param name="condition">条件部分</param>
         /// <returns></returns>
-        public SqlEntity GetSelect(List<MapEntity>mapInfos,List<JoinTableEntity>joinInfos,string condition)
+        public SqlEntity GetSelect<TData>(List<MapEntity> mapInfos, List<JoinTableEntity> joinInfos, string condition)
         {
             SqlEntity sql = new SqlEntity();
+
+            if (Check.IsNull(mapInfos))
+            {
+                mapInfos = new List<MapEntity>();
+            }
+            if (mapInfos.Count.Equals(CommonConst.ZeroOrNull))
+            {
+                Type type = typeof(TData);
+                string TableName = type.GetClassName();
+                foreach (var prop in type.GetNoIgnore())
+                {
+                    mapInfos.Add(new MapEntity()
+                    {
+                        PropName = prop.GetColName(),
+                        ColumnName = prop.GetColName(),
+                        TableName = TableName,
+                    });
+                }
+            }
             //视图
             sql.Sb_Sql.Append("SELECT ");
-            for (int i = 0; i <mapInfos.Count; i++)
-            {
-                mapInfos[i].AsColumnName= $"{mapInfos[i].TableName}{charConnectSign}{mapInfos[i].ColumnName}";
-                sql.Sb_Sql.Append($" {mapInfos[i].TableName}.{mapInfos[i].ColumnName} AS {mapInfos[i].AsColumnName} ");
 
-            }
-           
+            LinkMapInfos(mapInfos, sql.Sb_Sql);
             //连接
-            foreach (var join in joinInfos)
+            LinkJoinInfos(joinInfos, sql.Sb_Sql);
+            //条件
+            if (!Check.IsNullOrEmpty(condition))
             {
-                if (join.TableType.Equals(eTableType.Master))
+                sql.Sb_Sql.Append($" Where {condition} ");
+            }
+            return sql;
+        }
+
+        private void LinkMapInfos(List<MapEntity> mapInfos, StringBuilder sbValue)
+        {
+            if (Check.IsNull(sbValue))
+            {
+                throw new ArgumentException("");
+            }
+            if (!Check.IsNull(mapInfos))
+            {
+                for (int i = 0; i < mapInfos.Count; i++)
                 {
-                    sql.Sb_Sql.Append($" FROM {join.DisplayName} ");
-                }
-                else
-                {
-                    sql.Sb_Sql.Append($" {strJoins[(int)join.JoinType]} {join.DisplayName} ON ");
-                    int length = join.QValue.Count;
-                    for (int i = 0; i < length; i++)
+                    if (mapInfos[i].IsNeed)
                     {
-                        sql.Sb_Sql.Append($" {join.QValue.Dequeue()} ");
+                        mapInfos[i].AsColumnName = $"{mapInfos[i].TableName}{charConnectSign}{mapInfos[i].ColumnName}";
+                        sbValue.Append($" {mapInfos[i].TableName}.{mapInfos[i].ColumnName} AS {mapInfos[i].AsColumnName} ");
                     }
                 }
             }
-            //条件
-            sql.Sb_Sql.Append($" Where {condition} ");
 
-            return sql;
+        }
+
+        private void LinkJoinInfos(List<JoinTableEntity> joinInfos,StringBuilder sbValue)
+        {
+            if (Check.IsNull(sbValue))
+            {
+                throw new ArgumentException("");
+            }
+            if (!Check.IsNull(joinInfos))
+            {
+                foreach (var join in joinInfos)
+                {
+                    if (join.TableType.Equals(eTableType.Master))
+                    {
+                        sbValue.Append($" FROM {join.DisplayName} ");
+                    }
+                    else
+                    {
+                        sbValue.Append($" {strJoins[(int)join.JoinType]} {join.DisplayName} ON ");
+                        int length = join.QValue.Count;
+                        for (int i = 0; i < length; i++)
+                        {
+                            sbValue.Append($" {join.QValue.Dequeue()} ");
+                        }
+                    }
+                }
+            }
+        }
+
+        public void GetSelect<TData>()
+        {
+           
         }
     }
 }

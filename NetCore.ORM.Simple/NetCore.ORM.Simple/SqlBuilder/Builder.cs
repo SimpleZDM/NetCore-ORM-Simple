@@ -45,19 +45,19 @@ namespace NetCore.ORM.Simple.SqlBuilder
             return MatchDBType(() => mysqlBuilder.GetInsert(datas));
         }
 
-        public SqlEntity GetSelect<TData>()
-        {
-            return MatchDBType(() =>mysqlBuilder.GetSelect<TData>());
-        }
+        //public SqlEntity GetSelect<TData>()
+        //{
+        //    return MatchDBType(() =>mysqlBuilder.GetSelect<TData>());
+        //}
 
         public SqlEntity GetWhereSql<TData>(Expression<Func<TData, bool>> matchCondition)
         {
             return MatchDBType(() => mysqlBuilder.GetWhereSql(matchCondition));
         }
 
-        public SqlEntity GetSelect(List<MapEntity> mapInfos, List<JoinTableEntity> joinInfos, string condition)
+        public SqlEntity GetSelect<TData>(List<MapEntity> mapInfos, List<JoinTableEntity> joinInfos, string condition)
         {
-            return MatchDBType(() => mysqlBuilder.GetSelect(mapInfos, joinInfos, condition));
+            return MatchDBType(() => mysqlBuilder.GetSelect<TData>(mapInfos, joinInfos, condition));
         }
 
         public SqlEntity MatchDBType(params Func<SqlEntity>[] funcs)
@@ -71,6 +71,32 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 return funcs[(int)dbType].Invoke();
             }
             return null;
+        }
+        public void MatchDBType(params Action[] actions)
+        {
+            if (Check.IsNull(actions))
+            {
+                throw new ArgumentException(nameof(actions));
+            }
+            if ((int)dbType < actions.Length)
+            {
+                actions[(int)dbType].Invoke();
+            }
+        }
+
+        public SqlEntity GetSelect(List<MapEntity> mapInfos,string condition)
+        {
+            throw new NotImplementedException();
+        }
+
+        void ISqlBuilder.GetSelect<TData>()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GetLastInsert<TData>(SqlEntity sql)
+        {
+             MatchDBType(() => mysqlBuilder.GetLastInsert<TData>(sql));
         }
     }
 }

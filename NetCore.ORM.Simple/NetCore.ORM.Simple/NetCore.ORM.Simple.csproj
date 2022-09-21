@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NetCore.ORM.ISimple\NetCore.ORM.ISimple.csproj" />
     <ProjectReference Include="..\NetCore.ORM.Simple.Common\NetCore.ORM.Simple.Common.csproj" />
   </ItemGroup>
 
@@ -15,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="SimpleInterface\" />
+    <Folder Include="Queryable\Base\" />
   </ItemGroup>
 
 </Project>

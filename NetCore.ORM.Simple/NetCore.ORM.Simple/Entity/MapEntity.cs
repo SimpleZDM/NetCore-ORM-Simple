@@ -23,7 +23,7 @@ namespace NetCore.ORM.Simple.Entity
 
         public MapEntity()
         {
-
+            IsNeed = true;
         }
         /// <summary>
         /// 字段属性名称
@@ -41,13 +41,19 @@ namespace NetCore.ORM.Simple.Entity
         /// 别名
         /// </summary>
         public string AsColumnName { get { return asColumnName; } set { asColumnName = value; } }
-        
+        /// <summary>
+        /// --标记是否需要查询字段
+        /// --只标记最后一次映射的字段
+        /// </summary>
+        public bool IsNeed { get { return isNeed; } set { isNeed = value; } }
+
 
 
         private string propName;
         private string tableName;
         private string columnName;
         private string asColumnName;
+        private bool isNeed;
 
     }
 }

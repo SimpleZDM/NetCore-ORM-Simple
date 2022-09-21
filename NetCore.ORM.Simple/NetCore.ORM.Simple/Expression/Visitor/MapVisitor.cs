@@ -18,22 +18,31 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Visitor
 {
-    public class MapVisitor:ExpressionVisitor
+    public class MapVisitor : ExpressionVisitor
     {
         /// <summary>
         /// 存放Expression表达式树的内容
         /// </summary>
         private Queue<string> qValue;
+        /// <summary>
+        /// 所有的表
+        /// </summary>
 
         private string[] tableNames;
+        /// <summary>
+        /// 当前传入的参数表
+        /// </summary>
 
         private Dictionary<string, int> currentTables;
 
-        private List<string> entity_key;
-        private List<string> data_key;
+        /// <summary>
+        /// 映射的信息
+        /// </summary>
 
         private List<MapEntity> mapInfos;
+
         private MapEntity currentmapInfo;
+        private bool IsAgain;
         public MapVisitor(params string[] _tableNames)
         {
             if (!Check.IsNull(_tableNames))
@@ -42,8 +51,6 @@ namespace NetCore.ORM.Simple.Visitor
             }
             currentTables = new Dictionary<string, int>();
             qValue = new Queue<string>();
-            entity_key = new List<string>();
-            data_key = new List<string>();
             mapInfos = new List<MapEntity>();
 
         }
@@ -71,7 +78,23 @@ namespace NetCore.ORM.Simple.Visitor
         public Expression Modify(Expression expression)
         {
             currentTables.Clear();
+            if (Check.IsNull(mapInfos))
+            {
+                mapInfos = new List<MapEntity>();
+                IsAgain = false;
+            }
+            else
+            {
+                if (IsAgain)
+                {
+                    for (int i = 0; i < mapInfos.Count; i++)
+                    {
+                        mapInfos[i].IsNeed = false;
+                    }
+                }
+            }
             Visit(expression);
+            IsAgain = true;
             return expression;
         }
 
@@ -107,7 +130,7 @@ namespace NetCore.ORM.Simple.Visitor
                         SingleBinary(node, (queue) => { queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.LessThanOrEqual]); });
                         break;
                     case ExpressionType.Equal:
-                        SingleBinary(node,(queue) => { queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.Equal]); });
+                        SingleBinary(node, (queue) => { queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.Equal]); });
                         break;
                     case ExpressionType.NotEqual:
                         SingleBinary(node, (queue) => { queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.NotEqual]); });
@@ -257,34 +280,10 @@ namespace NetCore.ORM.Simple.Visitor
         protected override MemberBinding VisitMemberBinding(MemberBinding node)
         {
             base.VisitMemberBinding(node);
-            //currentmapInfo = new MapEntity();
-            //mapInfos.Add(currentmapInfo);
+            //view中的值
             currentmapInfo.PropName = node.Member.Name;
-            entity_key.Add(node.Member.Name);
-            //if (currentTables.Contains(node.Exp))
-            //{
-            //    map_data.Add(node.Member.Name);
-            //}
+            //entity_key.Add(node.Member.Name);
             return node;
-        }
-
-
-        protected override Expression VisitLabel(LabelExpression node)
-        {
-            Console.WriteLine(node.ToString());
-            return base.VisitLabel(node);
-        }
-
-        protected override SwitchCase VisitSwitchCase(SwitchCase node)
-        {
-            Console.WriteLine(node.ToString());
-            return base.VisitSwitchCase(node);
-        }
-
-        protected override Expression VisitExtension(Expression node)
-        {
-            Console.WriteLine(node.ToString());
-            return base.VisitExtension(node);
         }
 
         protected override Expression VisitParameter(ParameterExpression node)
@@ -356,12 +355,22 @@ namespace NetCore.ORM.Simple.Visitor
             Console.WriteLine(node.ToString());
             if (currentTables.ContainsKey(node.Expression.ToString()))
             {
-                data_key.Add($"{tableNames[currentTables[node.Expression.ToString()]]}_{node.Member.Name}");
-                currentmapInfo = new MapEntity();
-                mapInfos.Add(currentmapInfo);
-                currentmapInfo.ColumnName = node.Member.Name;
-                currentmapInfo.TableName = tableNames[currentTables[node.Expression.ToString()]];
-                qValue.Enqueue($"{tableNames[currentTables[node.Expression.ToString()]]}.{node.Member.Name} AS {data_key[data_key.Count() - 1]}");
+                ///表示重复
+                if (IsAgain)
+                {
+
+                     currentmapInfo=mapInfos.FirstOrDefault(m=>m.PropName.Equals(node.Member.Name));
+                     currentmapInfo.IsNeed = true;
+                     //qValue.Enqueue($"{tableNames[currentTables[node.Expression.ToString()]]}.{node.Member.Name} AS {data_key[data_key.Count() - 1]}");
+                }
+                else
+                {
+                    currentmapInfo = new MapEntity();
+                    mapInfos.Add(currentmapInfo);
+                    currentmapInfo.ColumnName = node.Member.Name;
+                    currentmapInfo.TableName = tableNames[currentTables[node.Expression.ToString()]];
+                }
+
             }
             return node;
         }

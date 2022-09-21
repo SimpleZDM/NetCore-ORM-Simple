@@ -23,14 +23,38 @@ namespace NetCore.ORM.Simple.Entity
         {
             Sb_Sql=new StringBuilder();
             DbParams = new List<DbParameter>(10);
+            TakeNumber = -1;
+            SkipNumber = -1;
         }
-
+        /// <summary>
+        /// 拼装之后的语句
+        /// </summary>
         public StringBuilder Sb_Sql { get { return sb_Sql; } set { sb_Sql=value ; } }
+        /// <summary>
+        /// 参数化
+        /// </summary>
         public List<DbParameter> DbParams { get { return dbParams; } set { dbParams=value; } }
+        /// <summary>
+        /// 取出的数据
+        /// </summary>
+        public int TakeNumber { get { return takeNumber; } set { takeNumber = value; } }
+        /// <summary>
+        /// 跳过的数据
+        /// </summary>
+        public int SkipNumber { get { return skipNumber; } set { skipNumber = value; } }
+
+        /// <summary>
+        /// 语句的类型
+        /// </summary>
+        public eDbCommandType DbCommandType { get { return dbCommandType; } set { dbCommandType = value; } }
 
 
         private List<DbParameter> dbParams;
         private StringBuilder sb_Sql;
+        private int takeNumber;
+        private int skipNumber;
+        private eDbCommandType dbCommandType;
+
 
     }
 }

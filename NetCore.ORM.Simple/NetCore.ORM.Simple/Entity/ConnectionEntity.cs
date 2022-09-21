@@ -28,7 +28,7 @@ namespace NetCore.ORM.Simple.Entity
         /// <summary>
         /// 连接字符串
         /// </summary>
-        public string ConnectStr { get { return connectStr; } set { connectStr = value; } }
+        public string ConnectStr { get { return connectStr; } private set { connectStr = value; } }
         /// <summary>
         /// 自动释放连接
         /// </summary>

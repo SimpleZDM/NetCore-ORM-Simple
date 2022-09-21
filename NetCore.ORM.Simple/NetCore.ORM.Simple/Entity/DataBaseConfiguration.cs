@@ -18,7 +18,20 @@ namespace NetCore.ORM.Simple.Entity
 {
     public class DataBaseConfiguration
     {
+        /// <summary>
+        /// 数据库连接的字典集合
+        /// </summary>
         public Dictionary<string,ConnectionEntity> ConnectMapName { get { return connectMapName; } set { connectMapName = value; } }
+
+        public ConnectionEntity CurrentConnectInfo { get {
+                if (RwSplit)
+                {
+                    int rNumber = new Random().Next(int.MinValue, int.MaxValue);
+                    int rang = rNumber % rwWight;
+                    var connect = ConnectMapName.Where(c => c.Value.Start <= rang && c.Value.End > rang).FirstOrDefault();
+                    return connect.Value;
+                }
+                return currentConnectInfo; } private set { currentConnectInfo = value; } }
         /// <summary>
         /// 设置连接名称将更新连接字符串
         /// </summary>
@@ -92,8 +105,10 @@ namespace NetCore.ORM.Simple.Entity
 
         private Dictionary<string, ConnectionEntity> connectMapName;
         private string currentUseConnectName;
-        private string currentUseConnectStr;
+        private string currentUseConnectStr; 
+        private ConnectionEntity currentConnectInfo;
         private bool rwSplit;
+       
         /// <summary>
         /// 读的总权重值
         /// </summary>
