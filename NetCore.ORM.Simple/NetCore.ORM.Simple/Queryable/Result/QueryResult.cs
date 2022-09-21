@@ -20,30 +20,33 @@ using NetCore.ORM.Simple.Common;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Queryable
 {
-    public class QueryResult<TResult>:IQueryResult<TResult>
+    public class QueryResult<TResult> : IQueryResult<TResult>
     {
-        
+
         protected eDBType DBType;
         protected Builder builder;
         protected MapVisitor mapVisitor;
-        protected JoinVisitor joinVisitor; 
+        protected JoinVisitor joinVisitor;
         protected ConditionVisitor conditionVisitor;
         protected SqlEntity sqlEntity;
 
-        public QueryResult(eDBType DbType, params string[] tableNames)
+        protected void Init(eDBType DbType, params string[] tableNames)
         {
-            mapVisitor=new MapVisitor(tableNames);
+            mapVisitor = new MapVisitor(tableNames);
             joinVisitor = new JoinVisitor(tableNames);
-            conditionVisitor=new ConditionVisitor(tableNames);
-            this.DBType=DbType;
+            conditionVisitor = new ConditionVisitor(tableNames);
+            this.DBType = DbType;
             builder = new Builder(this.DBType);
         }
+        public QueryResult()
+        {
+        }
         public QueryResult(
-            MapVisitor _mapVisitor,JoinVisitor _joinVisitor,
+            MapVisitor _mapVisitor, JoinVisitor _joinVisitor,
             ConditionVisitor _conditionVisitor,
             eDBType DbType)
         {
-            mapVisitor =_mapVisitor;
+            mapVisitor = _mapVisitor;
             joinVisitor = _joinVisitor;
             conditionVisitor = _conditionVisitor;
             this.DBType = DbType;
@@ -52,7 +55,7 @@ namespace NetCore.ORM.Simple.Queryable
 
         public IEnumerable<TResult> ToList()
         {
-            var joinInfos=joinVisitor.GetJoinInfos();
+            var joinInfos = joinVisitor.GetJoinInfos();
             var mapInfos = mapVisitor.GetMapInfos();
             var condition = conditionVisitor.GetValue();
             sqlEntity = builder.GetSelect<TResult>(mapInfos, joinInfos, condition);
@@ -75,23 +78,23 @@ namespace NetCore.ORM.Simple.Queryable
 
         public IQueryResult<TResult> Skip(int Number)
         {
-            sqlEntity.SkipNumber =Number;
+            sqlEntity.SkipNumber = Number;
             return this;
         }
 
         public IQueryResult<TResult> Take(int Number)
         {
-            sqlEntity.TakeNumber=Number;
+            sqlEntity.TakeNumber = Number;
             return this;
         }
-        public IQueryResult<TResult> ToPage(int takeNumber,int skipNumber)
+        public IQueryResult<TResult> ToPage(int takeNumber, int skipNumber)
         {
-            sqlEntity.TakeNumber =takeNumber;
-            sqlEntity.SkipNumber =skipNumber;
+            sqlEntity.TakeNumber = takeNumber;
+            sqlEntity.SkipNumber = skipNumber;
             return this;
         }
 
-        public IQueryResult<TResult>OrderBy<TOrder>(Expression<Func<TResult,TOrder>> expression)
+        public IQueryResult<TResult> OrderBy<TOrder>(Expression<Func<TResult, TOrder>> expression)
         {
             return this;
         }

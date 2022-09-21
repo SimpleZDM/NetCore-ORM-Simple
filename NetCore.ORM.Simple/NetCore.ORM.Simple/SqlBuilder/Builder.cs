@@ -35,9 +35,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
             return MatchDBType(() => mysqlBuilder.GetInsert(data,random));
         }
 
-        public SqlEntity GetUpdate<TData>(TData data)
+        public SqlEntity GetUpdate<TData>(TData data,int random=0)
         {
-            return MatchDBType(() => mysqlBuilder.GetUpdate(data));
+            return MatchDBType(() => mysqlBuilder.GetUpdate(data,random));
         }
 
         public SqlEntity GetInsert<TData>(IEnumerable<TData> datas)

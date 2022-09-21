@@ -1,4 +1,5 @@
-﻿using NetCore.ORM.Simple.Entity;
+﻿using NetCore.ORM.Simple.Common;
+using NetCore.ORM.Simple.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,11 +18,13 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Queryable
 {
-    public class SimpleQueryable<T>:QueryResult<T>,ISimpleQueryable<T>
+    public class SimpleQueryable<T>
+        :QueryResult<T>,ISimpleQueryable<T>
     {
-        public SimpleQueryable(eDBType DbType, params string[] tableNames) : base(DbType, tableNames)
+        public SimpleQueryable(eDBType DbType)
         {
-          
+            string tableName=ReflectExtension.GetTypeName<T>();
+            Init(DbType,tableName);
         }
 
         public IQueryResult<TResult> Select<TResult>(Expression<Func<T, TResult>> expression)

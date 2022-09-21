@@ -17,6 +17,8 @@ namespace NetCore.ORM.Simple.Client
 {
     public interface ISimpleCommand<TEntity>
     {
+        public bool GetResult();
 
+        public TEntity ReturnEntity();
     }
 }

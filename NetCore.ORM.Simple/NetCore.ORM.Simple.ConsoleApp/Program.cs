@@ -3,53 +3,62 @@ using NetCore.ORM.Simple.Visitor;
 using System.Linq.Expressions;
 using NetCore.ORM.Simple.SqlBuilder;
 using NetCore.ORM.Simple.Queryable;
+using NetCore.ORM.Simple.Client;
 
 namespace NetCore.ORM.Simple.ConsoleApp;
 public static class Program
 {
     public static int Main(string []args)
     {
-        eJoinType join=eJoinType.Inner;
-        Console.WriteLine(join.ToString());
-        MapVisitor mapVisitor = new MapVisitor("UserTable","CompanyTable","RoleTable");
-        JoinVisitor joinVisitor = new JoinVisitor("UserTable", "CompanyTable", "RoleTable"); 
-        ConditionVisitor conditionVisitor = new ConditionVisitor("UserTable", "CompanyTable", "RoleTable");
-        //条件解析
-        Expression<Func<UserEntity,CompanyEntity, RoleEntity, bool>> whereExpression = 
-            (u, c, r) =>u.Id>100;
+        //eJoinType join=eJoinType.Inner;
+        //Console.WriteLine(join.ToString());
+        //MapVisitor mapVisitor = new MapVisitor("UserTable","CompanyTable","RoleTable");
+        //JoinVisitor joinVisitor = new JoinVisitor("UserTable", "CompanyTable", "RoleTable"); 
+        //ConditionVisitor conditionVisitor = new ConditionVisitor("UserTable", "CompanyTable", "RoleTable");
+        ////条件解析
+        //Expression<Func<UserEntity,CompanyEntity, RoleEntity, bool>> whereExpression = 
+        //    (u, c, r) =>u.Id>100;
 
-        conditionVisitor.Modify(whereExpression);
-        //映射解析
-        Expression<Func<UserEntity, CompanyEntity, RoleEntity, ViewView>> mapExpression =
-            (u, c, r) => new ViewView()
-            {
-                UserId= u.Id,
-                DisplayName=u.Name,
-                CompanyName=c.Name,
-                RoleName=r.Name,
-            };
-        mapVisitor.Modify(mapExpression);
-        string strMap=mapVisitor.GetValue();
-        ///连接解析
-        Expression<Func<UserEntity, CompanyEntity, RoleEntity, JoinInfoEntity>> joinExpression =
-            (u, c, r) => new JoinInfoEntity(
-                new JoinMapEntity(eJoinType.Inner,u.Role==r.Id),
-                new JoinMapEntity(eJoinType.Inner,u.CompanyId==c.Id)
-                );
+        //conditionVisitor.Modify(whereExpression);
+        ////映射解析
+        //Expression<Func<UserEntity, CompanyEntity, RoleEntity, ViewView>> mapExpression =
+        //    (u, c, r) => new ViewView()
+        //    {
+        //        UserId= u.Id,
+        //        DisplayName=u.Name,
+        //        CompanyName=c.Name,
+        //        RoleName=r.Name,
+        //    };
+        //mapVisitor.Modify(mapExpression);
+        //string strMap=mapVisitor.GetValue();
+        /////连接解析
+        //Expression<Func<UserEntity, CompanyEntity, RoleEntity, JoinInfoEntity>> joinExpression =
+        //    (u, c, r) => new JoinInfoEntity(
+        //        new JoinMapEntity(eJoinType.Inner,u.Role==r.Id),
+        //        new JoinMapEntity(eJoinType.Inner,u.CompanyId==c.Id)
+        //        );
 
-        joinVisitor.Modify(joinExpression);
+        //joinVisitor.Modify(joinExpression);
 
-        var mpaInfos=mapVisitor.GetMapInfos();
-        var joinInfos=joinVisitor.GetJoinInfos();
-        var condition=conditionVisitor.GetValue();
-        Builder builder = new Builder(eDBType.Mysql);
+        //var mpaInfos=mapVisitor.GetMapInfos();
+        //var joinInfos=joinVisitor.GetJoinInfos();
+        //var condition=conditionVisitor.GetValue();
+        //Builder builder = new Builder(eDBType.Mysql);
 
-        //var sql=builder.GetSelect<TRe>(mpaInfos,joinInfos,condition);
+        ////var sql=builder.GetSelect<TRe>(mpaInfos,joinInfos,condition);
 
-        Console.WriteLine("Simple");
+        //Console.WriteLine("Simple");
 
-        ISimpleQueryable<UserEntity,RoleEntity> query =new SimpleQueryable<UserEntity,RoleEntity>(eDBType.Mysql);
-        query.Where((u,r)=>true);
+        //ISimpleQueryable<UserEntity,RoleEntity> query =new SimpleQueryable<UserEntity,RoleEntity>(eDBType.Mysql);
+        //query.Where((u,r)=>true);
+        ISimpleClient simpleClient = new SimpleClient(
+            new DataBaseConfiguration(false,
+            new ConnectionEntity() 
+            { 
+                IsAutoClose = true,
+                DBType=eDBType.Mysql
+            }));
+        simpleClient.In
         return 0;
     }
 }

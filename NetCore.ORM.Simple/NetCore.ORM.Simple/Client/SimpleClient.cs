@@ -1,11 +1,14 @@
-﻿using NetCore.ORM.Simple.Entity;
-using NetCore.ORM.Simple.Queryable;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using NetCore.ORM.Simple.Entity;
+using NetCore.ORM.Simple.Queryable;
+using NetCore.ORM.Simple.SqlBuilder;
+
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.Client
@@ -22,6 +25,8 @@ namespace NetCore.ORM.Simple.Client
     {
         private DataBaseConfiguration configuration;
         private List<SqlEntity> sqls;
+        private Builder builder;
+        private DBDrive dbdrive;
         public SimpleClient(DataBaseConfiguration _configuration)
         {
             configuration=_configuration;
@@ -32,9 +37,12 @@ namespace NetCore.ORM.Simple.Client
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="entity"></param>
-        public void Insert<TEntity>(TEntity entity)where TEntity : class,new ()
+        public ISimpleCommand<TEntity> Insert<TEntity>(TEntity entity)where TEntity : class,new ()
         {
-
+            var sql=builder.GetInsert(entity,sqls.Count);
+            sqls.Add(sql);
+            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,configuration.CurrentConnectInfo.DBType,sql,sqls);
+            return command;
         }
         /// <summary>
         /// 插入数据库
@@ -43,7 +51,8 @@ namespace NetCore.ORM.Simple.Client
         /// <param name="entity"></param>
         public void Update<TEntity>(TEntity entity) where TEntity : class, new()
         {
-
+            var sql = builder.GetUpdate(entity,sqls.Count);
+            sqls.Add(sql);
         }
 
         public void Delete<TEntity>(Expression<Func<TEntity,bool>>expression) where TEntity : class, new()
@@ -59,17 +68,17 @@ namespace NetCore.ORM.Simple.Client
         {
             return new SimpleQueryable<T1>(configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType);
         }
-        public ISimpleQueryable<T1,T2> Queryable<T1,T2>()
+        public ISimpleQueryable<T1,T2> Queryable<T1,T2>(Expression<Func<T1,T2,JoinInfoEntity>> expression)
         {
-            return new SimpleQueryable<T1,T2>(configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType);
+            return new SimpleQueryable<T1,T2>(expression,configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType);
         }
-        public ISimpleQueryable<T1, T2,T3> Queryable<T1,T2,T3>()
+        public ISimpleQueryable<T1, T2,T3> Queryable<T1,T2,T3>(Expression<Func<T1,T2,T3,JoinInfoEntity>> expression)
         {
-            return new SimpleQueryable<T1, T2,T3>(configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType);
+            return new SimpleQueryable<T1, T2,T3>(expression,configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType);
         }
-        public ISimpleQueryable<T1,T2,T3,T4> Queryable<T1,T2,T3,T4>()
+        public ISimpleQueryable<T1,T2,T3,T4> Queryable<T1,T2,T3,T4>(Expression<Func<T1,T2,T3,T4,JoinInfoEntity>> expression)
         {
-            return new SimpleQueryable<T1,T2,T3,T4>(configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType);
+            return new SimpleQueryable<T1,T2,T3,T4>(expression,configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType);
         }
         /// <summary>
         /// 

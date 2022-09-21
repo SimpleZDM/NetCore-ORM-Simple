@@ -1,4 +1,5 @@
-﻿using NetCore.ORM.Simple.Entity;
+﻿using NetCore.ORM.Simple.Common;
+using NetCore.ORM.Simple.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,9 +20,11 @@ namespace NetCore.ORM.Simple.Queryable
 {
     public class SimpleQueryable<T1,T2>:QueryResult<T1>,ISimpleQueryable<T1,T2>
     {
-        public SimpleQueryable(eDBType DbType, params string[] tableNames) : base(DbType, tableNames)
+        public SimpleQueryable(Expression<Func<T1,T2,JoinInfoEntity>>expression,eDBType DbType)
         {
-
+            string []tableNames = ReflectExtension.GetTypeName<T1,T2>();
+            Init(DbType,tableNames);
+            joinVisitor.Modify(expression);
         }
 
         public IQueryResult<TResult> Select<TResult>(Expression<Func<T1, T2, TResult>> expression)

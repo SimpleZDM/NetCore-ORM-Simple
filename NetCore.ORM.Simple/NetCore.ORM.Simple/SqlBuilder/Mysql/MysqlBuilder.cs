@@ -61,6 +61,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     return key;
                 })));
             sql.Sb_Sql.Append(");");
+
+            sql.DbCommandType = eDbCommandType.Insert;
+
             return sql;
         }
         /// <summary>
@@ -70,7 +73,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="data"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public SqlEntity GetUpdate<TData>(TData data)
+        public SqlEntity GetUpdate<TData>(TData data,int random)
         {
             SqlEntity sql = new SqlEntity();
             Type type = typeof(TData);
@@ -85,9 +88,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
             sql.Sb_Sql.Append(string.Join(',',
                 Props.Select(p =>
                 {
-                    string key = $"@{p.GetColName()}";
-                    sql.DbParams.Add(new MySqlParameter(key, p.GetValue(data)));
-                    return key;
+                    string key = $"{p.GetColName()}";
+                    sql.DbParams.Add(new MySqlParameter($"@{key}{random}", p.GetValue(data)));
+                    return $"{key}=@{key}{random}";
                 })));
             if (Check.IsNull(pKey))
             {
@@ -97,6 +100,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
             sql.Sb_Sql.Append($"{pKey.GetColName()}={keyName}");
             sql.Sb_Sql.Append(";");
+            sql.DbCommandType = eDbCommandType.Update;
             return sql;
         }
 

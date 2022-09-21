@@ -21,7 +21,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
     {
         public SqlEntity GetInsert<TData>(TData data, int random = 0);
 
-        public SqlEntity GetUpdate<TData>(TData data);
+        public SqlEntity GetUpdate<TData>(TData data,int random=0);
 
 
         /// <summary>
