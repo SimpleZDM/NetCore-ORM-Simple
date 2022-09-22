@@ -19,7 +19,5 @@ namespace NetCore.ORM.Simple.Visitor
     public interface IExpressionVisitor
     {
         public string GetValue();
-        public Expression Modify(Expression expression);
-
     }
 }

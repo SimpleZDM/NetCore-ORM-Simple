@@ -19,7 +19,7 @@ namespace NetCore.ORM.Simple.Common
     {
         public static bool IsNull<T>(this T t) where T : class
         {
-            if (t.Equals(null))
+            if (t==null)
             {
                 return true;
             }
@@ -28,7 +28,7 @@ namespace NetCore.ORM.Simple.Common
 
         public static bool IsNullOrEmpty(this string strValue)
         {
-            if (string.IsNullOrEmpty(strValue))
+            if (strValue==null||string.IsNullOrEmpty(strValue))
             {
                 return true;
             }

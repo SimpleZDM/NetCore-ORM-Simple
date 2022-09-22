@@ -17,6 +17,7 @@ namespace NetCore.ORM.Simple.Entity
 {
     public class JoinTableEntity
     {
+        
         /// <summary>
         /// 表名称
         /// </summary>
@@ -39,14 +40,26 @@ namespace NetCore.ORM.Simple.Entity
         /// 连接的条件
         /// </summary>
         public Queue<string> QValue { get { return qValue; } set { qValue = value; } }
+        /// <summary>
+        /// 记录一个等式
+        /// </summary>
+        public List<TreeConditionEntity> TreeConditions { get { return treeConditions; } set { treeConditions = value; } }
+        /// <summary>
+        /// 连接等式的条件
+        /// </summary>
+        public List<ConditionEntity> Conditions { get { return conditions; } set { conditions = value; } }
         public JoinTableEntity()
         {
             QValue = new Queue<string>();
+            TreeConditions = new List<TreeConditionEntity>();
+            Conditions=new List<ConditionEntity>();
         }
         private string displayName;
         private string asName;
         private eTableType tableType;
         private eJoinType joinType;
         private Queue<string> qValue;
+        private List<TreeConditionEntity> treeConditions;
+        private List<ConditionEntity> conditions;
     }
 }

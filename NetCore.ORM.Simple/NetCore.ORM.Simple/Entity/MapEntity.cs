@@ -42,6 +42,10 @@ namespace NetCore.ORM.Simple.Entity
         /// </summary>
         public string AsColumnName { get { return asColumnName; } set { asColumnName = value; } }
         /// <summary>
+        /// 调用方法
+        /// </summary>
+        public string MethodName { get { return methodName; } set { methodName = value; } }
+        /// <summary>
         /// --标记是否需要查询字段
         /// --只标记最后一次映射的字段
         /// </summary>
@@ -54,6 +58,7 @@ namespace NetCore.ORM.Simple.Entity
         private string columnName;
         private string asColumnName;
         private bool isNeed;
+        private string methodName;
 
     }
 }

@@ -103,7 +103,7 @@ namespace NetCore.ORM.Simple.Common
                     var value =!p.IsDefined(typeof(IgnoreAttribute), false);
                     if (p.IsDefined(typeof(KeyAttribute),false))
                     {
-                        KeyAttribute keyAttr=type.GetCustomAttribute<KeyAttribute>(false);
+                        KeyAttribute keyAttr=(KeyAttribute)p.GetCustomAttribute(typeof(KeyAttribute),false);
                         if (Check.IsNull(keyAttr))
                         {
                             throw new Exception("请为实体配置一个主键!");

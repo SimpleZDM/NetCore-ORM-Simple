@@ -83,18 +83,22 @@ public static class Program
         var query = simpleClient.Queryable<UserEntity, RoleEntity, CompanyEntity>(
             (u, r, c) =>
                 new JoinInfoEntity(
-                    new JoinMapEntity(eJoinType.Inner, u.Role == r.Id),
+                    new JoinMapEntity(eJoinType.Inner, u.Role == r.Id && u.Role.Equals((int)eConditionType.Sign)),
                     new JoinMapEntity(eJoinType.Inner, u.CompanyId == c.Id)
                 )
              )
-            .Where((u,r,c)=>u.Id>10&&r.Id==10&&c.Id==10)
+            .Where((u,r,c)=>u.Id>10&&(r.Id==10||c.Id.Equals((int)eDBType.Mysql)))
             .Select((u,r,c)=>new ViewView
              {
                  UserId=r.Id,
                  DisplayName=u.Name,
                  CompanyName=c.Name,
                  RoleName=r.Name,
-             }).Select();
+             }).Select(v=>new
+             {
+                 UID=v.UserId,
+                 RName=v.RoleName
+             });
         var data=query.ToList();
 
         return 0;

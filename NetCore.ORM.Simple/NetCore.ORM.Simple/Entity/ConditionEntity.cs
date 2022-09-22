@@ -23,9 +23,15 @@ namespace NetCore.ORM.Simple.Entity
         }
         public string DisplayName { get { return displayName; } set { displayName = value; } }
         public eConditionType ConditionType { get { return conditionType; } set { conditionType = value; } }
+        public eSignType SignType { get { return signType; } set { signType = value; } }
+
+        public Type PropertyType { get { return propertyType; } set { propertyType = value; } }
+
 
 
         private string displayName;
         private eConditionType conditionType;
+        private eSignType signType;
+        private Type propertyType;
     }
 }

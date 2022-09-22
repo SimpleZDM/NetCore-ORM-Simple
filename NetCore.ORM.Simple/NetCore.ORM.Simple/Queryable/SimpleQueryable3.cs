@@ -35,6 +35,7 @@ namespace NetCore.ORM.Simple.Queryable
 
         public ISimpleQueryable<T1, T2, T3> Where(Expression<Func<T1, T2, T3, bool>> expression)
         {
+            conditionVisitor.Modify(expression);
             return this;
         }
     }

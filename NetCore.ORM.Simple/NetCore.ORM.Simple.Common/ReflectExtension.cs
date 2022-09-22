@@ -33,17 +33,17 @@ namespace NetCore.ORM.Simple.Common
         {
             string[] names=new string[3];
             names[0]=GetTypeName<T>();
-            names[2]=GetTypeName<T2>();
-            names[3]=GetTypeName<T3>();
+            names[1]=GetTypeName<T2>();
+            names[2]=GetTypeName<T3>();
             return names;
         }
         public static string[] GetTypeName<T, T2, T3,T4>()
         {
             string[] names = new string[4];
             names[0] = GetTypeName<T>();
-            names[2] = GetTypeName<T2>();
-            names[3] = GetTypeName<T3>();
-            names[4] = GetTypeName<T4>();
+            names[1] = GetTypeName<T2>();
+            names[2] = GetTypeName<T3>();
+            names[3] = GetTypeName<T4>();
             return names;
         }
     }

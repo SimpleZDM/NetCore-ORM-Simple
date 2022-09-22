@@ -46,7 +46,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         {
             SqlEntity sql = new SqlEntity();
             Type type = typeof(TData);
-            var Props = type.GetNotKeyAndIgnore();
+            var Props = type.GetNotKeyAndIgnore().ToArray();
 
             sql.Sb_Sql.Append($"INSERT INTO {type.GetClassName()} ");
             sql.Sb_Sql.Append("(");
@@ -77,7 +77,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         {
             SqlEntity sql = new SqlEntity();
             Type type = typeof(TData);
-            var Props = type.GetNoIgnore();
+            var Props = type.GetNoIgnore().ToArray();
             var pKey = type.GetKey();
             string keyName = $"@{pKey.GetColName()}";
             sql.DbParams.Add(new MySqlParameter(keyName, pKey.GetValue(data)));
