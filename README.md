@@ -16,12 +16,12 @@ orm 框架是一个帮助程序员快速访问数据库的并且完成数据的�
                 WriteReadType=eWriteOrReadType.ReadOrWrite<br>
             }));<br>
 
-        var command=simpleClient.Insert(<br>
-            new UserEntity() {<br>
-                CompanyId=1,<br>
-                gIdColumn=Guid.NewGuid(),<br>
-                Description="Test",<br>
-                Name="Name",Role=10});<br>
+        var command=simpleClient.Insert(
+            new UserEntity() {
+                CompanyId=1,
+                gIdColumn=Guid.NewGuid(),
+                Description="Test",
+                Name="Name",Role=10});
 <br>
           simpleClient.Update(<br>
           new UserEntity()<br>
