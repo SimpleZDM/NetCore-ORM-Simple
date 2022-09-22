@@ -52,7 +52,6 @@ orm 框架是一个帮助程序员快速访问数据库的并且完成数据的�
                  UID=v.UserId,
                  RName=v.RoleName
              });
-'''
 第一版先实现mysql数据库的相关操作<br>
 后续会支持mysql sqlService sqlite 等数据库 <br>
 有兴趣的可以了解了解<br>

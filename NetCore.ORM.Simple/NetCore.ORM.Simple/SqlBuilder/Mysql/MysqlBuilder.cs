@@ -24,22 +24,12 @@ namespace NetCore.ORM.Simple.SqlBuilder
     public class MysqlBuilder : ISqlBuilder
     {
 
-        private const int INSERTMAX = 800;
         private const char charConnectSign = '_';
-
-        //private JoinVisitor joinVisitor;
-        //private ConditionVisitor conditionVisitor;
-        //private MapVisitor mapVisitor;
-        private string[] strJoins = new string[] { "INNER JOIN", "LEFT JOIN", "RIGHT JOIN" };
         public MysqlBuilder()
         {
-
-            //joinVisitor=new JoinVisitor(); 
-            //conditionVisitor = new ConditionVisitor();
-            //mapVisitor = new MapVisitor();
         }
         /// <summary>
-        /// 单挑sql语句生成
+        /// 单条sql语句生成
         /// </summary>
         /// <typeparam name="TData"></typeparam>
         public SqlEntity GetInsert<TData>(TData data, int random = 0)
@@ -138,7 +128,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                       return key;
                   })));
                 sql.Sb_Sql.Append(" (");
-                if (count == INSERTMAX)
+                if (count == MysqlConst.INSERTMAX)
                 {
                     sql.Sb_Sql.Append(";");
                     count = 0;
@@ -212,7 +202,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="joinInfos">连接部分</param>
         /// <param name="condition">条件部分</param>
         /// <returns></returns>
-        public SqlEntity GetSelect<TData>(List<MapEntity> mapInfos, List<JoinTableEntity> joinInfos, string condition)
+        public SqlEntity GetSelect<TData>(List<MapEntity> mapInfos, List<JoinTableEntity> joinInfos, List<ConditionEntity> conditions,List<TreeConditionEntity> treeConditions)
         {
             SqlEntity sql = new SqlEntity();
 
@@ -247,7 +237,12 @@ namespace NetCore.ORM.Simple.SqlBuilder
             }
             return sql;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mapInfos"></param>
+        /// <param name="sbValue"></param>
+        /// <exception cref="ArgumentException"></exception>
         private void LinkMapInfos(List<MapEntity> mapInfos, StringBuilder sbValue)
         {
             if (Check.IsNull(sbValue))
@@ -267,7 +262,12 @@ namespace NetCore.ORM.Simple.SqlBuilder
             }
 
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="joinInfos"></param>
+        /// <param name="sbValue"></param>
+        /// <exception cref="ArgumentException"></exception>
         private void LinkJoinInfos(List<JoinTableEntity> joinInfos,StringBuilder sbValue)
         {
             if (Check.IsNull(sbValue))
@@ -284,7 +284,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     }
                     else
                     {
-                        sbValue.Append($" {strJoins[(int)join.JoinType]} {join.DisplayName} ON ");
+                        sbValue.Append($" {MysqlConst.StrJoins[(int)join.JoinType]} {join.DisplayName} ON ");
                         int length = join.QValue.Count;
                         for (int i = 0; i < length; i++)
                         {
@@ -295,6 +295,91 @@ namespace NetCore.ORM.Simple.SqlBuilder
             }
         }
 
+        private void LinkConditions(List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions,SqlEntity sqlEntity)
+        {
+            if (Check.IsNull(treeConditions))
+            {
+                return;
+            }
+            if (Check.IsNull(conditions)||conditions.Count!=treeConditions.Count-1)
+            {
+                throw new Exception("sql 语句条件部分解析有误!");
+            }
+            if (treeConditions.Count()>0)
+            {
+                sqlEntity.Sb_Sql.Append(" where");
+            }
+            for (int i = 0; i <treeConditions.Count(); i++)
+            {
+                foreach (var sign in treeConditions[i].LeftBracket)
+                {
+                    sqlEntity.Sb_Sql.Append(MysqlConst.cStrSign[(int)sign]);
+                }
+                if (treeConditions[i].RelationCondition.ConditionType==eConditionType.Method)
+                {
+                    //如果是方法
+                    //if ()
+                    //{
+
+                    //}
+                }
+                else 
+                {
+                    switch (treeConditions[i].LeftCondition.ConditionType)
+                    {
+                        case eConditionType.ColumnName:
+                            sqlEntity.Sb_Sql.Append($" {treeConditions[i].LeftCondition.DisplayName} ");
+                            sqlEntity.Sb_Sql.Append($" {MysqlConst.cStrSign[(int)treeConditions[i].RelationCondition.SignType]}");
+                            if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
+                            {
+                                var key =$"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(),8)}{i}" ;
+                                sqlEntity.Sb_Sql.Append(key);
+                                sqlEntity.DbParams.Add(new MySqlParameter(key,treeConditions[i].RightCondition.DisplayName));
+                            }
+                            else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
+                            {
+                                //非常量
+                                sqlEntity.Sb_Sql.Append($" {treeConditions[i].RightCondition.DisplayName}");
+                            }
+                            break;
+                        case eConditionType.Constant:
+                            if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
+                            {
+                                var leftkey = $"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                                sqlEntity.Sb_Sql.Append(leftkey);
+                                sqlEntity.DbParams.Add(new MySqlParameter(leftkey,treeConditions[i].LeftCondition.DisplayName));
+
+                                sqlEntity.Sb_Sql.Append($" {MysqlConst.cStrSign[(int)treeConditions[i].RelationCondition.SignType]}");
+
+                                var rightkey = $"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                                sqlEntity.Sb_Sql.Append(rightkey);
+                                sqlEntity.DbParams.Add(new MySqlParameter(rightkey, treeConditions[i].RightCondition.DisplayName));
+                            }
+                            else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
+                            {
+                                sqlEntity.Sb_Sql.Append($" {treeConditions[i].RightCondition.DisplayName} ");
+                                sqlEntity.Sb_Sql.Append($" {MysqlConst.cStrSign[(int)treeConditions[i].RelationCondition.SignType]}");
+
+                                var leftkey = $"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                                sqlEntity.Sb_Sql.Append(leftkey);
+                                sqlEntity.DbParams.Add(new MySqlParameter(leftkey, treeConditions[i].LeftCondition.DisplayName));
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                foreach (var sign in treeConditions[i].RightBracket)
+                {
+                    sqlEntity.Sb_Sql.Append(MysqlConst.cStrSign[(int)sign]);
+                }
+
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TData"></typeparam>
         public void GetSelect<TData>()
         {
            
