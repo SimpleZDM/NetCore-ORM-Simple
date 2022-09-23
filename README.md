@@ -4,8 +4,8 @@ It's the about net core orm<br>
 orm 框架是一个帮助程序员快速访问数据库的并且完成数据的映射的一个工具<br>
 与直接写sql语句执行相比效率肯定要稍微差一点，但是可以提高项目开发的效率.<br>
 一些对查询语句的查询效率 (经过执行计划分析之后可以了解sql语句执行的相关信息) 要求不那么高的项目，使用orm框架是一个不错的选择<br>
-既然orm框架是为了快速完成数据库表中的数据的添加修改，和查询，那为啥不选择一个语法非常优雅的呢，尤其是查询的写法。<br>
-        var simpleClient = new SimpleClient(
+既然orm框架是为了快速完成数据库表中的数据的添加修改，和查询，那为啥不选择一个语法非常优雅的呢，尤其是查询的写法.
+        ''''var simpleClient = new SimpleClient(
             new DataBaseConfiguration(false,
             new ConnectionEntity("链接字符串!") 
             { 
