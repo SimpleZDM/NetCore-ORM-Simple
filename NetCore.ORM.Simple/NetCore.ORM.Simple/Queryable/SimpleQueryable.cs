@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using NetCore.ORM.Simple.SqlBuilder;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.Queryable
@@ -21,10 +22,10 @@ namespace NetCore.ORM.Simple.Queryable
     public class SimpleQueryable<T>
         :QueryResult<T>,ISimpleQueryable<T>
     {
-        public SimpleQueryable(eDBType DbType,DBDrive dbDrive)
+        public SimpleQueryable(Builder builder,DBDrive dbDrive)
         {
             string tableName=ReflectExtension.GetTypeName<T>();
-            Init(DbType, dbDrive,tableName);
+            Init(builder,dbDrive,tableName);
         }
 
         ISimpleQueryable<T> ISimpleQueryable<T>.SimpleQueryable()

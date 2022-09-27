@@ -18,8 +18,7 @@ namespace NetCore.ORM.Simple.Queryable
 {
     public interface ISimpleQueryable<T1,T2,T3,T4>:IQueryResult<T1>
     {  
-        public ISimpleQueryable<T1, T2, T3, T4> Where();
         public IQueryResult<TResult> Select<TResult>(Expression<Func<T1,T2,T3,T4,TResult>> expression);
-        
+        public ISimpleQueryable<T1, T2, T3, T4> Where(Expression<Func<T1, T2, T3, T4, bool>> expression);
     }
 }

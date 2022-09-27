@@ -38,19 +38,19 @@ namespace NetCore.ORM.Simple.SqlBuilder
             Type type = typeof(TData);
             var Props = type.GetNotKeyAndIgnore().ToArray();
 
-            sql.Sb_Sql.Append($"INSERT INTO {type.GetClassName()} ");
-            sql.Sb_Sql.Append("(");
-            sql.Sb_Sql.Append(string.Join(',', Props.Select(p => p.GetColName())));
-            sql.Sb_Sql.Append(") ");
-            sql.Sb_Sql.Append(" VALUE(");
-            sql.Sb_Sql.Append(string.Join(',',
+            sql.StrSqlValue.Append($"INSERT INTO {type.GetClassName()} ");
+            sql.StrSqlValue.Append("(");
+            sql.StrSqlValue.Append(string.Join(',', Props.Select(p => p.GetColName())));
+            sql.StrSqlValue.Append(") ");
+            sql.StrSqlValue.Append(" VALUE(");
+            sql.StrSqlValue.Append(string.Join(',',
                 Props.Select(p =>
                 {
                     string key = $"@{random}{p.GetColName()}";
                     sql.DbParams.Add(new MySqlParameter(key, p.GetValue(data)));
                     return key;
                 })));
-            sql.Sb_Sql.Append(");");
+            sql.StrSqlValue.Append(");");
 
             sql.DbCommandType = eDbCommandType.Insert;
 
@@ -73,9 +73,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
             sql.DbParams.Add(new MySqlParameter(keyName, pKey.GetValue(data)));
 
 
-            sql.Sb_Sql.Append($"UPDATE {type.GetClassName()} SET ");
+            sql.StrSqlValue.Append($"UPDATE {type.GetClassName()} SET ");
 
-            sql.Sb_Sql.Append(string.Join(',',
+            sql.StrSqlValue.Append(string.Join(',',
                 Props.Select(p =>
                 {
                     string key = $"{p.GetColName()}";
@@ -86,10 +86,10 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 throw new Exception("没有主键请为实体设置主键!");
             }
-            sql.Sb_Sql.Append(" Where ");
+            sql.StrSqlValue.Append(" Where ");
 
-            sql.Sb_Sql.Append($"{pKey.GetColName()}={keyName}");
-            sql.Sb_Sql.Append(";");
+            sql.StrSqlValue.Append($"{pKey.GetColName()}={keyName}");
+            sql.StrSqlValue.Append(";");
             sql.DbCommandType = eDbCommandType.Update;
             return sql;
         }
@@ -111,31 +111,31 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 if (count == 0)
                 {
-                    sql.Sb_Sql.Append($"INSERT INTO {type.GetClassName()} ");
-                    sql.Sb_Sql.Append("(");
-                    sql.Sb_Sql.Append(string.Join(',', Props.Select(p => p.GetColName())));
-                    sql.Sb_Sql.Append(") ");
-                    sql.Sb_Sql.Append(" VALUE");
+                    sql.StrSqlValue.Append($"INSERT INTO {type.GetClassName()} ");
+                    sql.StrSqlValue.Append("(");
+                    sql.StrSqlValue.Append(string.Join(',', Props.Select(p => p.GetColName())));
+                    sql.StrSqlValue.Append(") ");
+                    sql.StrSqlValue.Append(" VALUE");
                 }
                 Index++;
                 count++;
-                sql.Sb_Sql.Append(" (");
-                sql.Sb_Sql.Append(string.Join(',',
+                sql.StrSqlValue.Append(" (");
+                sql.StrSqlValue.Append(string.Join(',',
                   Props.Select(p =>
                   {
                       string key = $"@{Index}{charConnectSign}{p.GetColName()}";
                       sql.DbParams.Add(new MySqlParameter(key, p.GetValue(data)));
                       return key;
                   })));
-                sql.Sb_Sql.Append(" (");
+                sql.StrSqlValue.Append(" (");
                 if (count == MysqlConst.INSERTMAX)
                 {
-                    sql.Sb_Sql.Append(";");
+                    sql.StrSqlValue.Append(";");
                     count = 0;
                 }
                 else
                 {
-                    sql.Sb_Sql.Append(",");
+                    sql.StrSqlValue.Append(",");
                 }
             }
 
@@ -153,7 +153,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 sql = new SqlEntity();
             }   
             Type type = typeof(TData);
-            sql.Sb_Sql.Append($"SELECT " +
+            sql.StrSqlValue.Append($"SELECT " +
                 $"{string.Join(',', type.GetNoIgnore())} " +
                 $"FROM {type.GetClassName()} ");
         }
@@ -164,7 +164,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 sql = new SqlEntity();
             }
-            sql.Sb_Sql.Append($"SELECT " +
+            sql.StrSqlValue.Append($"SELECT " +
                 $"{string.Join(',', type.GetNoIgnore())} " +
                 $"FROM {type.GetClassName()} ");
         }
@@ -178,7 +178,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             Type type = typeof(TData);
             GetSelect(sql,type);
             var Key = type.GetKey();
-            sql.Sb_Sql.Append($" Where {Key.GetColName()}=LAST_INSERT_ID();");
+            sql.StrSqlValue.Append($" Where {Key.GetColName()}=LAST_INSERT_ID();");
         }
         /// <summary>
         /// 
@@ -202,24 +202,27 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="joinInfos">连接部分</param>
         /// <param name="condition">条件部分</param>
         /// <returns></returns>
-        public void GetSelect<TData>(List<MapEntity> mapInfos, List<JoinTableEntity> joinInfos, List<ConditionEntity> conditions,List<TreeConditionEntity> treeConditions,SqlEntity entity)
+        public void GetSelect<TData>(SelectEntity select, SqlEntity entity)
         {
             if (Check.IsNull(entity))
             {
                 entity= new SqlEntity();
             }
-
-            if (Check.IsNull(mapInfos))
+            if (Check.IsNull(select))
             {
-                mapInfos = new List<MapEntity>();
+                throw new ArgumentNullException(nameof(select));
             }
-            if (mapInfos.Count.Equals(CommonConst.ZeroOrNull))
+            if (Check.IsNull(select.MapInfos))
+            {
+                select.MapInfos = new List<MapEntity>();
+            }
+            if (select.MapInfos.Count.Equals(CommonConst.ZeroOrNull))
             {
                 Type type = typeof(TData);
                 string TableName = type.GetClassName();
                 foreach (var prop in type.GetNoIgnore())
                 {
-                    mapInfos.Add(new MapEntity()
+                    select.MapInfos.Add(new MapEntity()
                     {
                         PropName = prop.GetColName(),
                         ColumnName = prop.GetColName(),
@@ -228,16 +231,19 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 }
             }
             //视图
-            entity.Sb_Sql.Append("SELECT ");
+            entity.StrSqlValue.Append("SELECT ");
 
-            LinkMapInfos(mapInfos, entity);
+            entity.MapInfos = select.MapInfos.ToArray();
+
+            LinkMapInfos(select.MapInfos, entity);
+
             //连接
-            LinkJoinInfos(joinInfos, entity);
+            LinkJoinInfos(select.JoinInfos.Values.ToArray(), entity);
             //条件
-            if (!Check.IsNull(treeConditions) && treeConditions.Count>CommonConst.ZeroOrNull)
+            if (!Check.IsNull(select.TreeConditions) && select.TreeConditions.Count>CommonConst.ZeroOrNull)
             {
-                entity.Sb_Sql.Append(" where");
-                LinkConditions(conditions,treeConditions, entity);
+                entity.StrSqlValue.Append(" where");
+                LinkConditions(select.Conditions,select.TreeConditions, entity);
             }
 
             //分页部分
@@ -268,10 +274,10 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         }
                         else
                         {
-                            sqlEntity.Sb_Sql.Append(",");
+                            sqlEntity.StrSqlValue.Append(",");
                         }
                         mapInfos[i].AsColumnName = $"{mapInfos[i].TableName}{charConnectSign}{mapInfos[i].ColumnName}";
-                        sqlEntity.Sb_Sql.Append($" {mapInfos[i].TableName}.{mapInfos[i].ColumnName} AS {mapInfos[i].AsColumnName} ");
+                        sqlEntity.StrSqlValue.Append($" {mapInfos[i].TableName}.{mapInfos[i].ColumnName} AS {mapInfos[i].AsColumnName} ");
                         
                     }
                 }
@@ -284,7 +290,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="joinInfos"></param>
         /// <param name="sbValue"></param>
         /// <exception cref="ArgumentException"></exception>
-        private void LinkJoinInfos(List<JoinTableEntity> joinInfos,SqlEntity sqlEntity)
+        private void LinkJoinInfos(JoinTableEntity[] joinInfos,SqlEntity sqlEntity)
         {
             if (Check.IsNull(sqlEntity))
             {
@@ -296,11 +302,11 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 {
                     if (join.TableType.Equals(eTableType.Master))
                     {
-                        sqlEntity.Sb_Sql.Append($" FROM {join.DisplayName} ");
+                        sqlEntity.StrSqlValue.Append($" FROM {join.DisplayName} ");
                     }
                     else
                     {
-                        sqlEntity.Sb_Sql.Append($" {MysqlConst.StrJoins[(int)join.JoinType]} {join.DisplayName} ON ");
+                        sqlEntity.StrSqlValue.Append($" {MysqlConst.StrJoins[(int)join.JoinType]} {join.DisplayName} ON ");
                         LinkConditions(join.Conditions,join.TreeConditions,sqlEntity);
                     }
                 }
@@ -326,7 +332,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 foreach (var sign in treeConditions[i].LeftBracket)
                 {
-                    sqlEntity.Sb_Sql.Append(MysqlConst.cStrSign[(int)sign]);
+                    sqlEntity.StrSqlValue.Append(MysqlConst.cStrSign[(int)sign]);
                 }
                
                     string leftValue = string.Empty;
@@ -367,20 +373,20 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     }
                     if (treeConditions[i].RelationCondition.ConditionType.Equals(eConditionType.Method))
                     {
-                        sqlEntity.Sb_Sql.Append(MysqlConst.MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue));
+                        sqlEntity.StrSqlValue.Append(MysqlConst.MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue));
                     }
                     else
                     {
-                        sqlEntity.Sb_Sql.Append($"{leftValue}{MysqlConst.cStrSign[(int)treeConditions[i].RelationCondition.SignType]}{rightValue}");
+                        sqlEntity.StrSqlValue.Append($"{leftValue}{MysqlConst.cStrSign[(int)treeConditions[i].RelationCondition.SignType]}{rightValue}");
                     }
                 foreach (var sign in treeConditions[i].RightBracket)
                 {
-                    sqlEntity.Sb_Sql.Append(MysqlConst.cStrSign[(int)sign]);
+                    sqlEntity.StrSqlValue.Append(MysqlConst.cStrSign[(int)sign]);
                 }
 
                 if (conditions.Count>i)
                 {
-                    sqlEntity.Sb_Sql.Append(MysqlConst.cStrSign[(int)conditions[i].SignType]);
+                    sqlEntity.StrSqlValue.Append(MysqlConst.cStrSign[(int)conditions[i].SignType]);
                 }
 
             }
@@ -407,7 +413,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 sqlEntity.PageSize = 100;
             }
-            sqlEntity.Sb_Sql.Append(" Limit @SkipNumber,@TakeNumber");
+            sqlEntity.StrSqlValue.Append(" Limit @SkipNumber,@TakeNumber");
             sqlEntity.DbParams.Add(new MySqlParameter("@SkipNumber",(sqlEntity.PageNumber -1)*sqlEntity.PageSize));
             sqlEntity.DbParams.Add(new MySqlParameter("@TakeNumber",sqlEntity.PageSize));
 

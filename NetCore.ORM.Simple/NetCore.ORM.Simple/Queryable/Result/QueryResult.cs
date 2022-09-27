@@ -26,9 +26,7 @@ namespace NetCore.ORM.Simple.Queryable
 
         protected eDBType DBType;
         protected Builder builder;
-        protected MapVisitor mapVisitor;
-        protected JoinVisitor joinVisitor;
-        protected ConditionVisitor conditionVisitor;
+        protected SimpleVisitor visitor;
         protected SqlEntity sqlEntity;
         protected int PageNumber;
         protected int PageSize;
@@ -39,41 +37,31 @@ namespace NetCore.ORM.Simple.Queryable
         /// </summary>
         /// <param name="DbType"></param>
         /// <param name="tableNames"></param>
-        protected void Init(eDBType DbType,DBDrive DbDrive, params string[] tableNames)
+        protected void Init(Builder _builder,DBDrive DbDrive,params string[] tableNames)
         {
-            mapVisitor = new MapVisitor(tableNames);
-            joinVisitor = new JoinVisitor(tableNames);
-            conditionVisitor = new ConditionVisitor(tableNames);
-            this.DBType = DbType;
+            visitor = new SimpleVisitor(tableNames);
             this.DbDrive = DbDrive;
-            builder = new Builder(this.DBType);
+            builder = _builder;
         }
         public QueryResult()
         {
             sqlEntity = new SqlEntity();
         }
         public QueryResult(
-            MapVisitor _mapVisitor, JoinVisitor _joinVisitor,
-            ConditionVisitor _conditionVisitor,
-            eDBType DbType,DBDrive DbDrive)
+            SimpleVisitor _visitor,
+            Builder _builder,DBDrive DbDrive)
         {
-            mapVisitor = _mapVisitor;
-            joinVisitor = _joinVisitor;
-            conditionVisitor = _conditionVisitor;
-            this.DBType = DbType;
-            builder = new Builder(this.DBType);
+            visitor = _visitor;
+            builder = _builder;
             sqlEntity=new SqlEntity();
             this.DbDrive = DbDrive;
         }
 
         public  IEnumerable<TResult> ToList()
         {
-            var joinInfos = joinVisitor.GetJoinInfos();
-            var mapInfos = mapVisitor.GetMapInfos();
-            var condition = conditionVisitor.GetCondition();
-            builder.GetSelect<TResult>(mapInfos, joinInfos, condition.Item1,condition.Item2,sqlEntity);
-            Console.WriteLine(sqlEntity.Sb_Sql.ToString());
-          
+            
+            builder.GetSelect<TResult>(visitor.GetSelectInfo(),sqlEntity);
+            Console.WriteLine(sqlEntity);
             return null;
         }
         /// <summary>
@@ -82,11 +70,8 @@ namespace NetCore.ORM.Simple.Queryable
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ToListAsync()
         {
-            var joinInfos = joinVisitor.GetJoinInfos();
-            var mapInfos = mapVisitor.GetMapInfos();
-            var condition = conditionVisitor.GetCondition();
-             builder.GetSelect<TResult>(mapInfos,joinInfos,condition.Item1,condition.Item2,sqlEntity);
-            return await DbDrive.ReadAsync<TResult>(sqlEntity.Sb_Sql.ToString(),mapInfos.ToArray(),sqlEntity.DbParams.ToArray());
+            builder.GetSelect<TResult>(visitor.GetSelectInfo(),sqlEntity);
+            return await DbDrive.ReadAsync<TResult>(sqlEntity);
         }
 
         public IQueryResult<TResult> Skip(int pageNumber)
@@ -111,21 +96,27 @@ namespace NetCore.ORM.Simple.Queryable
         {
             return this;
         }
+
+        public ISimpleGroupByQueryable<TGroup> GroupBy<TGroup>(Expression<Func<TResult,TGroup>> expression)
+        {
+            ISimpleGroupByQueryable<TGroup> simpleGroupBy = new SimpleGroupByQueryable<TGroup>();
+            return simpleGroupBy;
+        }
         public IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<TResult,TNewResult>>expression)
         {
-            mapVisitor.Modify(expression);
-            IQueryResult<TNewResult> query = new QueryResult<TNewResult>(mapVisitor, joinVisitor, conditionVisitor, DBType, DbDrive);
+            visitor.VisitMap(expression);
+            IQueryResult<TNewResult> query = new QueryResult<TNewResult>(visitor,builder,DbDrive);
             return query;
         }
         public IQueryResult<TResult> Where(Expression<Func<TResult,bool>>expression)
         {
-            conditionVisitor.Modify(expression,mapVisitor.GetMapInfos());
+            visitor.VisitorCondition(expression);
             return this;
         }
 
         public IQueryResult<TResult> Select(Expression<Func<TResult, TResult>> expression)
         {
-            mapVisitor.Modify(expression);
+            visitor.VisitMap(expression);
             return this;
         }
     }

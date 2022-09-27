@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
 using NetCore.ORM.Simple.Entity;
+using NetCore.ORM.Simple.Common;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.Expression.Visitor
@@ -19,20 +20,25 @@ namespace NetCore.ORM.Simple.Visitor
 {
     public class SimpleVisitor
     {
-        private string[] tableNames;
+        private TableEntity Table;
         private MapVisitor mapVisitor;
         private JoinVisitor joinVisitor;
         private ConditionVisitor conditionVisitor;
+        private SelectEntity Select;
 
         /// <summary>
         /// 
         /// </summary>
         public SimpleVisitor(params string[]tableNames)
         {
-            this.tableNames = tableNames;
-            mapVisitor=new MapVisitor(tableNames);
-            joinVisitor=new JoinVisitor(tableNames);
-            conditionVisitor=new ConditionVisitor(tableNames);
+            if (Check.IsNull(tableNames))
+            {
+
+            }
+            Table = new TableEntity(tableNames);
+            mapVisitor=new MapVisitor(Table,Select.MapInfos);
+            joinVisitor=new JoinVisitor(Table,Select.JoinInfos);
+            conditionVisitor=new ConditionVisitor(Table,Select.Conditions,Select.TreeConditions);
         }
 
         public List<JoinTableEntity> GetJoinInfos()
@@ -44,9 +50,14 @@ namespace NetCore.ORM.Simple.Visitor
             return mapVisitor.GetMapInfos();
         }
 
-        public string GetCondition()
+        public Tuple<List<ConditionEntity>,List<TreeConditionEntity>> GetCondition()
         {
-            return conditionVisitor.GetValue();
+            return conditionVisitor.GetCondition();
+        }
+
+        public SelectEntity GetSelectInfo()
+        {
+            return Select;
         }
 
         public void VisitMap<T1,TResult>(Expression<Func<T1,TResult>> expression)
@@ -91,23 +102,23 @@ namespace NetCore.ORM.Simple.Visitor
 
         public void VisitorCondition<T1>(Expression<Func<T1,bool>>expression)
         {
-            joinVisitor.Modify(expression);
+            conditionVisitor.Modify(expression,GetMapInfos());
         }
         public void VisitorCondition<T1,T2>(Expression<Func<T1,T2,bool>> expression)
         {
-            joinVisitor.Modify(expression);
+            conditionVisitor.Modify(expression,GetMapInfos());
         }
         public void VisitorCondition<T1,T2,T3>(Expression<Func<T1,T2,T3,bool>> expression)
         {
-            joinVisitor.Modify(expression);
+            conditionVisitor.Modify(expression,GetMapInfos());
         }
         public void VisitorCondition<T1,T2,T3,T4>(Expression<Func<T1,T2,T3,T4,bool>> expression)
         {
-            joinVisitor.Modify(expression);
+            conditionVisitor.Modify(expression,GetMapInfos());
         }
         public void VisitorCondition<T1,T2,T3,T4,T5>(Expression<Func<T1,T2,T3,T4,T5,bool>> expression)
         {
-            joinVisitor.Modify(expression);
+            conditionVisitor.Modify(expression,GetMapInfos());
         }
     }
 }

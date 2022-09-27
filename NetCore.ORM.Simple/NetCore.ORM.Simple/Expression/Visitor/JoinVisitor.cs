@@ -49,16 +49,15 @@ namespace NetCore.ORM.Simple.Visitor
         /// </summary>
         private bool IsComplete;
 
-        public JoinVisitor(params string[] _tableNames)
+        public JoinVisitor(TableEntity table,Dictionary<string,JoinTableEntity> joinInfos)
         {
-            if (Check.IsNull(_tableNames))
+            if (Check.IsNull(table))
             {
-                throw new ArgumentNullException("table isn't exist!");
-                //tableNames = _tableNames;
+                throw new ArgumentException("not table names!");
             }
-            Table = new TableEntity(_tableNames);
+            Table = table;
             currentTables = new Dictionary<string, int>();
-            JoinTables = new Dictionary<string, JoinTableEntity>();
+            JoinTables = joinInfos;
             JoinTables.Add(Table.TableNames[0],new JoinTableEntity() { DisplayName = Table.TableNames[0],TableType = eTableType.Master });
             IsComplete = true;
         }

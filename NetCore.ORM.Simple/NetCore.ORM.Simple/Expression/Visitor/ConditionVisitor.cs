@@ -55,16 +55,16 @@ namespace NetCore.ORM.Simple.Visitor
         private Dictionary<string, int> currentTables;
 
         private int firstConditionIndex;
-        public ConditionVisitor(params string[] _tableNames)
+        public ConditionVisitor(TableEntity table,List<ConditionEntity> Conditions,List<TreeConditionEntity> TreeConditions)
         {
-            if (Check.IsNull(_tableNames))
+            if (Check.IsNull(table))
             {
                 throw new ArgumentException("not table names!");
             }
-            tableNames = new TableEntity(_tableNames);
+            tableNames = table;
             currentTables = new Dictionary<string, int>();
-            conditions = new List<ConditionEntity>();
-            treeConditions = new List<TreeConditionEntity>();
+            conditions = Conditions;
+            treeConditions = TreeConditions;
             IsComplete = true;
             IsMultipleMap = false;
             firstConditionIndex = 0;

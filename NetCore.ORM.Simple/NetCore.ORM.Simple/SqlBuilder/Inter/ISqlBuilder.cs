@@ -54,7 +54,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="joinInfos">连接部分</param>
         /// <param name="condition">条件部分</param>
         /// <returns></returns>
-        public void GetSelect<TData>(List<MapEntity> mapInfos, List<JoinTableEntity> joinInfos, List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions,SqlEntity entity);
+        public void GetSelect<TData>(SelectEntity select, SqlEntity entity);
 
         public void GetLastInsert<TData>(SqlEntity sql);
     }

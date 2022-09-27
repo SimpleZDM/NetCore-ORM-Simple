@@ -40,13 +40,13 @@ namespace NetCore.ORM.Simple.Visitor
 
         private MapEntity currentmapInfo;
         private bool IsAgain;
-        public MapVisitor(params string[] _tableNames)
+        public MapVisitor(TableEntity table,List<MapEntity> MapInfos)
         {
-            if (Check.IsNull(_tableNames))
+            if (Check.IsNull(table))
             {
-                throw new ArgumentNullException("Table isn't exist!");
+                throw new ArgumentException("not table names!");
             }
-            Table= new TableEntity(_tableNames);
+            Table = table;
             currentTables = new Dictionary<string, int>();
             mapInfos = new List<MapEntity>();
         }

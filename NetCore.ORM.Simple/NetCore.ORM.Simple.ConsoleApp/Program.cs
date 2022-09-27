@@ -83,7 +83,7 @@ public static class Program
         var query = simpleClient.Queryable<UserEntity, RoleEntity, CompanyEntity>(
             (u, r, c) =>
                 new JoinInfoEntity(
-                    new JoinMapEntity(eJoinType.Inner, u.RoleID == r.Id && u.RoleID>((int)eConditionType.Sign)),
+                    new JoinMapEntity(eJoinType.Inner, u.RoleID == r.Id && u.RoleID > ((int)eConditionType.Sign)),
                     new JoinMapEntity(eJoinType.Inner, u.CompanyId == c.ID)
                 )
              )
@@ -93,15 +93,22 @@ public static class Program
                 DisplayName = user.Name,
                 CompanyName = c.CompanyName,
                 RoleName = r.DisplayName,
-            }).Where(v=>v.UserId>0).Select(v=>new ViewView2
+            }).Where(v => v.UserId > 0).Select(v => new ViewView2
             {
-                RID=v.UserId,
-                DisplayName=v.DisplayName
+                RID = v.UserId,
+                DisplayName = v.DisplayName
+            }).
+            GroupBy(v => new  { Id=v.RID }).Select(v=>new
+            {
+                v.Key.Id,
+                age=v.Sum(s=>s.Id),
+                count=v.Count(s=>s.Id)
+
             });
             
         // var data = query.ToListAsync();
         //var query = simpleClient.Queryable<UserEntity>().Where(u=>u.Name.Equals("xxx")).ToPage(1,1);
-        var data=query.ToListAsync().Result;
+       // var data=query.ToListAsync().Result;
         return 0;
     }
 }

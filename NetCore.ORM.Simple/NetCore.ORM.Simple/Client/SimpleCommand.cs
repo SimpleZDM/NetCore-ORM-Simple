@@ -45,7 +45,7 @@ namespace NetCore.ORM.Simple.Client
                 case eDbCommandType.Insert:
                      SqlEntity GetInsertSql=new SqlEntity();
                      builder.GetLastInsert<TEntity>(GetInsertSql);
-                     return await dbDrive.ExcuteAsync<TEntity>(currentSql.Sb_Sql.ToString(),GetInsertSql.Sb_Sql.ToString(),currentSql.DbParams.ToArray());
+                     return await dbDrive.ExcuteAsync<TEntity>(currentSql,GetInsertSql.StrSqlValue.ToString());
                 case eDbCommandType.Update:
                     break;
                 default:

@@ -68,19 +68,19 @@ namespace NetCore.ORM.Simple.Client
         /// <returns></returns>
         public ISimpleQueryable<T1> Queryable<T1>()where T1:class,new()
         {
-            return new SimpleQueryable<T1>(configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType,dbDrive);
+            return new SimpleQueryable<T1>(builder,dbDrive);
         }
         public ISimpleQueryable<T1,T2> Queryable<T1,T2>(Expression<Func<T1,T2,JoinInfoEntity>> expression)
         {
-            return new SimpleQueryable<T1,T2>(expression,configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType,dbDrive);
+            return new SimpleQueryable<T1,T2>(expression,builder,dbDrive);
         }
         public ISimpleQueryable<T1, T2,T3> Queryable<T1,T2,T3>(Expression<Func<T1,T2,T3,JoinInfoEntity>> expression)
         {
-            return new SimpleQueryable<T1, T2,T3>(expression,configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType,dbDrive);
+            return new SimpleQueryable<T1, T2,T3>(expression,builder,dbDrive);
         }
         public ISimpleQueryable<T1,T2,T3,T4> Queryable<T1,T2,T3,T4>(Expression<Func<T1,T2,T3,T4,JoinInfoEntity>> expression)
         {
-            return new SimpleQueryable<T1,T2,T3,T4>(expression,configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType,dbDrive);
+            return new SimpleQueryable<T1,T2,T3,T4>(expression,builder,dbDrive);
         }
         /// <summary>
         /// 
@@ -96,7 +96,7 @@ namespace NetCore.ORM.Simple.Client
                     case eDbCommandType.Insert:
                     case eDbCommandType.Update:
                     case eDbCommandType.Delete:
-                        result +=await dbDrive.ExcuteAsync(entity.Sb_Sql.ToString(),entity.DbParams.ToArray());
+                        result +=await dbDrive.ExcuteAsync(entity);
                         break;
                     case eDbCommandType.Query:
                         break;

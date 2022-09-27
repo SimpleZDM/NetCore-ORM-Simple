@@ -21,52 +21,97 @@ namespace NetCore.ORM.Simple
     public class DBDrive : IDBDrive
     {
 
+        /// <summary>
+        /// 
+        /// </summary>
         IDBDrive mysqlDrive { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         DataBaseConfiguration configuration { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cfg"></param>
         public DBDrive(DataBaseConfiguration cfg)
         {
             configuration = cfg;
             mysqlDrive = new MysqlDrive(configuration);
         }
-        public async Task BeginTransactionAsync()
-        {
-            await MatchDBDrive(() => mysqlDrive.BeginTransactionAsync());
-        }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task CommitAsync()
         {
              await MatchDBDrive(() => mysqlDrive.CommitAsync());
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public async Task RollBackAsync()
+        {
+              await MatchDBDrive(() =>mysqlDrive.RollBackAsync());
+        } 
+       /// <summary>
+       /// 
+       /// </summary>
+       /// <returns></returns>
+        public async Task BeginTransactionAsync()
+        {
+            await MatchDBDrive(() => mysqlDrive.BeginTransactionAsync());
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> ExcuteAsync(SqlEntity entity)
+        {
+            return await MatchDBDrive(() => mysqlDrive.ExcuteAsync(entity));
+        }
+       
+        /// <summary>
+        /// 
+        /// </summary>
         public void Dispose()
         {
-        }
-
-        public async Task<int> ExcuteAsync(string sql, params DbParameter[] Params)
+        } 
+       
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(SqlEntity entity)
         {
-            return await MatchDBDrive(() => mysqlDrive.ExcuteAsync(sql,Params));
+            return await MatchDBDrive(() => mysqlDrive.ReadAsync<TResult>(entity));
         }
-
-        public async Task<TEntity> ExcuteAsync<TEntity>(string sql, string query, params DbParameter[] Params) where TEntity : class
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<TEntity> ExcuteAsync<TEntity>(SqlEntity entity,string query) where TEntity : class
         {
-            return await MatchDBDrive(() => mysqlDrive.ExcuteAsync<TEntity>(sql,query,Params));
+            return await MatchDBDrive(() => mysqlDrive.ExcuteAsync<TEntity>(entity,query));
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="Params"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params)
         {
            return await MatchDBDrive(() => mysqlDrive.ReadAsync<TResult>(sql,Params));
         }
-        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql,MapEntity[] mapInfos, params DbParameter[] Params)
-        {
-            return await MatchDBDrive(() => mysqlDrive.ReadAsync<TResult>(sql,mapInfos,Params));
-        }
-
-
-
-        public async Task RollBackAsync()
-        {
-              await MatchDBDrive(() =>mysqlDrive.RollBackAsync());
-        }
+       
         /// <summary>
         /// 
         /// </summary>

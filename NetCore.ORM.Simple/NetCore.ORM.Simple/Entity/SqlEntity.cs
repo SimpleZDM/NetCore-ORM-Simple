@@ -21,7 +21,7 @@ namespace NetCore.ORM.Simple.Entity
         //const int pLength = 10;
         public SqlEntity()
         {
-            Sb_Sql=new StringBuilder();
+            StrSqlValue = new StringBuilder();
             DbParams = new List<DbParameter>(10);
             PageSize = -1;
             PageNumber = -1;
@@ -29,7 +29,7 @@ namespace NetCore.ORM.Simple.Entity
         /// <summary>
         /// 拼装之后的语句
         /// </summary>
-        public StringBuilder Sb_Sql { get { return sb_Sql; } set { sb_Sql=value ; } }
+        public StringBuilder StrSqlValue { get { return strSqlValue; } set { strSqlValue = value ; } }
         /// <summary>
         /// 参数化
         /// </summary>
@@ -48,9 +48,14 @@ namespace NetCore.ORM.Simple.Entity
         /// </summary>
         public eDbCommandType DbCommandType { get { return dbCommandType; } set { dbCommandType = value; } }
 
+        /// <summary>
+        ///映射信息
+        /// </summary>
+        public MapEntity[] MapInfos { get { return mapInfos; } set { mapInfos = value; } }
 
+        private MapEntity[] mapInfos;
         private List<DbParameter> dbParams;
-        private StringBuilder sb_Sql;
+        private StringBuilder strSqlValue;
         private int pageNumber;
         private int pageSize;
         private eDbCommandType dbCommandType;

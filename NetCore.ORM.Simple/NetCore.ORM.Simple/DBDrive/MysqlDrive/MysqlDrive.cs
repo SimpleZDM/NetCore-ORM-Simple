@@ -75,7 +75,7 @@ namespace NetCore.ORM.Simple
         /// <typeparam name="TResult"></typeparam>
         /// <param name="sql"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params)
+        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql,params DbParameter[] Params)
         {
             if (!IsOpenConnect())
             {
@@ -102,19 +102,19 @@ namespace NetCore.ORM.Simple
         /// <param name="sql"></param>
         /// <param name="Params"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql,MapEntity[]mapInfos,params DbParameter[] Params)
+        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(SqlEntity entity)
         {
             if (!IsOpenConnect())
             {
                 Open();
             }
-            command = new MySqlCommand(sql, connection);
-            if (!Check.IsNull(Params) && Params.Length > 0)
+            command = new MySqlCommand(entity.StrSqlValue.ToString(), connection);
+            if (!Check.IsNull(entity.DbParams) && entity.DbParams.Count> 0)
             {
-                command.Parameters.AddRange(Params);
+                command.Parameters.AddRange(entity.DbParams.ToArray());
             }
             dataRead = await command.ExecuteReaderAsync();
-            var data = MapData<TResult>(mapInfos);
+            var data = MapData<TResult>(entity.MapInfos);
             if (configuration.CurrentConnectInfo.IsAutoClose)
             {
                 Close();
@@ -192,14 +192,17 @@ namespace NetCore.ORM.Simple
         /// <param name="sql"></param>
         /// <param name=""></param>
         /// <returns></returns>
-        public async Task<int> ExcuteAsync(string sql, params DbParameter[] Params)
+        public async Task<int> ExcuteAsync(SqlEntity entity)
         {
             if (!IsOpenConnect())
             {
                 Open();
             }
-            command = new MySqlCommand(sql, connection);
-            command.Parameters.Add(Params);
+            command = new MySqlCommand(entity.StrSqlValue.ToString(), connection);
+            if (!Check.IsNull(entity.DbParams))
+            {
+                command.Parameters.Add(entity.DbParams.ToArray());
+            }
             int result = await command.ExecuteNonQueryAsync();
 
             if (configuration.CurrentConnectInfo.IsAutoClose && !isBeginTransaction)
@@ -216,14 +219,17 @@ namespace NetCore.ORM.Simple
         /// <param name="sql"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<TEntity> ExcuteAsync<TEntity>(string sql, string query, params DbParameter[] Params) where TEntity : class
+        public async Task<TEntity> ExcuteAsync<TEntity>(SqlEntity entity, string query) where TEntity : class
         {
             if (!IsOpenConnect())
             {
                 Open();
             }
-            command = new MySqlCommand(sql, connection);
-            command.Parameters.Add(Params);
+            command = new MySqlCommand(entity.StrSqlValue.ToString(), connection);
+            if (!Check.IsNull(entity.DbParams))
+            {
+                 command.Parameters.Add(entity.DbParams.ToArray());
+            }
             int result = await command.ExecuteNonQueryAsync();
             if (result == 0)
             {
