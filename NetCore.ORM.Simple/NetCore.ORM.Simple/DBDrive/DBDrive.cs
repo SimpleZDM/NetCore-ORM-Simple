@@ -56,6 +56,12 @@ namespace NetCore.ORM.Simple
         {
            return await MatchDBDrive(() => mysqlDrive.ReadAsync<TResult>(sql,Params));
         }
+        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql,MapEntity[] mapInfos, params DbParameter[] Params)
+        {
+            return await MatchDBDrive(() => mysqlDrive.ReadAsync<TResult>(sql,mapInfos,Params));
+        }
+
+
 
         public async Task RollBackAsync()
         {
@@ -68,7 +74,7 @@ namespace NetCore.ORM.Simple
         {
             if (!Check.IsNull(funcs))
             {
-                if ((int)configuration.CurrentConnectInfo.DBType > funcs.Length)
+                if ((int)configuration.CurrentConnectInfo.DBType<funcs.Length)
                 {
                    return await funcs[(int)configuration.CurrentConnectInfo.DBType].Invoke();
                 }

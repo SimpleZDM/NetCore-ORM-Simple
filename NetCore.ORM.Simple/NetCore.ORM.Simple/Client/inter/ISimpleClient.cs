@@ -49,6 +49,6 @@ namespace NetCore.ORM.Simple.Client
         /// 
         /// </summary>
         /// <returns></returns>
-        public bool SaveChange();
+        public Task<int> SaveChangeAsync();
     }
 }

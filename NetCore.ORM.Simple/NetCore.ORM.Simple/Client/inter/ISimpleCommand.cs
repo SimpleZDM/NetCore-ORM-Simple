@@ -19,6 +19,6 @@ namespace NetCore.ORM.Simple.Client
     {
         public bool GetResult();
 
-        public TEntity ReturnEntity();
+        public  Task<TEntity> ReturnEntityAsync();
     }
 }

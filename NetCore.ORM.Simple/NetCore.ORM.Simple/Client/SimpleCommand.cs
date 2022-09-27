@@ -17,13 +17,14 @@ using NetCore.ORM.Simple.SqlBuilder;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Client
 {
-    public class SimpleCommand<TEntity>:ISimpleCommand<TEntity>
+    public class SimpleCommand<TEntity>:ISimpleCommand<TEntity>where TEntity : class
     {
         private List<SqlEntity> sqls;
         private SqlEntity currentSql;
         private Builder builder;
+        private DBDrive dbDrive;
 
-        public SimpleCommand(Builder builder,eDBType dbType,SqlEntity sql,List<SqlEntity>_sqls)
+        public SimpleCommand(Builder builder,eDBType dbType,SqlEntity sql,List<SqlEntity>_sqls,DBDrive dBDrive)
         {
             sqls = _sqls;
             currentSql= sql;
@@ -35,14 +36,16 @@ namespace NetCore.ORM.Simple.Client
             sqls.Remove(currentSql);
             return true;
         }
-        public TEntity ReturnEntity()
+        public async Task<TEntity> ReturnEntityAsync()
         {
+
             ///执行完了之后
             switch (currentSql.DbCommandType)
             {
                 case eDbCommandType.Insert:
-                    builder.GetLastInsert<TEntity>(currentSql);
-                    break;
+                     SqlEntity GetInsertSql=new SqlEntity();
+                     builder.GetLastInsert<TEntity>(GetInsertSql);
+                     return await dbDrive.ExcuteAsync<TEntity>(currentSql.Sb_Sql.ToString(),GetInsertSql.Sb_Sql.ToString(),currentSql.DbParams.ToArray());
                 case eDbCommandType.Update:
                     break;
                 default:

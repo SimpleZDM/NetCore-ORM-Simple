@@ -26,12 +26,13 @@ namespace NetCore.ORM.Simple.Client
         private DataBaseConfiguration configuration;
         private List<SqlEntity> sqls;
         private Builder builder;
-        private DBDrive dbdrive;
+        private DBDrive dbDrive;
         public SimpleClient(DataBaseConfiguration _configuration)
         {
             configuration=_configuration;
             builder = new Builder(configuration.CurrentConnectInfo.DBType);
             sqls = new List<SqlEntity>();
+            dbDrive = new DBDrive(configuration);
         }
         /// <summary>
         /// 插入语句
@@ -42,7 +43,7 @@ namespace NetCore.ORM.Simple.Client
         {
             var sql=builder.GetInsert(entity,sqls.Count);
             sqls.Add(sql);
-            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,configuration.CurrentConnectInfo.DBType,sql,sqls);
+            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,configuration.CurrentConnectInfo.DBType,sql,sqls,dbDrive);
             return command;
         }
         /// <summary>
@@ -67,27 +68,43 @@ namespace NetCore.ORM.Simple.Client
         /// <returns></returns>
         public ISimpleQueryable<T1> Queryable<T1>()where T1:class,new()
         {
-            return new SimpleQueryable<T1>(configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType);
+            return new SimpleQueryable<T1>(configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType,dbDrive);
         }
         public ISimpleQueryable<T1,T2> Queryable<T1,T2>(Expression<Func<T1,T2,JoinInfoEntity>> expression)
         {
-            return new SimpleQueryable<T1,T2>(expression,configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType);
+            return new SimpleQueryable<T1,T2>(expression,configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType,dbDrive);
         }
         public ISimpleQueryable<T1, T2,T3> Queryable<T1,T2,T3>(Expression<Func<T1,T2,T3,JoinInfoEntity>> expression)
         {
-            return new SimpleQueryable<T1, T2,T3>(expression,configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType);
+            return new SimpleQueryable<T1, T2,T3>(expression,configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType,dbDrive);
         }
         public ISimpleQueryable<T1,T2,T3,T4> Queryable<T1,T2,T3,T4>(Expression<Func<T1,T2,T3,T4,JoinInfoEntity>> expression)
         {
-            return new SimpleQueryable<T1,T2,T3,T4>(expression,configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType);
+            return new SimpleQueryable<T1,T2,T3,T4>(expression,configuration.ConnectMapName[configuration.CurrentUseConnectName].DBType,dbDrive);
         }
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public bool SaveChange()
+        public async Task<int> SaveChangeAsync()
         {
-            return true;
+            int result=0;
+            foreach (var entity in sqls)
+            {
+                switch (entity.DbCommandType)
+                {
+                    case eDbCommandType.Insert:
+                    case eDbCommandType.Update:
+                    case eDbCommandType.Delete:
+                        result +=await dbDrive.ExcuteAsync(entity.Sb_Sql.ToString(),entity.DbParams.ToArray());
+                        break;
+                    case eDbCommandType.Query:
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return result;
         }
     }
 }

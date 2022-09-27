@@ -58,7 +58,14 @@ namespace NetCore.ORM.Simple
             {
                 throw new ArgumentNullException("connect");
             }
-            connection = new MySqlConnection(configuration.CurrentConnectInfo.ConnectStr);
+            try
+            {
+                connection = new MySqlConnection(configuration.CurrentConnectInfo.ConnectStr);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
             isBeginTransaction = false;
         }
 
@@ -75,7 +82,10 @@ namespace NetCore.ORM.Simple
                 Open();
             }
             command = new MySqlCommand(sql, connection);
-            command.Parameters.Add(Params);
+            if (!Check.IsNull(Params)&&Params.Length>0)
+            {
+                command.Parameters.AddRange(Params);
+            }
             dataRead = await command.ExecuteReaderAsync();
             var data = MapData<TResult>();
             if (configuration.CurrentConnectInfo.IsAutoClose)
@@ -85,6 +95,32 @@ namespace NetCore.ORM.Simple
             return data;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="Params"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql,MapEntity[]mapInfos,params DbParameter[] Params)
+        {
+            if (!IsOpenConnect())
+            {
+                Open();
+            }
+            command = new MySqlCommand(sql, connection);
+            if (!Check.IsNull(Params) && Params.Length > 0)
+            {
+                command.Parameters.AddRange(Params);
+            }
+            dataRead = await command.ExecuteReaderAsync();
+            var data = MapData<TResult>(mapInfos);
+            if (configuration.CurrentConnectInfo.IsAutoClose)
+            {
+                Close();
+            }
+            return data;
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -118,6 +154,31 @@ namespace NetCore.ORM.Simple
                         var Prop = MapProps[key];
                         Prop.SetPropValue(tresult, dataRead[i]);
                         //Prop.SetValue(tresult,dataRead[i]);
+                    }
+                }
+                data.Add(tresult);
+            }
+            return data;
+        }
+
+        private IEnumerable<TResult> MapData<TResult>(MapEntity[]mapInfos)
+        {
+            if (Check.IsNull(dataRead))
+            {
+                return null;
+            }
+            Type type = typeof(TResult);
+            Dictionary<string, PropertyInfo> PropMapNames = GetPropMapNames(type.GetProperties());
+            List<TResult> data = new List<TResult>();
+            while (dataRead.Read())
+            {
+                TResult tresult = Activator.CreateInstance<TResult>();
+
+                foreach (var item in mapInfos)
+                {
+                    if (PropMapNames.ContainsKey(item.PropName))
+                    {
+                        PropMapNames[item.PropName].SetPropValue(tresult,dataRead[item.AsColumnName]);
                     }
                 }
                 data.Add(tresult);
@@ -307,6 +368,16 @@ namespace NetCore.ORM.Simple
             {
                 connection.Close();
             }
+        }
+
+        private Dictionary<string,PropertyInfo> GetPropMapNames(PropertyInfo[] Props)
+        {
+            Dictionary<string, PropertyInfo> PropsMapNames = new Dictionary<string, PropertyInfo>();
+            foreach (var item in Props)
+            {
+                PropsMapNames.Add(item.GetColName(),item);
+            }
+            return PropsMapNames;
         }
     }
 }

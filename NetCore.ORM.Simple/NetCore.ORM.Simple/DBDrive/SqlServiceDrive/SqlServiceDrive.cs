@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetCore.ORM.Simple.Entity;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
@@ -44,6 +45,11 @@ namespace NetCore.ORM.Simple
         }
 
         public Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, MapEntity[] mapInfos, params DbParameter[] Params)
         {
             throw new NotImplementedException();
         }

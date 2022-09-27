@@ -32,7 +32,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// </summary>
         /// <param name="methodName"></param>
         /// <returns></returns>
-        public static string MapMethod(string methodName)
+        public static string MapMethod(string methodName,string leftValue,string rightValue)
         {
             string value = EqualSign.ToString();
             if (Check.IsNullOrEmpty(methodName))
@@ -43,9 +43,17 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 case "ToString":
                     break;
-                case "Equal":
+                case "Equals":
+                    value = $"{leftValue}={rightValue}";
                     break;
                 case "IsNullOrEmpty":
+                    if (!Check.IsNullOrEmpty(leftValue)) 
+                    {
+                        value = $"{leftValue} IS NULL";
+                    }else if (!Check.IsNullOrEmpty(rightValue))
+                    {
+                        value = $"{rightValue} IS NULL";
+                    }
                     break;
                 default:
                     break;

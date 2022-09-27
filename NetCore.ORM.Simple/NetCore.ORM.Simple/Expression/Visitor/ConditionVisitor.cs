@@ -47,21 +47,27 @@ namespace NetCore.ORM.Simple.Visitor
         /// <summary>
         /// 初始化是包含的所有表
         /// </summary>
-        private string[] tableNames;
+        private TableEntity tableNames;
+
         /// <summary>
         /// 当前表达式目录树中表的别称
         /// </summary>
         private Dictionary<string, int> currentTables;
+
+        private int firstConditionIndex;
         public ConditionVisitor(params string[] _tableNames)
         {
-            if (!Check.IsNull(_tableNames))
+            if (Check.IsNull(_tableNames))
             {
-                tableNames = _tableNames;
+                throw new ArgumentException("not table names!");
             }
+            tableNames = new TableEntity(_tableNames);
             currentTables = new Dictionary<string, int>();
             conditions = new List<ConditionEntity>();
-            treeConditions=new List<TreeConditionEntity>();
+            treeConditions = new List<TreeConditionEntity>();
             IsComplete = true;
+            IsMultipleMap = false;
+            firstConditionIndex = 0;
         }
 
         /// <summary>
@@ -88,7 +94,7 @@ namespace NetCore.ORM.Simple.Visitor
                 {
                     values.Append(SimpleConst.cStrSign[(int)item]);
                 }
-                if (conditions.Count>i)
+                if (conditions.Count > i)
                 {
                     values.Append(SimpleConst.cStrSign[(int)conditions[i].SignType]);
                 }
@@ -99,26 +105,44 @@ namespace NetCore.ORM.Simple.Visitor
         /// 
         /// </summary>
         /// <returns></returns>
-        public Tuple<List<ConditionEntity>,List<TreeConditionEntity>> GetCondition()
+        public Tuple<List<ConditionEntity>, List<TreeConditionEntity>> GetCondition()
         {
-           return Tuple.Create(conditions,treeConditions);
+            return Tuple.Create(conditions, treeConditions);
         }
         /// <summary>
         /// 修改表达式树的形式
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public Expression Modify(Expression expression,List<MapEntity> mapInfos=null)
+        public Expression Modify(Expression expression, List<MapEntity> mapInfos = null)
         {
             currentTables.Clear();
-           
-            if (!Check.IsNull(mapInfos))
+            currentTree = null;
+
+
+            if (treeConditions.Count > 0)
+            {
+                treeConditions[firstConditionIndex].LeftBracket.Add(eSignType.LeftBracket);
+                firstConditionIndex = treeConditions.Count - 1;
+                treeConditions[firstConditionIndex].RightBracket.Add(eSignType.RightBracket);
+                conditions.Add(new ConditionEntity(eConditionType.Sign)
+                {
+                    SignType = eSignType.And
+
+                });
+            }
+            if (!Check.IsNull(mapInfos) && mapInfos.Count > 0)
             {
                 this.mapInfos = mapInfos;
                 IsMultipleMap = true;
             }
+            foreach (ParameterExpression item in ((dynamic)expression).Parameters)
+            {
+                currentTables.Add(item.Name, currentTables.Count);
+            }
             Visit(expression);
-            return Visit(expression);
+
+            return expression;
         }
 
         /// <summary>
@@ -128,13 +152,14 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            if (currentTables.Count() > 0)
+            if (currentTables.Count() > CommonConst.ZeroOrNull)
             {
                 #region
                 switch (node.NodeType)
                 {
                     case ExpressionType.AndAlso:
-                        SingleLogicBinary(node, (queue) => { 
+                        SingleLogicBinary(node, (queue) =>
+                        {
                             conditions.Add(new ConditionEntity(eConditionType.Sign)
                             {
                                 SignType = eSignType.And
@@ -142,10 +167,11 @@ namespace NetCore.ORM.Simple.Visitor
                         });
                         break;
                     case ExpressionType.Call:
-                       
+
                         break;
                     case ExpressionType.GreaterThan:
-                        SingleBinary(node, (queue) => { 
+                        SingleBinary(node, (queue) =>
+                        {
                             currentTree.RelationCondition =
                                new ConditionEntity(eConditionType.Sign)
                                {
@@ -154,7 +180,8 @@ namespace NetCore.ORM.Simple.Visitor
                         });
                         break;
                     case ExpressionType.GreaterThanOrEqual:
-                        SingleBinary(node, (queue) => { 
+                        SingleBinary(node, (queue) =>
+                        {
                             currentTree.RelationCondition =
                               new ConditionEntity(eConditionType.Sign)
                               {
@@ -163,7 +190,8 @@ namespace NetCore.ORM.Simple.Visitor
                         });
                         break;
                     case ExpressionType.LessThan:
-                        SingleBinary(node, (queue) => { 
+                        SingleBinary(node, (queue) =>
+                        {
                             currentTree.RelationCondition =
                               new ConditionEntity(eConditionType.Sign)
                               {
@@ -172,7 +200,8 @@ namespace NetCore.ORM.Simple.Visitor
                         });
                         break;
                     case ExpressionType.LessThanOrEqual:
-                        SingleBinary(node, (queue) => { 
+                        SingleBinary(node, (queue) =>
+                        {
                             currentTree.RelationCondition =
                              new ConditionEntity(eConditionType.Sign)
                              {
@@ -181,7 +210,8 @@ namespace NetCore.ORM.Simple.Visitor
                         });
                         break;
                     case ExpressionType.Equal:
-                        SingleBinary(node, (queue) => { 
+                        SingleBinary(node, (queue) =>
+                        {
                             currentTree.RelationCondition =
                              new ConditionEntity(eConditionType.Sign)
                              {
@@ -190,7 +220,8 @@ namespace NetCore.ORM.Simple.Visitor
                         });
                         break;
                     case ExpressionType.NotEqual:
-                        SingleBinary(node, (queue) => { 
+                        SingleBinary(node, (queue) =>
+                        {
                             currentTree.RelationCondition =
                             new ConditionEntity(eConditionType.Sign)
                             {
@@ -199,10 +230,11 @@ namespace NetCore.ORM.Simple.Visitor
                         });
                         break;
                     case ExpressionType.OrElse:
-                        SingleLogicBinary(node, (queue) => {
+                        SingleLogicBinary(node, (queue) =>
+                        {
                             conditions.Add(new ConditionEntity(eConditionType.Sign)
                             {
-                                SignType=eSignType.Or
+                                SignType = eSignType.Or
                             });
                         });
                         break;
@@ -226,10 +258,17 @@ namespace NetCore.ORM.Simple.Visitor
         }
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            base.VisitMethodCall(node);
-            currentTree.RelationCondition = new ConditionEntity(eConditionType.Method);
-            currentTree.RelationCondition.DisplayName=node.Method.Name;
-            treeConditions.Add(currentTree);
+            if (currentTables.Count>CommonConst.ZeroOrNull)
+            {
+                if (Check.IsNull(currentTree))
+                {
+                    currentTree = new TreeConditionEntity();
+                }
+                base.VisitMethodCall(node);
+                currentTree.RelationCondition = new ConditionEntity(eConditionType.Method);
+                currentTree.RelationCondition.DisplayName = node.Method.Name;
+                treeConditions.Add(currentTree);
+            }
             return node;
         }
 
@@ -253,14 +292,17 @@ namespace NetCore.ORM.Simple.Visitor
         }
         protected override Expression VisitMember(MemberExpression node)
         {
-            base.VisitMember(node);
-            Console.WriteLine(node.ToString());
-            if (currentTables.ContainsKey(node.Expression.ToString()))
+            if (currentTables.Count > CommonConst.ZeroOrNull)
             {
-                currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
-                currentTree.LeftCondition.DisplayName = $"{tableNames[currentTables[node.Expression.ToString()]]}.{node.Member.Name}";
-                currentTree.LeftCondition.PropertyType = node.Type;
+                base.VisitMember(node);
+                if (currentTables.ContainsKey(node.Expression.ToString()))
+                {
+                    currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
+                    currentTree.LeftCondition.DisplayName = $"{tableNames.TableNames[currentTables[node.Expression.ToString()]]}.{node.Member.Name}";
+                    currentTree.LeftCondition.PropertyType = node.Type;
+                }
             }
+
             return node;
         }
         /// <summary>
@@ -270,13 +312,19 @@ namespace NetCore.ORM.Simple.Visitor
         /// <param name="action"></param>
         private void SingleBinary(BinaryExpression node, Action<Queue<string>> action)
         {
+            if (Check.IsNull(currentTree))
+            {
+                currentTree = new TreeConditionEntity();
+            }
             if (node.Left is MemberExpression leftMember)
             {
                 currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
-
-            }else if (node.Left is ConstantExpression leftConstant)
+                GetMemberValue(leftMember, currentTree.LeftCondition);
+            }
+            else if (node.Left is ConstantExpression leftConstant)
             {
                 currentTree.LeftCondition = new ConditionEntity(eConditionType.Constant);
+                GetConstantValue(leftConstant, currentTree.LeftCondition);
             }
             if (!Check.IsNull(action))
             {
@@ -291,7 +339,7 @@ namespace NetCore.ORM.Simple.Visitor
             else if (node.Right is MemberExpression rightMember)
             {
                 currentTree.RightCondition = new ConditionEntity(eConditionType.ColumnName);
-                GetMemberValue(rightMember,currentTree.RightCondition);
+                GetMemberValue(rightMember, currentTree.RightCondition);
             }
             treeConditions.Add(currentTree);
             IsComplete = true;
@@ -315,7 +363,7 @@ namespace NetCore.ORM.Simple.Visitor
             if (!Check.IsNull(action))
             {
                 action.Invoke(null);
-            } 
+            }
             if (IsComplete)
             {
                 currentTree = new TreeConditionEntity();
@@ -340,7 +388,7 @@ namespace NetCore.ORM.Simple.Visitor
 
                 if (IsMultipleMap)
                 {
-                  var mapInfo=mapInfos.FirstOrDefault();
+                    var mapInfo = mapInfos.FirstOrDefault();
                     if (!Check.IsNull(mapInfo))
                     {
                         condition.DisplayName = $"{mapInfo.TableName}.{mapInfo.ColumnName}";
@@ -348,11 +396,11 @@ namespace NetCore.ORM.Simple.Visitor
                 }
                 else
                 {
-                    if (tableNames.Length > SimpleConst.minTableCount)
+                    if (tableNames.TableNames.Length > SimpleConst.minTableCount)
                     {
                         if (currentTables.ContainsKey(member.Expression.ToString()))
                         {
-                            mName = $"{tableNames[currentTables[member.Expression.ToString()]]}.{member.Member.Name}";
+                            mName = $"{tableNames.TableNames[currentTables[member.Expression.ToString()]]}.{member.Member.Name}";
                             condition.DisplayName = mName;
                         }
                     }
@@ -370,7 +418,7 @@ namespace NetCore.ORM.Simple.Visitor
         /// <param name="constant"></param>
         /// <param name="condition"></param>
         /// <returns></returns>
-        private string GetConstantValue(ConstantExpression constant,ConditionEntity condition)
+        private string GetConstantValue(ConstantExpression constant, ConditionEntity condition)
         {
             string mName = string.Empty;
             if (!Check.IsNull(constant))

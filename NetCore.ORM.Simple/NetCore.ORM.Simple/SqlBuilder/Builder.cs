@@ -55,9 +55,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
             return MatchDBType(() => mysqlBuilder.GetWhereSql(matchCondition));
         }
 
-        public SqlEntity GetSelect<TData>(List<MapEntity> mapInfos, List<JoinTableEntity> joinInfos, string condition)
+        public void GetSelect<TData>(List<MapEntity> mapInfos, List<JoinTableEntity> joinInfos,List<ConditionEntity> conditions,List<TreeConditionEntity>treeConditions,SqlEntity entity)
         {
-            return MatchDBType(() => mysqlBuilder.GetSelect<TData>(mapInfos, joinInfos, condition));
+             MatchDBType(() => mysqlBuilder.GetSelect<TData>(mapInfos, joinInfos, conditions,treeConditions,entity));
         }
 
         public SqlEntity MatchDBType(params Func<SqlEntity>[] funcs)

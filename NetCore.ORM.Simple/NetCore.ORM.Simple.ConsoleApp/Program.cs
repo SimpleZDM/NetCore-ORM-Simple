@@ -54,7 +54,7 @@ public static class Program
         //query.Where((u,r)=>true);
         ISimpleClient simpleClient = new SimpleClient(
             new DataBaseConfiguration(false,
-            new ConnectionEntity("链接字符串!") 
+            new ConnectionEntity("server=127.0.0.1;database=testdb;user=root;pwd=123456;") 
             { 
                 IsAutoClose = true,
                 DBType=eDBType.Mysql,
@@ -68,7 +68,7 @@ public static class Program
                 CompanyId=1,
                 gIdColumn=Guid.NewGuid(),
                 Description="Test",
-                Name="Name",Role=10});
+                Name="Name",RoleID=10});
 
           simpleClient.Update(
           new UserEntity()
@@ -77,33 +77,35 @@ public static class Program
               gIdColumn = Guid.NewGuid(),
               Description = "Test",
               Name = "Name",
-              Role = 10
+              RoleID= 10
           });
 
         var query = simpleClient.Queryable<UserEntity, RoleEntity, CompanyEntity>(
             (u, r, c) =>
                 new JoinInfoEntity(
-                    new JoinMapEntity(eJoinType.Inner, u.Role == r.Id && u.Role.Equals((int)eConditionType.Sign)),
-                    new JoinMapEntity(eJoinType.Inner, u.CompanyId == c.Id)
+                    new JoinMapEntity(eJoinType.Inner, u.RoleID == r.Id && u.RoleID>((int)eConditionType.Sign)),
+                    new JoinMapEntity(eJoinType.Inner, u.CompanyId == c.ID)
                 )
              )
-            .Where((u,r,c)=>u.Id>10&&(r.Id==10||c.Id.Equals((int)eDBType.Mysql)))
-            .Select((u,r,c)=>new ViewView
-             {
-                 UserId=r.Id,
-                 DisplayName=u.Name,
-                 CompanyName=c.Name,
-                 RoleName=r.Name,
-             }).Select(v=>new
-             {
-                 UID=v.UserId,
-                 RName=v.RoleName
-             });
-        var data=query.ToList();
-
+            .Select((user, r, c) => new ViewView
+            {
+                UserId = r.Id,
+                DisplayName = user.Name,
+                CompanyName = c.CompanyName,
+                RoleName = r.DisplayName,
+            }).Where(v=>v.UserId>0).Select(v=>new ViewView2
+            {
+                RID=v.UserId,
+                DisplayName=v.DisplayName
+            });
+            
+        // var data = query.ToListAsync();
+        //var query = simpleClient.Queryable<UserEntity>().Where(u=>u.Name.Equals("xxx")).ToPage(1,1);
+        var data=query.ToListAsync().Result;
         return 0;
     }
 }
+[ClassName("UserTable")]
 public class UserEntity
 {
     [Key(true)]
@@ -111,22 +113,23 @@ public class UserEntity
     public int CompanyId { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
-    public int Role { get; set; }
+    public int RoleID { get; set; }
     public Guid gIdColumn { get; set; }
+    public int Age { get; set; }
 }
-
+[ClassName("RoleTable")]
 public class RoleEntity
 {
     [Key(true)]
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string DisplayName { get; set; }
 }
-
+[ClassName("CompanyTable")]
 public class CompanyEntity
 {
     [Key(true)]
-    public int Id { get; set; }
-    public string Name { get; set; }
+    public int ID { get; set; }
+    public string CompanyName { get; set; }
 }
 
 public class MissionDetailEntity
@@ -216,4 +219,9 @@ public class ViewView
     public string DisplayName { get; set; }
     public string RoleName { get; set; }
     public string CompanyName { get; set; }
+}
+public class ViewView2
+{
+    public int RID { get; set; }
+    public string DisplayName { get; set; }
 }

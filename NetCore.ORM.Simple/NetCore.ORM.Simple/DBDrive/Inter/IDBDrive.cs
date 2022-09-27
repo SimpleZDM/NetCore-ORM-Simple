@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetCore.ORM.Simple.Entity;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
@@ -25,13 +26,15 @@ namespace NetCore.ORM.Simple
         public Task<TEntity> ExcuteAsync<TEntity>(string sql, string query, params DbParameter[] Params) where TEntity : class;
 
         public  Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params);
-        
+        public  Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql,MapEntity[] mapInfos, params DbParameter[] Params);
 
-              
-       
-        
-        
-       
+
+
+
+
+
+
+
 
         public  Task RollBackAsync();
        

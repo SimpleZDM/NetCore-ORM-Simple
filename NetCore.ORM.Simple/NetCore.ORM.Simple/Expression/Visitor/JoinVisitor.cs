@@ -25,7 +25,7 @@ namespace NetCore.ORM.Simple.Visitor
         /// all tables
         /// </summary>
 
-        private string[] tableNames;
+        private TableEntity Table;
 
         private Dictionary<string, int> currentTables;
         /// <summary>
@@ -33,7 +33,7 @@ namespace NetCore.ORM.Simple.Visitor
         /// for table join info
         /// </summary>
 
-        private Dictionary<string, JoinTableEntity> JoinTables;
+        private Dictionary<string,JoinTableEntity> JoinTables;
         /// <summary>
         /// 正在解析连接条件
         /// </summary>
@@ -51,13 +51,15 @@ namespace NetCore.ORM.Simple.Visitor
 
         public JoinVisitor(params string[] _tableNames)
         {
-            if (!Check.IsNull(_tableNames))
+            if (Check.IsNull(_tableNames))
             {
-                tableNames = _tableNames;
+                throw new ArgumentNullException("table isn't exist!");
+                //tableNames = _tableNames;
             }
+            Table = new TableEntity(_tableNames);
             currentTables = new Dictionary<string, int>();
             JoinTables = new Dictionary<string, JoinTableEntity>();
-            JoinTables.Add(tableNames[0], new JoinTableEntity() { DisplayName = tableNames[0], TableType = eTableType.Master });
+            JoinTables.Add(Table.TableNames[0],new JoinTableEntity() { DisplayName = Table.TableNames[0],TableType = eTableType.Master });
             IsComplete = true;
         }
 
@@ -65,21 +67,21 @@ namespace NetCore.ORM.Simple.Visitor
         public string GetValue()
         {
             StringBuilder value = new StringBuilder();
-            foreach (var jTable in JoinTables)
-            {
-                if (jTable.Value.TableType.Equals(eTableType.Master))
-                {
-                    continue;
-                }
-                int length = jTable.Value.QValue.Count;
-                value.Append(jTable.Value.JoinType);
-                value.Append($" {jTable.Key} ON ");
-                for (int i = 0; i < length; i++)
-                {
-                    value.Append($"{jTable.Value.QValue.Dequeue()}");
-                }
-            }
-            Console.WriteLine(value);
+            //foreach (var jTable in JoinTables)
+            //{
+            //    if (jTable.Value.TableType.Equals(eTableType.Master))
+            //    {
+            //        continue;
+            //    }
+            //    int length = jTable.Value.QValue.Count;
+            //    value.Append(jTable.Value.JoinType);
+            //    value.Append($" {jTable.Key} ON ");
+            //    for (int i = 0; i < length; i++)
+            //    {
+            //        value.Append($"{jTable.Value.QValue.Dequeue()}");
+            //    }
+            //}
+            //Console.WriteLine(value);
             return value.ToString();
         }
         /// <summary>
@@ -102,8 +104,12 @@ namespace NetCore.ORM.Simple.Visitor
         public Expression Modify(Expression expression)
         {
             currentTables.Clear();
+            foreach (ParameterExpression item in ((dynamic)expression).Parameters)
+            {
+                currentTables.Add(item.Name, currentTables.Count);
+            }
             Visit(expression);
-            return Visit(expression);
+            return expression;
         }
 
         /// <summary>
@@ -117,12 +123,12 @@ namespace NetCore.ORM.Simple.Visitor
             if (currentTables.Count() > SimpleConst.minTableCount)
             {
                 #region
+                IsComplete = false;
                 switch (node.NodeType)
                 {
                     case ExpressionType.AndAlso:
                         SingleLogicBinary(node, (queue) =>
                         {
-                           // queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.And]);
                             CurrentJoinTable.Conditions.Add(
                                 new ConditionEntity(eConditionType.Sign)
                                 {
@@ -134,7 +140,6 @@ namespace NetCore.ORM.Simple.Visitor
                         break;
                     case ExpressionType.GreaterThan:
                         SingleBinary(node, (queue) => { 
-                            //queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.GrantThan]);
                             currentTree.RelationCondition = new ConditionEntity(eConditionType.Sign) 
                             { 
                                 SignType= eSignType.GrantThan
@@ -143,7 +148,6 @@ namespace NetCore.ORM.Simple.Visitor
                         break;
                     case ExpressionType.GreaterThanOrEqual:
                         SingleBinary(node, (queue) => { 
-                            //queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.GreatThanOrEqual]);
                             currentTree.RelationCondition = new ConditionEntity(eConditionType.Sign)
                             {
                                 SignType = eSignType.GreatThanOrEqual
@@ -152,7 +156,6 @@ namespace NetCore.ORM.Simple.Visitor
                         break;
                     case ExpressionType.LessThan:
                         SingleBinary(node, (queue) => { 
-                           // queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.LessThan]);
                             currentTree.RelationCondition = new ConditionEntity(eConditionType.Sign)
                             {
                                 SignType = eSignType.LessThan
@@ -161,7 +164,6 @@ namespace NetCore.ORM.Simple.Visitor
                         break;
                     case ExpressionType.LessThanOrEqual:
                         SingleBinary(node, (queue) => { 
-                            //queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.LessThanOrEqual]);
                             currentTree.RelationCondition = new ConditionEntity(eConditionType.Sign)
                             {
                                 SignType = eSignType.LessThanOrEqual
@@ -170,7 +172,6 @@ namespace NetCore.ORM.Simple.Visitor
                         break;
                     case ExpressionType.Equal:
                         SingleBinary(node, (queue) => { 
-                            //queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.Equal]);
                             currentTree.RelationCondition = new ConditionEntity(eConditionType.Sign)
                             {
                                 SignType = eSignType.Equal
@@ -179,7 +180,6 @@ namespace NetCore.ORM.Simple.Visitor
                         break;
                     case ExpressionType.NotEqual:
                         SingleBinary(node, (queue) => { 
-                            //queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.NotEqual]);
                             currentTree.RelationCondition = new ConditionEntity(eConditionType.Sign)
                             {
                                 SignType = eSignType.NotEqual
@@ -189,7 +189,6 @@ namespace NetCore.ORM.Simple.Visitor
                     case ExpressionType.OrElse:
                         SingleLogicBinary(node, (queue) =>
                         {
-                            //queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.Or]);
                             CurrentJoinTable.Conditions.Add(
                                     new ConditionEntity(eConditionType.Sign)
                                     {
@@ -216,7 +215,10 @@ namespace NetCore.ORM.Simple.Visitor
             {
                 if (IsComplete)
                 {
+                    
                     CurrentJoinTable = new JoinTableEntity() { TableType = eTableType.Slave };
+                    currentTree = new TreeConditionEntity();
+                    // JoinTables.Add(CurrentJoinTable);
                     switch (node.Value)
                     {
                         case eJoinType.Inner:
@@ -283,13 +285,6 @@ namespace NetCore.ORM.Simple.Visitor
             Console.WriteLine(node.ToString());
             return base.VisitUnary(node);
         }
-
-
-
-        protected override Expression VisitConditional(ConditionalExpression node)
-        {
-            return base.VisitConditional(node);
-        }
         protected override Expression VisitListInit(ListInitExpression node)
         {
             return base.VisitListInit(node);
@@ -303,7 +298,7 @@ namespace NetCore.ORM.Simple.Visitor
             if (currentTables.ContainsKey(node.Expression.ToString()))
             {
                 currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
-                currentTree.LeftCondition.DisplayName = $"{tableNames[currentTables[node.Expression.ToString()]]}.{ node.Member.Name}";
+                currentTree.LeftCondition.DisplayName = $"{Table.TableNames[currentTables[node.Expression.ToString()]]}.{ node.Member.Name}";
                 currentTree.LeftCondition.PropertyType = node.Type;
             }
             return node;
@@ -320,7 +315,6 @@ namespace NetCore.ORM.Simple.Visitor
             if (currentTables.Count > SimpleConst.minTableCount)
             {
                 base.VisitNew(node);
-                Console.WriteLine(node.ToString());
             }
             return node;
         }
@@ -355,7 +349,7 @@ namespace NetCore.ORM.Simple.Visitor
             {
                 action.Invoke(null);
             }
-            if (node.Left is ConstantExpression rightConstant)
+            if (node.Right is ConstantExpression rightConstant)
             {
                 currentTree.RightCondition = new ConditionEntity(eConditionType.Constant);
                 currentTree.RightCondition.DisplayName = GetConstantValue(rightConstant);
@@ -363,7 +357,6 @@ namespace NetCore.ORM.Simple.Visitor
             }
             else if (node.Right is MemberExpression rightMember)
             {
-
                 currentTree.RightCondition = new ConditionEntity(eConditionType.ColumnName);
                 currentTree.RightCondition.DisplayName = GetMemberValue(rightMember);
                 currentTree.LeftCondition.PropertyType = rightMember.Type;
@@ -382,13 +375,12 @@ namespace NetCore.ORM.Simple.Visitor
         {
             if (IsComplete)
             {
+               
                 currentTree = new TreeConditionEntity();
                 IsComplete = false;
             }
-            CurrentJoinTable.QValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.LeftBracket]);
             currentTree.LeftBracket.Add(eSignType.LeftBracket);
             base.Visit(node.Left);
-            CurrentJoinTable.QValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.RightBracket]);
             currentTree.RightBracket.Add(eSignType.RightBracket);
             if (!Check.IsNull(action))
             {
@@ -399,11 +391,8 @@ namespace NetCore.ORM.Simple.Visitor
                 currentTree = new TreeConditionEntity();
                 IsComplete = false;
             }
-            CurrentJoinTable.QValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.LeftBracket]);
             currentTree.LeftBracket.Add(eSignType.LeftBracket);
-
             base.Visit(node.Right);
-            CurrentJoinTable.QValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.RightBracket]);
             currentTree.RightBracket.Add(eSignType.RightBracket);
         }
         /// <summary>
@@ -417,15 +406,15 @@ namespace NetCore.ORM.Simple.Visitor
             if (!Check.IsNull(member))
             {
 
-                if (tableNames.Length > SimpleConst.minTableCount)
+                if (Table.TableNames.Length > SimpleConst.minTableCount)
                 {
                     if (currentTables.ContainsKey(member.Expression.ToString()))
                     {
-                        if (!JoinTables.ContainsKey(tableNames[currentTables[member.Expression.ToString()]]))
+                        if (!JoinTables.ContainsKey(Table.TableNames[currentTables[member.Expression.ToString()]]))
                         {
                             CreateJoinTable(member);
                         }
-                        mName = $"{tableNames[currentTables[member.Expression.ToString()]]}.{member.Member.Name}";
+                        mName = $"{Table.TableNames[currentTables[member.Expression.ToString()]]}.{member.Member.Name}";
 
                     }
 
@@ -444,15 +433,7 @@ namespace NetCore.ORM.Simple.Visitor
             string mName = string.Empty;
             if (!Check.IsNull(constant))
             {
-
-                if (constant.Type == typeof(string))
-                {
-                    CurrentJoinTable.QValue.Enqueue($"'{constant.Value}'");
-                }
-                else
-                {
-                    CurrentJoinTable.QValue.Enqueue($"{constant.Value}");
-                }
+                mName = constant.Value.ToString();
             }
             return mName;
         }
@@ -466,25 +447,21 @@ namespace NetCore.ORM.Simple.Visitor
             if (!Check.IsNull(member))
             {
                 string mName = string.Empty;
-                if (tableNames.Length > SimpleConst.minTableCount)
+                if (Table.TableNames.Length > SimpleConst.minTableCount)
                 {
                     if (currentTables.ContainsKey(member.Expression.ToString()))
                     {
-                        if (!JoinTables.ContainsKey(tableNames[currentTables[member.Expression.ToString()]]))
+                        if (!JoinTables.ContainsKey(Table.TableNames[currentTables[member.Expression.ToString()]]))
                         {
                             if (Check.IsNull(CurrentJoinTable))
                             {
-                                CurrentJoinTable = new JoinTableEntity()
-                                {
-                                    DisplayName = tableNames[currentTables[member.Expression.ToString()]],
-                                    //JoinStr = JoinInfos.Last(),
+                                CurrentJoinTable = new JoinTableEntity();
 
-                                };
                             }
-                            else
-                            {
-                                CurrentJoinTable.DisplayName = tableNames[currentTables[member.Expression.ToString()]];
-                            }
+                            Dictionary<string, string> dic = new Dictionary<string, string>();
+
+                            CurrentJoinTable.AsName = Table.TableNames[currentTables[member.Expression.ToString()]];
+                            CurrentJoinTable.DisplayName = Table.DicTable[CurrentJoinTable.AsName].DisplayNmae;
                             JoinTables.Add(CurrentJoinTable.DisplayName, CurrentJoinTable);
                         }
                     }

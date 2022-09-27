@@ -20,15 +20,12 @@ namespace NetCore.ORM.Simple.Visitor
 {
     public class MapVisitor : ExpressionVisitor
     {
-        /// <summary>
-        /// 存放Expression表达式树的内容
-        /// </summary>
-        private Queue<string> qValue;
+      
         /// <summary>
         /// 所有的表
         /// </summary>
 
-        private string[] tableNames;
+        private TableEntity Table;
         /// <summary>
         /// 当前传入的参数表
         /// </summary>
@@ -45,14 +42,13 @@ namespace NetCore.ORM.Simple.Visitor
         private bool IsAgain;
         public MapVisitor(params string[] _tableNames)
         {
-            if (!Check.IsNull(_tableNames))
+            if (Check.IsNull(_tableNames))
             {
-                tableNames = _tableNames;
+                throw new ArgumentNullException("Table isn't exist!");
             }
+            Table= new TableEntity(_tableNames);
             currentTables = new Dictionary<string, int>();
-            qValue = new Queue<string>();
             mapInfos = new List<MapEntity>();
-
         }
 
         public List<MapEntity> GetMapInfos()
@@ -62,12 +58,12 @@ namespace NetCore.ORM.Simple.Visitor
         public string GetValue()
         {
             StringBuilder value = new StringBuilder();
-            int length = qValue.Count();
-            for (int i = 0; i < length; i++)
-            {
-                value.Append($" `{qValue.Dequeue()}` ");
-            }
-            Console.WriteLine(value.ToString());
+            //int length = qValue.Count();
+            //for (int i = 0; i < length; i++)
+            //{
+            //    value.Append($" `{qValue.Dequeue()}` ");
+            //}
+            //Console.WriteLine(value.ToString());
             return value.ToString();
         }
         /// <summary>
@@ -78,7 +74,7 @@ namespace NetCore.ORM.Simple.Visitor
         public Expression Modify(Expression expression)
         {
             currentTables.Clear();
-            if (Check.IsNull(mapInfos))
+            if (Check.IsNull(mapInfos)||mapInfos.Count==0)
             {
                 mapInfos = new List<MapEntity>();
                 IsAgain = false;
@@ -93,7 +89,13 @@ namespace NetCore.ORM.Simple.Visitor
                     }
                 }
             }
+
+            foreach (ParameterExpression item in ((dynamic)expression).Parameters)
+            {
+                currentTables.Add(item.Name,currentTables.Count);
+            }
             Visit(expression);
+            
             IsAgain = true;
             return expression;
         }
@@ -246,13 +248,13 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            qValue.Enqueue(node.Value.ToString());
+            //qValue.Enqueue(node.Value.ToString());
             return base.VisitConstant(node);
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            Console.WriteLine(node.Method.Name);
+            // Console.WriteLine(node.Method.Name);
             return base.VisitMethodCall(node);
         }
 
@@ -280,9 +282,7 @@ namespace NetCore.ORM.Simple.Visitor
         protected override MemberBinding VisitMemberBinding(MemberBinding node)
         {
             base.VisitMemberBinding(node);
-            //view中的值
             currentmapInfo.PropName = node.Member.Name;
-            //entity_key.Add(node.Member.Name);
             return node;
         }
 
@@ -294,44 +294,6 @@ namespace NetCore.ORM.Simple.Visitor
             }
             return base.VisitParameter(node);
         }
-        protected override Expression VisitUnary(UnaryExpression node)
-        {
-            Console.WriteLine(node.ToString());
-            return base.VisitUnary(node);
-        }
-
-        protected override Expression VisitBlock(BlockExpression node)
-        {
-            Console.WriteLine(node.ToString());
-            return base.VisitBlock(node);
-        }
-
-        protected override Expression VisitConditional(ConditionalExpression node)
-        {
-            Console.WriteLine(node.ToString());
-            return base.VisitConditional(node);
-        }
-
-
-        protected override Expression VisitDefault(DefaultExpression node)
-        {
-            Console.WriteLine(node.ToString());
-            return base.VisitDefault(node);
-        }
-
-        protected override Expression VisitDynamic(DynamicExpression node)
-        {
-            Console.WriteLine(node.ToString());
-            return base.VisitDynamic(node);
-        }
-
-
-        protected override Expression VisitGoto(GotoExpression node)
-        {
-            Console.WriteLine(node.ToString());
-            return base.VisitGoto(node);
-        }
-
 
         protected override Expression VisitListInit(ListInitExpression node)
         {
@@ -355,20 +317,18 @@ namespace NetCore.ORM.Simple.Visitor
             Console.WriteLine(node.ToString());
             if (currentTables.ContainsKey(node.Expression.ToString()))
             {
-                ///表示重复
                 if (IsAgain)
                 {
 
                      currentmapInfo=mapInfos.FirstOrDefault(m=>m.PropName.Equals(node.Member.Name));
                      currentmapInfo.IsNeed = true;
-                     //qValue.Enqueue($"{tableNames[currentTables[node.Expression.ToString()]]}.{node.Member.Name} AS {data_key[data_key.Count() - 1]}");
                 }
                 else
                 {
                     currentmapInfo = new MapEntity();
                     mapInfos.Add(currentmapInfo);
                     currentmapInfo.ColumnName = node.Member.Name;
-                    currentmapInfo.TableName = tableNames[currentTables[node.Expression.ToString()]];
+                    currentmapInfo.TableName = Table.TableNames[currentTables[node.Expression.ToString()]];
                 }
 
             }
@@ -377,13 +337,11 @@ namespace NetCore.ORM.Simple.Visitor
 
         protected override Expression VisitMemberInit(MemberInitExpression node)
         {
-            Console.WriteLine(node.ToString());
             return base.VisitMemberInit(node);
         }
 
         protected override Expression VisitNew(NewExpression node)
         {
-            Console.WriteLine(node.ToString());
             return base.VisitNew(node);
         }
 
@@ -433,12 +391,12 @@ namespace NetCore.ORM.Simple.Visitor
             if (node.Left is MemberExpression member)
             {
                 string mName = string.Empty;
-                if (tableNames.Length > SimpleConst.minTableCount)
+                if (Table.TableNames.Length > SimpleConst.minTableCount)
                 {
                     if (currentTables.ContainsKey(member.Expression.ToString()))
                     {
 
-                        mName = $"{tableNames[currentTables[member.Expression.ToString()]]}.{member.Member.Name}";
+                        mName = $"{Table.TableNames[currentTables[member.Expression.ToString()]]}.{member.Member.Name}";
                     }
 
                 }
@@ -446,16 +404,15 @@ namespace NetCore.ORM.Simple.Visitor
                 {
                     mName = member.Member.Name;
                 }
-                qValue.Enqueue(mName);
 
             }
             if (!Check.IsNull(action))
             {
-                action.Invoke(qValue);
+                action.Invoke(null);
             }
             if (node.Right is ConstantExpression constant)
             {
-                qValue.Enqueue(constant.Value.ToString());
+               // qValue.Enqueue(constant.Value.ToString());
             }
         }
 
@@ -466,16 +423,16 @@ namespace NetCore.ORM.Simple.Visitor
         /// <param name="action"></param>
         private void SingleLogicBinary(BinaryExpression node, Action<Queue<string>> action)
         {
-            qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.LeftBracket]);
+            //qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.LeftBracket]);
             base.Visit(node.Left);
-            qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.RightBracket]);
+           // qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.RightBracket]);
             if (!Check.IsNull(action))
             {
-                action.Invoke(qValue);
+                action.Invoke(null);
             }
-            qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.LeftBracket]);
+            // qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.LeftBracket]);
             base.Visit(node.Right);
-            qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.RightBracket]);
+            // qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.RightBracket]);
         }
     }
 }

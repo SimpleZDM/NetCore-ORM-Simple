@@ -21,17 +21,10 @@ namespace NetCore.ORM.Simple.Queryable
     public class SimpleQueryable<T>
         :QueryResult<T>,ISimpleQueryable<T>
     {
-        public SimpleQueryable(eDBType DbType)
+        public SimpleQueryable(eDBType DbType,DBDrive dbDrive)
         {
             string tableName=ReflectExtension.GetTypeName<T>();
-            Init(DbType,tableName);
-        }
-
-        public IQueryResult<TResult> Select<TResult>(Expression<Func<T, TResult>> expression)
-        {
-            mapVisitor.Modify(expression);
-            IQueryResult<TResult> query = new QueryResult<TResult>(mapVisitor,joinVisitor,conditionVisitor,DBType);
-            return query;
+            Init(DbType, dbDrive,tableName);
         }
 
         ISimpleQueryable<T> ISimpleQueryable<T>.SimpleQueryable()

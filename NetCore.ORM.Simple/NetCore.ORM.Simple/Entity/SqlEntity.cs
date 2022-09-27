@@ -23,8 +23,8 @@ namespace NetCore.ORM.Simple.Entity
         {
             Sb_Sql=new StringBuilder();
             DbParams = new List<DbParameter>(10);
-            TakeNumber = -1;
-            SkipNumber = -1;
+            PageSize = -1;
+            PageNumber = -1;
         }
         /// <summary>
         /// 拼装之后的语句
@@ -37,11 +37,11 @@ namespace NetCore.ORM.Simple.Entity
         /// <summary>
         /// 取出的数据
         /// </summary>
-        public int TakeNumber { get { return takeNumber; } set { takeNumber = value; } }
+        public int PageNumber { get { return pageNumber; } set { pageNumber = value; } }
         /// <summary>
         /// 跳过的数据
         /// </summary>
-        public int SkipNumber { get { return skipNumber; } set { skipNumber = value; } }
+        public int PageSize { get { return pageSize; } set { pageSize = value; } }
 
         /// <summary>
         /// 语句的类型
@@ -51,8 +51,8 @@ namespace NetCore.ORM.Simple.Entity
 
         private List<DbParameter> dbParams;
         private StringBuilder sb_Sql;
-        private int takeNumber;
-        private int skipNumber;
+        private int pageNumber;
+        private int pageSize;
         private eDbCommandType dbCommandType;
 
 
