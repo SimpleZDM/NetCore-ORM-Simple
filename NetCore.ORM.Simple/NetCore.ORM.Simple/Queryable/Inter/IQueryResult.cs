@@ -29,6 +29,22 @@ namespace NetCore.ORM.Simple.Queryable
         public  ISimpleGroupByQueryable<TResult, TOrder> OrderBy<TOrder>(Expression<Func<TResult, TOrder>> expression) where TOrder : class;
         public ISimpleGroupByQueryable<TResult, TGroup> GroupBy<TGroup>(Expression<Func<TResult, TGroup>> expression)where TGroup :class;
 
+        public int Count();
+       
+        public bool Any();
+        
+        public  Task<int> CountAsync();
+       
+        public  Task<bool> AnyAsync();
+       
+        public TResult First();
+       
+        public  Task<TResult> FirstAsync();
+       
+        public TResult FirstOrDefault();
+       
+        public  Task<TResult> FirstOrDefaultAsync();
+
 
 
     }

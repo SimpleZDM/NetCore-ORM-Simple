@@ -13,7 +13,6 @@ public static class Program
     public static int Main(string []args)
     {
         string [] arry=new string[] { "sdfsd", "sdfsd", "sdfasd" };
-        var i=arry.Where(i=>i.Equals("11")).First();
         //Console.WriteLine(DateTime.Now.ToString("yyyy-M-dd HH:mm"));
         //eJoinType join=eJoinType.Inner;
         //Console.WriteLine(join.ToString());
@@ -78,35 +77,35 @@ public static class Program
                 ReadWeight=5,
                 WriteReadType=eWriteOrReadType.ReadOrWrite
             }));
- //       Stopwatch watch = new Stopwatch();
- //       int lenght = 100;
- //       watch.Start();
- //       for (int i = 0; i < 100; i++)
- //       {
- //var data1=simpleClient.GetEntity<UserEntity,CompanyEntity,RoleEntity>(
- //           new UserEntity() { Id = 10, Name = "test" },
- //           (u)=>new CompanyEntity() { CompanyName=u.Name,ID=u.Id},
- //           (u)=>new RoleEntity() { DisplayName=u.CompanyName,Id=u.ID}
- //           );
- //       }
+        //       Stopwatch watch = new Stopwatch();
+        //       int lenght = 100;
+        //       watch.Start();
+        //       for (int i = 0; i < 100; i++)
+        //       {
+        //var data1=simpleClient.GetEntity<UserEntity,CompanyEntity,RoleEntity>(
+        //           new UserEntity() { Id = 10, Name = "test" },
+        //           (u)=>new CompanyEntity() { CompanyName=u.Name,ID=u.Id},
+        //           (u)=>new RoleEntity() { DisplayName=u.CompanyName,Id=u.ID}
+        //           );
+        //       }
 
- //       watch.Stop();
- //       Console.WriteLine($"******************用时:{watch.ElapsedMilliseconds}********************");
- //       Console.WriteLine($"*********************单次时长:{watch.ElapsedMilliseconds/(lenght+0.0)}毫秒*****************");
- //       Dictionary<string,object> map = new Dictionary<string,object>();
- //       map.Add("Name","sadfasd");
- //       map.Add("Age",100);
- //       UserEntity user = new UserEntity();
- //       watch.Start();
- //       for (int i = 0; i < 100; i++)
- //       {
- //           var data1 = simpleClient.GetEntity<UserEntity>(map
- //                      );
- //       }
+        //       watch.Stop();
+        //       Console.WriteLine($"******************用时:{watch.ElapsedMilliseconds}********************");
+        //       Console.WriteLine($"*********************单次时长:{watch.ElapsedMilliseconds/(lenght+0.0)}毫秒*****************");
+        //       Dictionary<string,object> map = new Dictionary<string,object>();
+        //       map.Add("Name","sadfasd");
+        //       map.Add("Age",100);
+        //       UserEntity user = new UserEntity();
+        //       watch.Start();
+        //       for (int i = 0; i < 100; i++)
+        //       {
+        //           var data1 = simpleClient.GetEntity<UserEntity>(map
+        //                      );
+        //       }
 
- //       watch.Stop();
- //       Console.WriteLine($"******************用时:{watch.ElapsedMilliseconds}********************");
- //       Console.WriteLine($"*********************单次时长:{watch.ElapsedMilliseconds / (lenght + 0.0)}毫秒*****************");
+        //       watch.Stop();
+        //       Console.WriteLine($"******************用时:{watch.ElapsedMilliseconds}********************");
+        //       Console.WriteLine($"*********************单次时长:{watch.ElapsedMilliseconds / (lenght + 0.0)}毫秒*****************");
 
         //var command=simpleClient.Insert(
         //    new UserEntity() {
@@ -125,13 +124,13 @@ public static class Program
         //      RoleID= 10
         //  });
 
-        TestSimple();
+        TestSimpleQuery();
         //Expression<Func<UserEntity, UserEntity>> expression = (u) => new UserEntity { Name=u.Name};
         //expression.Compile().Invoke(new UserEntity());
 
         return 0;
     }
-    public static void TestSimple()
+    public static void TestSimpleQuery()
     {
         Console.WriteLine("*******************Simple*************************");
         Stopwatch watch = new Stopwatch();
@@ -153,9 +152,17 @@ public static class Program
         });
         for (int i = 0; i < 20; i++)
         {
-            var data=simpleClient.Queryable<MissionDetailEntity>().
-                Where(m=>m.Id.Equals("00073aec-630b-4d4f-b042-067ed92db178")).Take(500).ToListAsync().Result;
-            Console.WriteLine(i);
+            var data=simpleClient.Queryable<MissionDetailEntity>()
+                .Take(500).ToListAsync().Result;
+
+            var count = simpleClient.Queryable<MissionDetailEntity>().
+                Take(500).Count();
+            var Any = simpleClient.Queryable<MissionDetailEntity>().
+           Take(500).Any();
+            var firest = simpleClient.Queryable<MissionDetailEntity>().First();
+            var FirstOrDefault = simpleClient.Queryable<MissionDetailEntity>().FirstOrDefault();
+            Console.WriteLine($"count:{count}");
+            Console.WriteLine($"Any:{Any}");
         }
        
         #endregion

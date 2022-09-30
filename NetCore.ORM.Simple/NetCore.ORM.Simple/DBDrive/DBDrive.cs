@@ -217,7 +217,7 @@ namespace NetCore.ORM.Simple
         {
             if (!Check.IsNull(funcs))
             {
-                if ((int)configuration.CurrentConnectInfo.DBType > funcs.Length)
+                if ((int)configuration.CurrentConnectInfo.DBType < funcs.Length)
                 {
                     await funcs[(int)configuration.CurrentConnectInfo.DBType].Invoke();
                 }
@@ -228,7 +228,7 @@ namespace NetCore.ORM.Simple
         {
             if (!Check.IsNull(funcs))
             {
-                if ((int)configuration.CurrentConnectInfo.DBType > funcs.Length)
+                if ((int)configuration.CurrentConnectInfo.DBType < funcs.Length)
                 {
                     return funcs[(int)configuration.CurrentConnectInfo.DBType].Invoke();
                 }

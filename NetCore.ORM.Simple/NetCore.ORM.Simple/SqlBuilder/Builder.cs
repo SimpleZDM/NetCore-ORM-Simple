@@ -121,6 +121,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
         public void GetCount(SelectEntity select, QueryEntity entity)
         {
+             
              MatchDBType(() => mysqlBuilder.GetCount(select,entity));
         }
 

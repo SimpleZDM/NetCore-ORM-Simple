@@ -89,7 +89,7 @@ namespace NetCore.ORM.Simple
             await ExcuteAsync(entity, async (command) =>
             {
                 dataRead = await command.ExecuteReaderAsync();
-                var data = MapData<TResult>();
+                data = MapData<TResult>();
             });
             return data;
         }
@@ -116,7 +116,7 @@ namespace NetCore.ORM.Simple
              Excute(entity, (command) =>
             {
                 dataRead = command.ExecuteReader();
-                var data = MapData<TResult>(entity);
+                 data = MapData<TResult>(entity);
             });
             return data;
         }
@@ -126,7 +126,7 @@ namespace NetCore.ORM.Simple
             Excute(entity, (command) =>
             {
                 dataRead = command.ExecuteReader();
-                var data = MapDataFirstOrDefault<TResult>(entity);
+                data = MapDataFirstOrDefault<TResult>(entity);
             });
             return data;
         }
@@ -136,7 +136,7 @@ namespace NetCore.ORM.Simple
             await ExcuteAsync(entity, async(command) =>
             {
                 dataRead =await command.ExecuteReaderAsync();
-                var data = MapDataFirstOrDefault<TResult>(entity);
+                data = MapDataFirstOrDefault<TResult>(entity);
             });
             return data;
         }
@@ -475,13 +475,13 @@ namespace NetCore.ORM.Simple
             TResult tResult = null;
             while (dataRead.Read())
             {
-                TResult tresult = Activator.CreateInstance<TResult>();
+                tResult = Activator.CreateInstance<TResult>();
 
                 foreach (var item in entity.MapInfos)
                 {
                     if (PropMapNames.ContainsKey(item.PropName))
                     {
-                        PropMapNames[item.PropName].SetPropValue(tresult, dataRead[item.AsColumnName]);
+                        PropMapNames[item.PropName].SetPropValue(tResult, dataRead[item.AsColumnName]);
                     }
                 }
                 break;
