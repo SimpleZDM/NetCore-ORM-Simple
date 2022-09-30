@@ -56,6 +56,10 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <returns></returns>
         public void GetSelect<TData>(SelectEntity select,QueryEntity entity);
 
+        public SqlCommandEntity GetDelete<TDate>(Type type, List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions);
+
+        public SqlCommandEntity GetDelete<TData>(TData data);
+
         public void GetLastInsert<TData>(QueryEntity sql);
     }
 }

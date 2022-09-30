@@ -23,11 +23,11 @@ namespace NetCore.ORM.Simple.Queryable
         public IQueryResult<TResult> ToPage(int takeNumber, int skipNumber);
         public IEnumerable<TResult> ToList();
         public Task<IEnumerable<TResult>> ToListAsync();
-        public IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<TResult,TNewResult>> expression);
+        public IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<TResult,TNewResult>> expression) where TNewResult : class;
         public IQueryResult<TResult> Select(Expression<Func<TResult,TResult>> expression);
         public IQueryResult<TResult> Where(Expression<Func<TResult,bool>>expression);
-        public  ISimpleGroupByQueryable<TResult, TOrder> OrderBy<TOrder>(Expression<Func<TResult, TOrder>> expression);
-        public ISimpleGroupByQueryable<TResult, TGroup> GroupBy<TGroup>(Expression<Func<TResult, TGroup>> expression);
+        public  ISimpleGroupByQueryable<TResult, TOrder> OrderBy<TOrder>(Expression<Func<TResult, TOrder>> expression) where TOrder : class;
+        public ISimpleGroupByQueryable<TResult, TGroup> GroupBy<TGroup>(Expression<Func<TResult, TGroup>> expression)where TGroup :class;
 
 
 

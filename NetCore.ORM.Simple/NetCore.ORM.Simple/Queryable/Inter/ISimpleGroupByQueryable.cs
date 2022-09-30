@@ -43,7 +43,7 @@ namespace NetCore.ORM.Simple.Queryable
       
         public int Count();
        
-        public IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<ISimpleGroupByQueryable<TResult, TGroup>,TNewResult>> expression);
+        public IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<ISimpleGroupByQueryable<TResult, TGroup>,TNewResult>> expression)where TNewResult : class;
 
         public ISimpleGroupByQueryable<TResult,TGroup> OrderBy<TOrder>(Expression<Func<ISimpleGroupByQueryable<TResult,TGroup>,TOrder>> expression);
 

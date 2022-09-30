@@ -19,6 +19,8 @@ namespace NetCore.ORM.Simple
 {
     public class SqlServiceDrive : IDBDrive
     {
+        public Action<string, DbParameter[]> AOPSqlLog { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         public Task BeginTransactionAsync()
         {
             throw new NotImplementedException();
@@ -44,12 +46,47 @@ namespace NetCore.ORM.Simple
             throw new NotImplementedException();
         }
 
+        public IEnumerable<TResult> Read<TResult>(QueryEntity entity) where TResult : class
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ReadAny(QueryEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> ReadAnyAsync(QueryEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
+        public Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity) where TResult : class
+        {
+            throw new NotImplementedException();
+        }
+
+        public int ReadCount(QueryEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> ReadCountAsync(QueryEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public TResult ReadFirstOrDefault<TResult>(QueryEntity entity) where TResult : class
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity) where TResult : class
         {
             throw new NotImplementedException();
         }

@@ -16,9 +16,9 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Queryable
 {
-    public interface ISimpleQueryable<T1,T2,T3,T4>:IQueryResult<T1>
+    public interface ISimpleQueryable<T1,T2,T3,T4>:IQueryResult<T1> where T1 : class
     {  
-        public IQueryResult<TResult> Select<TResult>(Expression<Func<T1,T2,T3,T4,TResult>> expression);
+        public IQueryResult<TResult> Select<TResult>(Expression<Func<T1,T2,T3,T4,TResult>> expression) where TResult : class;
         public ISimpleQueryable<T1, T2, T3, T4> Where(Expression<Func<T1, T2, T3, T4, bool>> expression);
     }
 }

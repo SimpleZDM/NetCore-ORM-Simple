@@ -38,6 +38,9 @@ namespace NetCore.ORM.Simple
                 connection.ConnectionString = connectStr;
             }
         }
+
+        public Action<string, DbParameter[]> AOPSqlLog { get{ return aopSqlLog; } set{ aopSqlLog = value; } }
+
         private MySqlConnection connection;
         private MySqlCommand command;
         private DbDataReader dataRead;
@@ -45,6 +48,7 @@ namespace NetCore.ORM.Simple
         private bool isBeginTransaction;
         private MySqlTransaction transaction;
         private DataBaseConfiguration configuration;
+        private Action<string, DbParameter[]> aopSqlLog;
 
         /// <summary>
         /// 
@@ -77,24 +81,18 @@ namespace NetCore.ORM.Simple
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params)
         {
-            if (!IsOpenConnect())
+
+            var entity=new QueryEntity();
+            entity.StrSqlValue.Append(sql);
+            entity.DbParams.AddRange(Params);
+            IEnumerable<TResult> data = null;
+            await ExcuteAsync(entity, async (command) =>
             {
-                Open();
-            }
-            command = new MySqlCommand(sql, connection);
-            if (!Check.IsNull(Params) && Params.Length > 0)
-            {
-                command.Parameters.AddRange(Params);
-            }
-            dataRead = await command.ExecuteReaderAsync();
-            var data = MapData<TResult>();
-            if (configuration.CurrentConnectInfo.IsAutoClose)
-            {
-                Close();
-            }
+                dataRead = await command.ExecuteReaderAsync();
+                var data = MapData<TResult>();
+            });
             return data;
         }
-
         /// <summary>
         /// 
         /// </summary>
@@ -102,8 +100,142 @@ namespace NetCore.ORM.Simple
         /// <param name="sql"></param>
         /// <param name="Params"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
+        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity) where TResult : class
         {
+            IEnumerable<TResult> data = null;
+            await ExcuteAsync(entity,async(command) =>
+            {
+              dataRead = await command.ExecuteReaderAsync();
+              data = MapData<TResult>(entity);
+            });
+            return data;
+        }
+        public IEnumerable<TResult> Read<TResult>(QueryEntity entity) where TResult : class
+        {
+            IEnumerable<TResult> data = null;
+             Excute(entity, (command) =>
+            {
+                dataRead = command.ExecuteReader();
+                var data = MapData<TResult>(entity);
+            });
+            return data;
+        }
+        public TResult ReadFirstOrDefault<TResult>(QueryEntity entity) where TResult : class
+        {
+            TResult data = null;
+            Excute(entity, (command) =>
+            {
+                dataRead = command.ExecuteReader();
+                var data = MapDataFirstOrDefault<TResult>(entity);
+            });
+            return data;
+        }
+        public async Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity) where TResult : class
+        {
+            TResult data = null;
+            await ExcuteAsync(entity, async(command) =>
+            {
+                dataRead =await command.ExecuteReaderAsync();
+                var data = MapDataFirstOrDefault<TResult>(entity);
+            });
+            return data;
+        }
+        public int ReadCount(QueryEntity entity)
+        {
+            //TResult data = null;
+            int value=0;
+             Excute(entity,  (command) =>
+            {
+                dataRead =  command.ExecuteReader();
+                while (dataRead.Read())
+                {
+                    string strValue=dataRead[CommonConst.StrDataCount].ToString();
+                    int.TryParse(strValue,out value);
+                }
+                //var data = MapDataFirstOrDefault<TResult>(entity);
+            });
+            return value;
+        }
+
+        public async Task<int> ReadCountAsync(QueryEntity entity)
+        {
+            //TResult data = null;
+            int value=0;
+            await ExcuteAsync(entity, async(command) =>
+            {
+                dataRead =await command.ExecuteReaderAsync();
+                while (dataRead.Read())
+                {
+                    string strValue = dataRead[CommonConst.StrDataCount].ToString();
+                    int.TryParse(strValue, out value);
+                }
+                //var data = MapDataFirstOrDefault<TResult>(entity);
+            });
+            return value;
+        }
+
+        public async Task<bool> ReadAnyAsync(QueryEntity entity)
+        {
+            return await ReadCountAsync(entity)>CommonConst.ZeroOrNull;
+        }
+        public  bool ReadAny(QueryEntity entity)
+        {
+            return  ReadCount(entity) >CommonConst.ZeroOrNull;
+        }
+
+
+        /// <summary>
+        /// 执行命令
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name=""></param>
+        /// <returns></returns>
+        public async Task<int> ExcuteAsync(SqlCommandEntity entity)
+        {
+            int result = 0;
+            await ExcuteAsync(entity, async(command) =>
+            {
+              result = await command.ExecuteNonQueryAsync();
+            });
+            return result;
+        }
+
+        /// <summary>
+        /// 添加成功后返回单个实体
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
+        {
+            TEntity result=null;
+            await ExcuteAsync(entity, async (command) =>
+            {
+                int result = await command.ExecuteNonQueryAsync();
+                if (result == 0)
+                {
+                    return;
+                }
+                command.CommandText = query;
+                command.Parameters.Clear();
+                dataRead = await command.ExecuteReaderAsync();
+                var data = MapData<TEntity>().FirstOrDefault();
+            });
+            return result;
+        }
+
+
+
+
+
+
+        private void Excute(QueryEntity entity, Action<MySqlCommand> action)
+        {
+            if (Check.IsNull(action))
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
             if (!IsOpenConnect())
             {
                 Open();
@@ -113,15 +245,110 @@ namespace NetCore.ORM.Simple
             {
                 command.Parameters.AddRange(entity.DbParams.ToArray());
             }
-            dataRead = await command.ExecuteReaderAsync();
-            var data = MapData<TResult>(entity);
+            if (!Check.IsNull(AOPSqlLog))
+            {
+                AOPSqlLog.Invoke(entity.StrSqlValue.ToString(), entity.DbParams.ToArray());
+            }
+            action(command);
             if (configuration.CurrentConnectInfo.IsAutoClose)
             {
                 command.Dispose();
                 Close();
             }
-            return data;
         }
+
+        private async Task ExcuteAsync(QueryEntity entity, Action<MySqlCommand> action)
+        {
+            await Task.Run(() =>
+            {
+                if (Check.IsNull(action))
+                {
+                    throw new ArgumentNullException(nameof(action));
+                }
+                if (!IsOpenConnect())
+                {
+                    Open();
+                }
+                command = new MySqlCommand(entity.StrSqlValue.ToString(), connection);
+
+                if (!Check.IsNull(entity.DbParams) && entity.DbParams.Count > 0)
+                {
+                    command.Parameters.AddRange(entity.DbParams.ToArray());
+                }
+                if (!Check.IsNull(AOPSqlLog))
+                {
+                    AOPSqlLog.Invoke(entity.StrSqlValue.ToString(), entity.DbParams.ToArray());
+                }
+                action(command);
+               
+                if (configuration.CurrentConnectInfo.IsAutoClose)
+                {
+                    command.Dispose();
+                    Close();
+                }
+            });
+        }
+
+        private void Excute(SqlCommandEntity entity, Action<MySqlCommand> action)
+        {
+            if (Check.IsNull(action))
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+            if (!IsOpenConnect())
+            {
+                Open();
+            }
+            command = new MySqlCommand(entity.StrSqlValue.ToString(), connection);
+            if (!Check.IsNull(entity.DbParams) && entity.DbParams.Count > 0)
+            {
+                command.Parameters.AddRange(entity.DbParams.ToArray());
+            }
+
+            if (!Check.IsNull(AOPSqlLog))
+            {
+                AOPSqlLog.Invoke(entity.StrSqlValue.ToString(), entity.DbParams.ToArray());
+            }
+            action(command);
+           
+            if (configuration.CurrentConnectInfo.IsAutoClose && !isBeginTransaction)
+            {
+                Close();
+            }
+        }
+
+        private async Task ExcuteAsync(SqlCommandEntity entity, Action<MySqlCommand> action)
+        {
+            await Task.Run(() =>
+            {
+                if (Check.IsNull(action))
+                {
+                    throw new ArgumentNullException(nameof(action));
+                }
+                if (!IsOpenConnect())
+                {
+                    Open();
+                }
+                command = new MySqlCommand(entity.StrSqlValue.ToString(), connection);
+                if (!Check.IsNull(entity.DbParams) && entity.DbParams.Count > 0)
+                {
+                    command.Parameters.AddRange(entity.DbParams.ToArray());
+                }
+                if (!Check.IsNull(AOPSqlLog))
+                {
+                    AOPSqlLog.Invoke(entity.StrSqlValue.ToString(),entity.DbParams.ToArray());
+                }
+                action(command);
+
+                if (configuration.CurrentConnectInfo.IsAutoClose && !isBeginTransaction)
+                {
+                    Close();
+                }
+            });
+
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -146,7 +373,7 @@ namespace NetCore.ORM.Simple
             List<TResult> data = new List<TResult>();
             while (dataRead.Read())
             {
-                TResult tresult = (TResult)Activator.CreateInstance(type, new object[] { });
+                TResult tresult = (TResult)Activator.CreateInstance(type);
                 for (int i = 0; i < dataRead.FieldCount; i++)
                 {
                     string key = dataRead.GetName(i);
@@ -161,8 +388,7 @@ namespace NetCore.ORM.Simple
             }
             return data;
         }
-
-        private IEnumerable<TResult> MapData<TResult>(QueryEntity entity)
+        private IEnumerable<TResult> MapData<TResult>(QueryEntity entity) where TResult : class
         {
             if (Check.IsNull(dataRead))
             {
@@ -170,103 +396,114 @@ namespace NetCore.ORM.Simple
             }
             Type type = typeof(TResult);
             Dictionary<string, PropertyInfo> PropMapNames = GetPropMapNames(type.GetProperties());
-            List<TResult> data = new List<TResult>();
+            IEnumerable<TResult> data = null;
             if (entity.LastAnonymity)
             {
                 if (entity.LastType.Count().Equals(1))
                 {
-                    while (dataRead.Read())
-                    {
-                        object obj = Activator.CreateInstance(entity.LastType[0]);
-                       
-                        
-                            foreach (var item in entity.MapInfos.Where(m=>m.IsNeed))
-                            {
-                                var Prop = entity.LastType[0].GetProperty(item.LastPropName);
-                                Prop.SetPropValue(obj,dataRead[item.AsColumnName]);
-                            }
-                        TResult tResult = entity.GetResult<TResult>(obj);
-                        data.Add(tResult);
-                    }
+                    data = ReadDataAnonymity<TResult>(entity);
                 }
 
             }
             else
             {
-                while (dataRead.Read())
-                {
-                    TResult tresult = Activator.CreateInstance<TResult>();
-
-                    foreach (var item in entity.MapInfos)
-                    {
-                        if (PropMapNames.ContainsKey(item.PropName))
-                        {
-                            PropMapNames[item.PropName].SetPropValue(tresult, dataRead[item.AsColumnName]);
-                        }
-                    }
-                    data.Add(tresult);
-                }
+                data = ReadData<TResult>(entity, PropMapNames);
             }
 
             return data;
         }
-
-        /// <summary>
-        /// 执行命令
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name=""></param>
-        /// <returns></returns>
-        public async Task<int> ExcuteAsync(SqlCommandEntity entity)
+        private TResult MapDataFirstOrDefault<TResult>(QueryEntity entity) where TResult : class
         {
-            if (!IsOpenConnect())
-            {
-                Open();
-            }
-            command = new MySqlCommand(entity.StrSqlValue.ToString(), connection);
-            if (!Check.IsNull(entity.DbParams))
-            {
-                command.Parameters.Add(entity.DbParams.ToArray());
-            }
-            int result = await command.ExecuteNonQueryAsync();
-
-            if (configuration.CurrentConnectInfo.IsAutoClose && !isBeginTransaction)
-            {
-                Close();
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// 添加成功后返回单个实体
-        /// </summary>
-        /// <typeparam name="TEntity"></typeparam>
-        /// <param name="sql"></param>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public async Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
-        {
-            if (!IsOpenConnect())
-            {
-                Open();
-            }
-            command = new MySqlCommand(entity.StrSqlValue.ToString(), connection);
-            if (!Check.IsNull(entity.DbParams))
-            {
-                command.Parameters.Add(entity.DbParams.ToArray());
-            }
-            int result = await command.ExecuteNonQueryAsync();
-            if (result == 0)
+            if (Check.IsNull(dataRead))
             {
                 return null;
             }
-            command.CommandText = query;
-            command.Parameters.Clear();
-            dataRead = await command.ExecuteReaderAsync();
-            var data = MapData<TEntity>().FirstOrDefault();
-            if (configuration.CurrentConnectInfo.IsAutoClose)
+            Type type = typeof(TResult);
+            Dictionary<string, PropertyInfo> PropMapNames = GetPropMapNames(type.GetProperties());
+            TResult tResult = null;
+            if (entity.LastAnonymity)
             {
-                Close();
+                if (entity.LastType.Count().Equals(1))
+                {
+                    tResult = ReadDataAnonymityFirstOrDefault<TResult>(entity);
+                }
+
+            }
+            else
+            {
+                tResult = ReadDataFirstOrDefault<TResult>(entity, PropMapNames);
+            }
+            return tResult;
+        }
+        private TResult ReadDataAnonymityFirstOrDefault<TResult>(QueryEntity entity) where TResult : class
+        {
+            TResult tResult = null;
+            while (dataRead.Read())
+            {
+                object obj = Activator.CreateInstance(entity.LastType[0]);
+
+                foreach (var item in entity.MapInfos.Where(m => m.IsNeed))
+                {
+                    var Prop = entity.LastType[0].GetProperty(item.LastPropName);
+                    Prop.SetPropValue(obj, dataRead[item.AsColumnName]);
+                }
+                tResult = entity.GetResult<TResult>(obj);
+                break;
+            }
+            return tResult;
+        }
+
+        private IEnumerable<TResult> ReadDataAnonymity<TResult>(QueryEntity entity) where TResult : class
+        {
+            List<TResult> data = new List<TResult>();
+            while (dataRead.Read())
+            {
+                object obj = Activator.CreateInstance(entity.LastType[0]);
+
+                foreach (var item in entity.MapInfos.Where(m => m.IsNeed))
+                {
+                    var Prop = entity.LastType[0].GetProperty(item.LastPropName);
+                    Prop.SetPropValue(obj, dataRead[item.AsColumnName]);
+                }
+                data.Add(entity.GetResult<TResult>(obj));
+            }
+            return data;
+        }
+
+        private TResult ReadDataFirstOrDefault<TResult>(QueryEntity entity, Dictionary<string, PropertyInfo> PropMapNames) where TResult : class
+        {
+            TResult tResult = null;
+            while (dataRead.Read())
+            {
+                TResult tresult = Activator.CreateInstance<TResult>();
+
+                foreach (var item in entity.MapInfos)
+                {
+                    if (PropMapNames.ContainsKey(item.PropName))
+                    {
+                        PropMapNames[item.PropName].SetPropValue(tresult, dataRead[item.AsColumnName]);
+                    }
+                }
+                break;
+            }
+            return tResult;
+        }
+
+        private IEnumerable<TResult> ReadData<TResult>(QueryEntity entity, Dictionary<string, PropertyInfo> PropMapNames) where TResult : class
+        {
+            List<TResult> data = new List<TResult>();
+            while (dataRead.Read())
+            {
+                TResult tresult = Activator.CreateInstance<TResult>();
+
+                foreach (var item in entity.MapInfos)
+                {
+                    if (PropMapNames.ContainsKey(item.PropName))
+                    {
+                        PropMapNames[item.PropName].SetPropValue(tresult, dataRead[item.AsColumnName]);
+                    }
+                }
+                data.Add(tresult);
             }
             return data;
         }
@@ -401,13 +638,12 @@ namespace NetCore.ORM.Simple
                 connection.Dispose();
             }
         }
-
         private Dictionary<string, PropertyInfo> GetPropMapNames(PropertyInfo[] Props)
         {
             Dictionary<string, PropertyInfo> PropsMapNames = new Dictionary<string, PropertyInfo>();
             foreach (var item in Props)
             {
-                PropsMapNames.Add(item.GetColName(),item);
+                PropsMapNames.Add(item.GetColName(), item);
             }
             return PropsMapNames;
         }

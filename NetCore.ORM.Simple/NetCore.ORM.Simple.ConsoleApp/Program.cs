@@ -12,7 +12,8 @@ public static class Program
 {
     public static int Main(string []args)
     {
-        
+        string [] arry=new string[] { "sdfsd", "sdfsd", "sdfasd" };
+        var i=arry.Where(i=>i.Equals("11")).First();
         //Console.WriteLine(DateTime.Now.ToString("yyyy-M-dd HH:mm"));
         //eJoinType join=eJoinType.Inner;
         //Console.WriteLine(join.ToString());
@@ -107,22 +108,22 @@ public static class Program
  //       Console.WriteLine($"******************用时:{watch.ElapsedMilliseconds}********************");
  //       Console.WriteLine($"*********************单次时长:{watch.ElapsedMilliseconds / (lenght + 0.0)}毫秒*****************");
 
-        var command=simpleClient.Insert(
-            new UserEntity() {
-                CompanyId=1,
-                gIdColumn=Guid.NewGuid(),
-                Description="Test",
-                Name="Name",RoleID=10});
+        //var command=simpleClient.Insert(
+        //    new UserEntity() {
+        //        CompanyId=1,
+        //        gIdColumn=Guid.NewGuid(),
+        //        Description="Test",
+        //        Name="Name",RoleID=10});
 
-          simpleClient.Update(
-          new UserEntity()
-          {
-              CompanyId = 1,
-              gIdColumn = Guid.NewGuid(),
-              Description = "Test",
-              Name = "Name",
-              RoleID= 10
-          });
+        //  simpleClient.Update(
+        //  new UserEntity()
+        //  {
+        //      CompanyId = 1,
+        //      gIdColumn = Guid.NewGuid(),
+        //      Description = "Test",
+        //      Name = "Name",
+        //      RoleID= 10
+        //  });
 
         TestSimple();
         //Expression<Func<UserEntity, UserEntity>> expression = (u) => new UserEntity { Name=u.Name};
@@ -146,12 +147,14 @@ public static class Program
               ReadWeight = 5,
               WriteReadType = eWriteOrReadType.ReadOrWrite
           }));
-
+        simpleClient.SetAPOLog((sql, Params) =>
+        {
+            Console.WriteLine(sql);
+        });
         for (int i = 0; i < 20; i++)
         {
             var data=simpleClient.Queryable<MissionDetailEntity>().
-                Where(m => !m.IsDelete || (m.EndTime < DateTime.Now && m.StartTime >
-                DateTime.MinValue)).Take(500).GroupBy(s=>new {s.EndTime}).Select(t=>new {age=t.Average(x=>x.)});
+                Where(m=>m.Id.Equals("00073aec-630b-4d4f-b042-067ed92db178")).Take(500).ToListAsync().Result;
             Console.WriteLine(i);
         }
        
@@ -196,10 +199,10 @@ public static class Program
         private string concurrencyStamp;
         private DateTime creationTime;
         private DateTime deletionTime;
-        private Guid? creatorID;
+        private Guid creatorID;
         private DateTime lastModificationTime;
-        private Guid? lastModifierID;
-        private Guid? deleterID;
+        private Guid lastModifierID;
+        private Guid deleterID;
 
         /// <summary>
         /// 修改标记--防止并发冲突
@@ -213,7 +216,7 @@ public static class Program
         /// <summary>
         /// 创建者Id
         /// </summary>
-        public Guid? CreatorID { get { return creatorID; } set { creatorID = value; } }
+        public Guid CreatorID { get { return creatorID; } set { creatorID = value; } }
         /// <summary>
         /// 最后跟新时间
         /// </summary>
@@ -222,7 +225,7 @@ public static class Program
         /// <summary>
         /// 最后修改的id
         /// </summary>
-        public Guid? LastModifierID { get { return lastModifierID; } set { lastModifierID = value; } }
+        public Guid LastModifierID { get { return lastModifierID; } set { lastModifierID = value; } }
         /// <summary>
         /// 是否删除
         /// </summary>
@@ -231,7 +234,7 @@ public static class Program
         /// <summary>
         /// 删除者id
         /// </summary>
-        public Guid? DeleterID { get { return deleterID; } set { deleterID = value; } }
+        public Guid DeleterID { get { return deleterID; } set { deleterID = value; } }
         /// <summary>
         /// 删除时间
         /// </summary>

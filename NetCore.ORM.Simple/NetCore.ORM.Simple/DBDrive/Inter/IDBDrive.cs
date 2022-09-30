@@ -19,26 +19,58 @@ namespace NetCore.ORM.Simple
 {
     public interface IDBDrive:IDisposable
     {
+        public Action<string, DbParameter[]> AOPSqlLog { get; set; }
         public Task BeginTransactionAsync(); 
         public Task CommitAsync();
-        public Task<int> ExcuteAsync(SqlCommandEntity entity);
-
-        public Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class;
-
-        public  Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params);
-        public  Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity);
-
-
-
-
-
-
-
-
 
         public  Task RollBackAsync();
+
+        public  Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params);
        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="Params"></param>
+        /// <returns></returns>
+        public  Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity) where TResult : class;
+        
+        public IEnumerable<TResult> Read<TResult>(QueryEntity entity) where TResult : class;
+      
+        public TResult ReadFirstOrDefault<TResult>(QueryEntity entity) where TResult : class;
+        
+        public  Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity) where TResult : class;
+        
+        public int ReadCount(QueryEntity entity);
        
+
+        public  Task<int> ReadCountAsync(QueryEntity entity);
+        
+
+        public  Task<bool> ReadAnyAsync(QueryEntity entity);
+        
+        public bool ReadAny(QueryEntity entity);
        
+
+
+        /// <summary>
+        /// 执行命令
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name=""></param>
+        /// <returns></returns>
+        public  Task<int> ExcuteAsync(SqlCommandEntity entity);
+
+
+        /// <summary>
+        /// 添加成功后返回单个实体
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public  Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class;
+
     }
 }

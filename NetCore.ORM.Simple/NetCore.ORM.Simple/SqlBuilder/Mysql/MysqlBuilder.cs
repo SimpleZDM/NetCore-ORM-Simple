@@ -4,6 +4,7 @@ using NetCore.ORM.Simple.Entity;
 using NetCore.ORM.Simple.Visitor;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -254,6 +255,83 @@ namespace NetCore.ORM.Simple.SqlBuilder
             //分页部分
             SetPageList(entity);
         }
+
+        public void GetCount(SelectEntity select, QueryEntity entity)
+        {
+            if (Check.IsNull(entity))
+            {
+                entity = new QueryEntity();
+            }
+            if (Check.IsNull(select))
+            {
+                throw new ArgumentNullException(nameof(select));
+            }
+          
+            //视图
+            entity.StrSqlValue.Append("SELECT COUNT(*) As Number");
+
+            //连接
+            LinkJoinInfos(select.JoinInfos.Values.ToArray(), entity);
+            //条件
+            if (!Check.IsNull(select.TreeConditions) && select.TreeConditions.Count > CommonConst.ZeroOrNull)
+            {
+                entity.StrSqlValue.Append(" where");
+                LinkConditions(select.Conditions, select.TreeConditions, entity);
+            }
+
+
+
+            GroupBy(select.OrderInfos, entity);
+
+            OrderBy(select.OrderInfos, entity);
+            //分页部分
+            SetPageList(entity);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TDate"></typeparam>
+        /// <param name="entity"></param>
+        public SqlCommandEntity GetDelete<TDate>(Type type,List<ConditionEntity> conditions,List<TreeConditionEntity>treeConditions)
+        {
+            //var PropKey=type.GetKey();
+            //if (Check.IsNull(PropKey))
+            //{
+            //    throw new Exception("请为实体配置主键!");
+            //}
+            SqlCommandEntity sqlCommand = new SqlCommandEntity();
+            sqlCommand.StrSqlValue.Append($"DELETE  FROM {type.GetClassName()} ");
+            if (Check.IsNull(treeConditions)||treeConditions.Count.Equals(CommonConst.ZeroOrNull))
+            {
+                throw new Exception("删除数据,请指定删除的条件");
+            }
+            sqlCommand.StrSqlValue.Append(" Where ");
+            LinkConditions(conditions,treeConditions,sqlCommand);
+            return sqlCommand;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TData"></typeparam>
+        /// <param name="data"></param>
+        /// <exception cref="Exception"></exception>
+        public SqlCommandEntity GetDelete<TData>(TData data)
+        {
+            Type type=typeof(TData);
+            var PropKey = type.GetKey();
+            if (Check.IsNull(PropKey))
+            {
+                throw new Exception("请为实体配置主键!");
+            }
+            SqlCommandEntity sqlCommand = new SqlCommandEntity();
+            var key = $"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 4)}";
+            sqlCommand.StrSqlValue.Append($" DELETE FROM {type.GetClassName()} WHERE {PropKey.GetColName()}=@{key}");
+            sqlCommand.DbParams.Append(new MySqlParameter(key,PropKey.GetValue(data)));
+            return sqlCommand;
+        }
+
+        
         /// <summary>
         /// 
         /// </summary>
@@ -328,6 +406,85 @@ namespace NetCore.ORM.Simple.SqlBuilder
         }
 
         private void LinkConditions(List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions, QueryEntity sqlEntity)
+        {
+            if (Check.IsNull(treeConditions))
+            {
+                return;
+            }
+            if (Check.IsNull(conditions))
+            {
+                return;
+
+            }
+            if (treeConditions.Count > 0 && conditions.Count != treeConditions.Count - 1)
+            {
+                throw new Exception("sql 语句条件部分解析有误!");
+            }
+            for (int i = 0; i < treeConditions.Count(); i++)
+            {
+                foreach (var sign in treeConditions[i].LeftBracket)
+                {
+                    sqlEntity.StrSqlValue.Append(MysqlConst.cStrSign[(int)sign]);
+                }
+
+                string leftValue = string.Empty;
+                string rightValue = string.Empty;
+                switch (treeConditions[i].LeftCondition.ConditionType)
+                {
+                    case eConditionType.ColumnName:
+                        leftValue = $" {treeConditions[i].LeftCondition.DisplayName} ";
+                        if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
+                        {
+                            rightValue = $"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                            sqlEntity.DbParams.Add(new MySqlParameter(rightValue, treeConditions[i].RightCondition.DisplayName));
+                        }
+                        else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
+                        {
+                            //非常量
+                            rightValue = $" {treeConditions[i].RightCondition.DisplayName}";
+                        }
+                        break;
+                    case eConditionType.Constant:
+                        if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
+                        {
+                            leftValue = $"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                            sqlEntity.DbParams.Add(new MySqlParameter(leftValue, treeConditions[i].LeftCondition.DisplayName));
+
+                            rightValue = $"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                            sqlEntity.DbParams.Add(new MySqlParameter(rightValue, treeConditions[i].RightCondition.DisplayName));
+                        }
+                        else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
+                        {
+                            leftValue = $" {treeConditions[i].RightCondition.DisplayName} ";
+                            rightValue = $"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                            sqlEntity.DbParams.Add(new MySqlParameter(rightValue, treeConditions[i].LeftCondition.DisplayName));
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                if (treeConditions[i].RelationCondition.ConditionType.Equals(eConditionType.Method))
+                {
+                    sqlEntity.StrSqlValue.Append(MysqlConst.MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue));
+                }
+                else
+                {
+                    sqlEntity.StrSqlValue.Append($"{leftValue}{MysqlConst.cStrSign[(int)treeConditions[i].RelationCondition.SignType]}{rightValue}");
+                }
+                foreach (var sign in treeConditions[i].RightBracket)
+                {
+                    sqlEntity.StrSqlValue.Append(MysqlConst.cStrSign[(int)sign]);
+                }
+
+                if (conditions.Count > i)
+                {
+                    sqlEntity.StrSqlValue.Append(MysqlConst.cStrSign[(int)conditions[i].SignType]);
+                }
+
+            }
+        }
+
+        private void LinkConditions(List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions, SqlCommandEntity sqlEntity)
         {
             if (Check.IsNull(treeConditions))
             {

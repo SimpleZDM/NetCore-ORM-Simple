@@ -80,23 +80,23 @@ namespace NetCore.ORM.Simple.Entity
                     var a = func.Invoke((dynamic)objs[0]);
                     return a;
                 case 2:
-                    return func.Invoke(objs[0], objs[1]);
+                    return func.Invoke((dynamic)objs[0],(dynamic)objs[1]);
                 case 3:
-                    return func.Invoke(objs[0], objs[1], objs[2]);
+                    return func.Invoke((dynamic)objs[0],(dynamic)objs[1],(dynamic)objs[2]);
                 case 4:
-                    return func.Invoke(objs[0], objs[1], objs[2], objs[3]);
+                    return func.Invoke((dynamic)objs[0],(dynamic)objs[1],(dynamic)objs[2],(dynamic)objs[3]);
                 case 5:
-                    return func.Invoke(objs[0], objs[1], objs[2], objs[3], objs[4]);
+                    return func.Invoke((dynamic)objs[0],(dynamic)objs[1],(dynamic)objs[2],(dynamic)objs[3],(dynamic)objs[4]);
                 case 6:
-                    return func.Invoke(objs[0], objs[1], objs[2], objs[3], objs[4], objs[5]);
+                    return func.Invoke((dynamic)objs[0],(dynamic)objs[1],(dynamic)objs[2],(dynamic)objs[3],(dynamic)objs[4],(dynamic)objs[5]);
                 case 7:
-                    return func.Invoke(objs[0], objs[1], objs[2], objs[3], objs[4], objs[5], objs[6]);
+                    return func.Invoke((dynamic)objs[0],(dynamic)objs[1],(dynamic)objs[2],(dynamic)objs[3],(dynamic)objs[4],(dynamic)objs[5],(dynamic)objs[6]);
                 case 8:
-                    return func.Invoke(objs[0], objs[1], objs[2], objs[3], objs[4], objs[5], objs[6], objs[7]);
+                    return func.Invoke((dynamic)objs[0],(dynamic)objs[1],(dynamic)objs[2],(dynamic)objs[3],(dynamic)objs[4],(dynamic)objs[5],(dynamic)objs[6],(dynamic)objs[7]);
                 case 9:
-                    return func.Invoke(objs[0], objs[1], objs[2], objs[3], objs[4], objs[5], objs[6], objs[7], objs[8]);
+                    return func.Invoke((dynamic)objs[0],(dynamic)objs[1],(dynamic)objs[2],(dynamic)objs[3],(dynamic)objs[4],(dynamic)objs[5],(dynamic)objs[6],(dynamic)objs[7],(dynamic)objs[8]);
                 case 10:
-                    return func.Invoke(objs[0], objs[1], objs[2], objs[3], objs[4], objs[5], objs[6], objs[7], objs[8], objs[9]);
+                    return func.Invoke((dynamic)objs[0],(dynamic)objs[1],(dynamic)objs[2],(dynamic)objs[3],(dynamic)objs[4],(dynamic)objs[5],(dynamic)objs[6],(dynamic)objs[7],(dynamic)objs[8],(dynamic)objs[9]);
                 default:
                     break;
             }

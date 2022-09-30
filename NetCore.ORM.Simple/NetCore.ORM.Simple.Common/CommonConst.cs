@@ -41,5 +41,7 @@ namespace NetCore.ORM.Simple.Common
             }
             return false;
         }
+
+        public static string StrDataCount = "Number";
     }
 }

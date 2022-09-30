@@ -18,7 +18,8 @@ using NetCore.ORM.Simple.SqlBuilder;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Queryable
 {
-    public class SimpleGroupByQueryable<TResult,TGroup>:QueryResult<TGroup>,ISimpleGroupByQueryable<TResult,TGroup>
+    public class SimpleGroupByQueryable<TResult,TGroup>:QueryResult<TGroup>,
+        ISimpleGroupByQueryable<TResult,TGroup> where TGroup : class
     {
         public SimpleGroupByQueryable(SimpleVisitor visitor,Builder builder,DBDrive dBDrive):base(visitor,builder,dBDrive)
         {
@@ -102,7 +103,7 @@ namespace NetCore.ORM.Simple.Queryable
         {
             return default(decimal);
         }
-        public virtual IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<ISimpleGroupByQueryable<TResult,TGroup>,TNewResult>> expression)
+        public virtual IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<ISimpleGroupByQueryable<TResult,TGroup>,TNewResult>> expression)where TNewResult : class
         {
             visitor.VisitMap(expression);
             IQueryResult<TNewResult> result = new QueryResult<TNewResult>(visitor,builder, DbDrive);

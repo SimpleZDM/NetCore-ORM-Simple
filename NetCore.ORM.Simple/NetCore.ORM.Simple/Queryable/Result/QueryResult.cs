@@ -21,7 +21,7 @@ using System.Data.Common;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Queryable
 {
-    public class QueryResult<TResult> : IQueryResult<TResult>
+    public class QueryResult<TResult> : IQueryResult<TResult> where TResult : class
     {
 
         protected eDBType DBType;
@@ -57,25 +57,7 @@ namespace NetCore.ORM.Simple.Queryable
             this.DbDrive = DbDrive;
         }
 
-        public  IEnumerable<TResult> ToList()
-        {
-            
-            builder.GetSelect<TResult>(visitor.GetSelectInfo(),sqlEntity);
-            Console.WriteLine(sqlEntity);
-            return null;
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public async Task<IEnumerable<TResult>> ToListAsync()
-        {
-            sqlEntity.StrSqlValue.Clear();
-            sqlEntity.DbParams.Clear(); 
-            builder.GetSelect<TResult>(visitor.GetSelectInfo(),sqlEntity);
-            //Console.WriteLine(sqlEntity.StrSqlValue.ToString());
-            return await DbDrive.ReadAsync<TResult>(sqlEntity);
-        }
+        
 
         public IQueryResult<TResult> Skip(int pageNumber)
         {
@@ -95,20 +77,20 @@ namespace NetCore.ORM.Simple.Queryable
             return this;
         }
 
-        public virtual ISimpleGroupByQueryable<TResult,TOrder> OrderBy<TOrder>(Expression<Func<TResult,TOrder>> expression)
+        public virtual ISimpleGroupByQueryable<TResult,TOrder> OrderBy<TOrder>(Expression<Func<TResult,TOrder>> expression)where TOrder :class
         {
             visitor.GroupBy(expression);
             ISimpleGroupByQueryable<TResult,TOrder> simpleOrder = new SimpleGroupByQueryable<TResult,TOrder>(visitor, builder, DbDrive);
             return simpleOrder;
         }
 
-        public  ISimpleGroupByQueryable<TResult, TGroup> GroupBy<TGroup>(Expression<Func<TResult,TGroup>> expression)
+        public  ISimpleGroupByQueryable<TResult, TGroup> GroupBy<TGroup>(Expression<Func<TResult,TGroup>> expression)where TGroup : class
         {
             visitor.GroupBy(expression);
             ISimpleGroupByQueryable<TResult, TGroup> simpleGroupBy = new SimpleGroupByQueryable<TResult,TGroup>(visitor,builder,DbDrive);
             return simpleGroupBy;
         }
-        public virtual IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<TResult,TNewResult>>expression)
+        public virtual IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<TResult,TNewResult>>expression)where TNewResult:class
         {
             visitor.VisitMap(expression);
             IQueryResult<TNewResult> query = new QueryResult<TNewResult>(visitor,builder,DbDrive);
@@ -125,5 +107,73 @@ namespace NetCore.ORM.Simple.Queryable
             visitor.VisitMap(expression);
             return this;
         }
+
+        public int Count()
+        {
+            builder.GetCount(visitor.GetSelectInfo(), sqlEntity);
+            return default(int);
+        }
+        public bool Any()
+        {
+            sqlEntity.PageSize = 1;
+            sqlEntity.PageNumber = 1;
+            builder.GetCount(visitor.GetSelectInfo(), sqlEntity);
+            return true;
+        }
+        public async Task<int> CountAsync()
+        {
+            builder.GetCount(visitor.GetSelectInfo(), sqlEntity);
+            return default(int);
+        }
+        public async Task<bool> AnyAsync()
+        {
+            sqlEntity.PageSize = 1;
+            sqlEntity.PageNumber = 1;
+            builder.GetCount(visitor.GetSelectInfo(), sqlEntity);
+            return true;
+        }
+        public TResult First()
+        {
+            return default(TResult);
+        }
+        public async Task<TResult> FirstAsync()
+        {
+            sqlEntity.PageSize = 1;
+            sqlEntity.PageNumber = 1;
+            builder.GetSelect<TResult>(visitor.GetSelectInfo(), sqlEntity);
+            return default(TResult);
+        }
+        public TResult FirstOrDefault()
+        {
+            sqlEntity.PageSize = 1;
+            sqlEntity.PageNumber = 1;
+            builder.GetSelect<TResult>(visitor.GetSelectInfo(), sqlEntity);
+            return default(TResult);
+        }
+        public async Task<TResult> FirstOrDefaultAsync()
+        {
+            sqlEntity.PageSize = 1;
+            sqlEntity.PageNumber = 1;
+            builder.GetSelect<TResult>(visitor.GetSelectInfo(), sqlEntity);
+
+            return default(TResult);
+        }
+        public IEnumerable<TResult> ToList()
+        {
+
+            builder.GetSelect<TResult>(visitor.GetSelectInfo(), sqlEntity);
+            Console.WriteLine(sqlEntity);
+            return null;
+        }
+      
+        public async Task<IEnumerable<TResult>> ToListAsync()
+        {
+            sqlEntity.StrSqlValue.Clear();
+            sqlEntity.DbParams.Clear();
+            builder.GetSelect<TResult>(visitor.GetSelectInfo(), sqlEntity);
+            return await DbDrive.ReadAsync<TResult>(sqlEntity);
+        }
+
+
     }
 }

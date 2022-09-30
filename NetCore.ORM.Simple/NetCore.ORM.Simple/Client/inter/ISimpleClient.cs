@@ -2,6 +2,7 @@
 using NetCore.ORM.Simple.Queryable;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -39,11 +40,12 @@ namespace NetCore.ORM.Simple.Client
         /// <returns></returns>
         public ISimpleQueryable<T1> Queryable<T1>() where T1 : class, new();
 
-        public ISimpleQueryable<T1, T2> Queryable<T1, T2>(Expression<Func<T1, T2, JoinInfoEntity>> expression);
+        public ISimpleQueryable<T1, T2> Queryable<T1, T2>(Expression<Func<T1, T2, JoinInfoEntity>> expression) where T1 : class;
+
+
+        public ISimpleQueryable<T1, T2, T3> Queryable<T1, T2, T3>(Expression<Func<T1, T2, T3, JoinInfoEntity>> expression) where T1 : class;
        
-        public ISimpleQueryable<T1, T2, T3> Queryable<T1, T2, T3>(Expression<Func<T1, T2, T3, JoinInfoEntity>> expression);
-       
-        public ISimpleQueryable<T1, T2, T3, T4> Queryable<T1, T2, T3, T4>(Expression<Func<T1, T2, T3, T4, JoinInfoEntity>> expression);
+        public ISimpleQueryable<T1, T2, T3, T4> Queryable<T1, T2, T3, T4>(Expression<Func<T1, T2, T3, T4, JoinInfoEntity>> expression) where T1 : class;
 
         /// <summary>
         /// 
@@ -51,8 +53,10 @@ namespace NetCore.ORM.Simple.Client
         /// <returns></returns>
         public Task<int> SaveChangeAsync();
 
-        public List<T2> GetEntity<T, T1, T2>(T t, Expression<Func<T, T1>> expression, Expression<Func<T1, T2>> expression1);
+        public void SetAPOLog(Action<string,DbParameter[]> action);
 
-        public List<T> GetEntity<T>(Dictionary<string, object> data);
+        //public List<T2> GetEntity<T, T1, T2>(T t, Expression<Func<T, T1>> expression, Expression<Func<T1, T2>> expression1);
+
+        //public List<T> GetEntity<T>(Dictionary<string, object> data);
     }
 }

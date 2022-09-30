@@ -80,17 +80,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             }
             return null;
         }
-        public void MatchDBType(params Action[] actions)
-        {
-            if (Check.IsNull(actions))
-            {
-                throw new ArgumentException(nameof(actions));
-            }
-            if ((int)dbType < actions.Length)
-            {
-                actions[(int)dbType].Invoke();
-            }
-        }
+      
 
         public SqlCommandEntity GetSelect(List<MapEntity> mapInfos,string condition)
         {
@@ -105,6 +95,50 @@ namespace NetCore.ORM.Simple.SqlBuilder
         public void GetLastInsert<TData>(QueryEntity sql)
         {
              MatchDBType(() => mysqlBuilder.GetLastInsert<TData>(sql));
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TDate"></typeparam>
+        /// <param name="type"></param>
+        /// <param name="conditions"></param>
+        /// <param name="treeConditions"></param>
+        /// <returns></returns>
+        public SqlCommandEntity GetDelete<TDate>(Type type, List<ConditionEntity> conditions,List<TreeConditionEntity> treeConditions)
+        {
+            return MatchDBType(() => mysqlBuilder.GetDelete<TDate>(type,conditions,treeConditions));
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TData"></typeparam>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public SqlCommandEntity GetDelete<TData>(TData data)
+        {
+            return MatchDBType(() => mysqlBuilder.GetDelete(data));
+        }
+
+        public void GetCount(SelectEntity select, QueryEntity entity)
+        {
+             MatchDBType(() => mysqlBuilder.GetCount(select,entity));
+        }
+
+        public void GetAync(SelectEntity select, QueryEntity entity)
+        {
+            MatchDBType(() => mysqlBuilder.GetCount(select, entity));
+        }
+
+        public void MatchDBType(params Action[] actions)
+        {
+            if (Check.IsNull(actions))
+            {
+                throw new ArgumentException(nameof(actions));
+            }
+            if ((int)dbType < actions.Length)
+            {
+                actions[(int)dbType].Invoke();
+            }
         }
     }
 }

@@ -20,7 +20,7 @@ using NetCore.ORM.Simple.SqlBuilder;
 namespace NetCore.ORM.Simple.Queryable
 {
     public class SimpleQueryable<T>
-        :QueryResult<T>,ISimpleQueryable<T>
+        :QueryResult<T>,ISimpleQueryable<T> where T : class
     {
         public SimpleQueryable(Builder builder,DBDrive dbDrive)
         {

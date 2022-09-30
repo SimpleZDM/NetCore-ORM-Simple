@@ -20,7 +20,7 @@ using NetCore.ORM.Simple.SqlBuilder;
 namespace NetCore.ORM.Simple.Queryable
 {
     public class SimpleQueryable<T1,T2,T3,T4>:
-        QueryResult<T1>,ISimpleQueryable<T1,T2,T3,T4>
+        QueryResult<T1>,ISimpleQueryable<T1,T2,T3,T4>where T1 : class
     {
         public SimpleQueryable(Expression<Func<T1,T2,T3,T4,JoinInfoEntity>> expression,Builder builder,DBDrive dBDrive)
         {
@@ -29,7 +29,7 @@ namespace NetCore.ORM.Simple.Queryable
             visitor.VisitJoin(expression);
         }
 
-        public IQueryResult<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, TResult>> expression)
+        public IQueryResult<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, TResult>> expression)where TResult : class
         {
             visitor.VisitMap(expression);
             IQueryResult<TResult> query = new QueryResult<TResult>(visitor,builder,DbDrive);

@@ -19,17 +19,16 @@ using NetCore.ORM.Simple.SqlBuilder;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Queryable
 {
-    public class SimpleQueryable<T1,T2>:QueryResult<T1>,ISimpleQueryable<T1,T2>
+    public class SimpleQueryable<T1,T2>:QueryResult<T1>,ISimpleQueryable<T1,T2> where T1 : class
     {
         public SimpleQueryable(Expression<Func<T1,T2,JoinInfoEntity>>expression,Builder builder,DBDrive dbDrive)
         {
             Type []types = ReflectExtension.GetType<T1,T2>();
             Init(builder,dbDrive,types);
-            //joinVisitor.Modify(expression);
             visitor.VisitJoin(expression);
         }
 
-        public IQueryResult<TResult> Select<TResult>(Expression<Func<T1, T2, TResult>> expression)
+        public IQueryResult<TResult> Select<TResult>(Expression<Func<T1, T2, TResult>> expression)where TResult : class
         {
             visitor.VisitMap(expression);
             IQueryResult<TResult> query = new QueryResult<TResult>(visitor,builder,DbDrive);
@@ -46,5 +45,6 @@ namespace NetCore.ORM.Simple.Queryable
             visitor.OrderBy(expression);
             return this;
         }
+
     }
 }

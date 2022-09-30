@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
 /*********************************************************
- * 命名空间 NetCore.ORM.ISimple.IQuable
- * 接口名称 IQueryable
+ * 命名空间 NetCore.ORM.Simple.Queryable
+ * 接口名称 ISimpleQueryable8
  * 开发人员：-nhy
- * 创建时间：2022/9/20 10:48:00
+ * 创建时间：2022/9/30 13:40:48
  * 描述说明：
  * 更改历史：
  * 
  * *******************************************************/
 namespace NetCore.ORM.Simple.Queryable
 {
-    public interface ISimpleQueryable<T>:IQueryResult<T> where T : class
+    public class SimpleQueryable8
     {
-        public ISimpleQueryable<T> SimpleQueryable();
         
     }
 }

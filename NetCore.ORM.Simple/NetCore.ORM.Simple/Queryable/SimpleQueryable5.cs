@@ -16,7 +16,7 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Queryable
 {
-    public class SimpleQueryable<T1,T2,T3,T4,T5>:QueryResult<T1>,ISimpleQueryable<T1,T2,T3,T4,T5>
+    public class SimpleQueryable<T1,T2,T3,T4,T5>:QueryResult<T1>,ISimpleQueryable<T1,T2,T3,T4,T5> where T1 : class
     {
         public SimpleQueryable(eDBType DbType, params string[] tableNames) 
         {
