@@ -35,11 +35,6 @@ namespace NetCore.ORM.Simple.Entity
         /// 表的别称
         /// </summary>
         public string AsName { get { return asName; } set { asName = value; } }
-
-        /// <summary>
-        /// 连接的条件
-        /// </summary>
-        public Queue<string> QValue { get { return qValue; } set { qValue = value; } }
         /// <summary>
         /// 记录一个等式
         /// </summary>
@@ -50,7 +45,6 @@ namespace NetCore.ORM.Simple.Entity
         public List<ConditionEntity> Conditions { get { return conditions; } set { conditions = value; } }
         public JoinTableEntity()
         {
-            QValue = new Queue<string>();
             TreeConditions = new List<TreeConditionEntity>();
             Conditions=new List<ConditionEntity>();
         }

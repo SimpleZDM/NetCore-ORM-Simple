@@ -54,6 +54,10 @@ namespace NetCore.ORM.Simple.Visitor
         /// </summary>
         private Dictionary<string, int> currentTables;
 
+        /// <summary>
+        /// 多重条件的时候
+        /// </summary>
+        /// 
         private int firstConditionIndex;
         public ConditionVisitor(TableEntity table,List<ConditionEntity> Conditions,List<TreeConditionEntity> TreeConditions)
         {
@@ -388,7 +392,7 @@ namespace NetCore.ORM.Simple.Visitor
 
                 if (IsMultipleMap)
                 {
-                    var mapInfo = mapInfos.FirstOrDefault();
+                    var mapInfo = mapInfos.Where(map=>map.PropName.Equals(member.Member.Name)).FirstOrDefault();
                     if (!Check.IsNull(mapInfo))
                     {
                         condition.DisplayName = $"{mapInfo.TableName}.{mapInfo.ColumnName}";

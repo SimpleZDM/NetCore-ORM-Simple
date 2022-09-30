@@ -32,9 +32,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// 单条sql语句生成
         /// </summary>
         /// <typeparam name="TData"></typeparam>
-        public SqlEntity GetInsert<TData>(TData data, int random = 0)
+        public SqlCommandEntity GetInsert<TData>(TData data, int random = 0)
         {
-            SqlEntity sql = new SqlEntity();
+            SqlCommandEntity sql = new SqlCommandEntity();
             Type type = typeof(TData);
             var Props = type.GetNotKeyAndIgnore().ToArray();
 
@@ -63,9 +63,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="data"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public SqlEntity GetUpdate<TData>(TData data,int random)
+        public SqlCommandEntity GetUpdate<TData>(TData data, int random)
         {
-            SqlEntity sql = new SqlEntity();
+            SqlCommandEntity sql = new SqlCommandEntity();
             Type type = typeof(TData);
             var Props = type.GetNoIgnore().ToArray();
             var pKey = type.GetKey();
@@ -100,9 +100,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <typeparam name="TData"></typeparam>
         /// <param name="datas"></param>
         /// <returns></returns>
-        public SqlEntity GetInsert<TData>(IEnumerable<TData> datas)
+        public SqlCommandEntity GetInsert<TData>(IEnumerable<TData> datas)
         {
-            SqlEntity sql = new SqlEntity();
+            SqlCommandEntity sql = new SqlCommandEntity();
             Type type = typeof(TData);
             var Props = type.GetNotKeyAndIgnore();
             int count = 0;
@@ -146,37 +146,37 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// </summary>
         /// <typeparam name="TData"></typeparam>
         /// <returns></returns>
-        public void GetSelect<TData>(SqlEntity sql)
+        public void GetSelect<TData>(QueryEntity sql)
         {
             if (Check.IsNull(sql))
             {
-                sql = new SqlEntity();
-            }   
+                sql = new QueryEntity();
+            }
             Type type = typeof(TData);
             sql.StrSqlValue.Append($"SELECT " +
                 $"{string.Join(',', type.GetNoIgnore())} " +
                 $"FROM {type.GetClassName()} ");
         }
 
-        public void GetSelect(SqlEntity sql,Type type)
+        public void GetSelect(QueryEntity sql, Type type)
         {
             if (Check.IsNull(sql))
             {
-                sql = new SqlEntity();
+                sql = new QueryEntity();
             }
             sql.StrSqlValue.Append($"SELECT " +
                 $"{string.Join(',', type.GetNoIgnore())} " +
                 $"FROM {type.GetClassName()} ");
         }
 
-        public void GetLastInsert<TData>(SqlEntity sql)
+        public void GetLastInsert<TData>(QueryEntity sql)
         {
             if (Check.IsNull(sql))
             {
-                sql = new SqlEntity();
+                sql = new QueryEntity();
             }
             Type type = typeof(TData);
-            GetSelect(sql,type);
+            GetSelect(sql, type);
             var Key = type.GetKey();
             sql.StrSqlValue.Append($" Where {Key.GetColName()}=LAST_INSERT_ID();");
         }
@@ -185,9 +185,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// </summary>
         /// <typeparam name="TData"></typeparam>
         /// <returns></returns>
-        public SqlEntity GetWhereSql<TData>(Expression<Func<TData, bool>> matchCondition)
+        public SqlCommandEntity GetWhereSql<TData>(Expression<Func<TData, bool>> matchCondition)
         {
-            SqlEntity sqlEntity = new SqlEntity();
+            SqlCommandEntity sqlEntity = new SqlCommandEntity();
             if (Check.IsNull(matchCondition))
             {
                 throw new Exception();
@@ -202,11 +202,11 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="joinInfos">连接部分</param>
         /// <param name="condition">条件部分</param>
         /// <returns></returns>
-        public void GetSelect<TData>(SelectEntity select, SqlEntity entity)
+        public void GetSelect<TData>(SelectEntity select, QueryEntity entity)
         {
             if (Check.IsNull(entity))
             {
-                entity= new SqlEntity();
+                entity = new QueryEntity();
             }
             if (Check.IsNull(select))
             {
@@ -240,12 +240,17 @@ namespace NetCore.ORM.Simple.SqlBuilder
             //连接
             LinkJoinInfos(select.JoinInfos.Values.ToArray(), entity);
             //条件
-            if (!Check.IsNull(select.TreeConditions) && select.TreeConditions.Count>CommonConst.ZeroOrNull)
+            if (!Check.IsNull(select.TreeConditions) && select.TreeConditions.Count > CommonConst.ZeroOrNull)
             {
                 entity.StrSqlValue.Append(" where");
-                LinkConditions(select.Conditions,select.TreeConditions, entity);
+                LinkConditions(select.Conditions, select.TreeConditions, entity);
             }
 
+
+
+            GroupBy(select.OrderInfos,entity);
+
+            OrderBy(select.OrderInfos,entity);
             //分页部分
             SetPageList(entity);
         }
@@ -255,7 +260,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="mapInfos"></param>
         /// <param name="sbValue"></param>
         /// <exception cref="ArgumentException"></exception>
-        private void LinkMapInfos(List<MapEntity> mapInfos, SqlEntity sqlEntity)
+        private void LinkMapInfos(List<MapEntity> mapInfos, QueryEntity sqlEntity)
         {
             if (Check.IsNull(sqlEntity))
             {
@@ -278,7 +283,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         }
                         mapInfos[i].AsColumnName = $"{mapInfos[i].TableName}{charConnectSign}{mapInfos[i].ColumnName}";
                         sqlEntity.StrSqlValue.Append($" {mapInfos[i].TableName}.{mapInfos[i].ColumnName} AS {mapInfos[i].AsColumnName} ");
-                        
+
                     }
                 }
             }
@@ -290,7 +295,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="joinInfos"></param>
         /// <param name="sbValue"></param>
         /// <exception cref="ArgumentException"></exception>
-        private void LinkJoinInfos(JoinTableEntity[] joinInfos,SqlEntity sqlEntity)
+        private void LinkJoinInfos(JoinTableEntity[] joinInfos, QueryEntity sqlEntity)
         {
             if (Check.IsNull(sqlEntity))
             {
@@ -307,13 +312,13 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     else
                     {
                         sqlEntity.StrSqlValue.Append($" {MysqlConst.StrJoins[(int)join.JoinType]} {join.DisplayName} ON ");
-                        LinkConditions(join.Conditions,join.TreeConditions,sqlEntity);
+                        LinkConditions(join.Conditions, join.TreeConditions, sqlEntity);
                     }
                 }
             }
         }
 
-        private void LinkConditions(List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions,SqlEntity sqlEntity)
+        private void LinkConditions(List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions, QueryEntity sqlEntity)
         {
             if (Check.IsNull(treeConditions))
             {
@@ -322,69 +327,69 @@ namespace NetCore.ORM.Simple.SqlBuilder
             if (Check.IsNull(conditions))
             {
                 return;
-              
+
             }
-            if (treeConditions.Count>0&&conditions.Count!=treeConditions.Count-1)
+            if (treeConditions.Count > 0 && conditions.Count != treeConditions.Count - 1)
             {
-                    throw new Exception("sql 语句条件部分解析有误!");
+                throw new Exception("sql 语句条件部分解析有误!");
             }
-            for (int i = 0; i <treeConditions.Count(); i++)
+            for (int i = 0; i < treeConditions.Count(); i++)
             {
                 foreach (var sign in treeConditions[i].LeftBracket)
                 {
                     sqlEntity.StrSqlValue.Append(MysqlConst.cStrSign[(int)sign]);
                 }
-               
-                    string leftValue = string.Empty;
-                    string rightValue = string.Empty;
-                    switch (treeConditions[i].LeftCondition.ConditionType)
-                    {
-                        case eConditionType.ColumnName:
-                            leftValue=$" {treeConditions[i].LeftCondition.DisplayName} ";
-                            if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
-                            {
-                                rightValue =$"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(),8)}{i}" ;
-                                sqlEntity.DbParams.Add(new MySqlParameter(rightValue, treeConditions[i].RightCondition.DisplayName));
-                            }
-                            else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
-                            {
-                                //非常量
-                                rightValue=$" {treeConditions[i].RightCondition.DisplayName}";
-                            }
-                            break;
-                        case eConditionType.Constant:
-                            if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
-                            {
-                                leftValue = $"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
-                                sqlEntity.DbParams.Add(new MySqlParameter(leftValue,treeConditions[i].LeftCondition.DisplayName));
 
-                                rightValue = $"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
-                                sqlEntity.DbParams.Add(new MySqlParameter(rightValue,treeConditions[i].RightCondition.DisplayName));
-                            }
-                            else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
-                            {
-                               leftValue=$" {treeConditions[i].RightCondition.DisplayName} ";
-                                rightValue = $"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
-                                sqlEntity.DbParams.Add(new MySqlParameter(rightValue, treeConditions[i].LeftCondition.DisplayName));
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                    if (treeConditions[i].RelationCondition.ConditionType.Equals(eConditionType.Method))
-                    {
-                        sqlEntity.StrSqlValue.Append(MysqlConst.MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue));
-                    }
-                    else
-                    {
-                        sqlEntity.StrSqlValue.Append($"{leftValue}{MysqlConst.cStrSign[(int)treeConditions[i].RelationCondition.SignType]}{rightValue}");
-                    }
+                string leftValue = string.Empty;
+                string rightValue = string.Empty;
+                switch (treeConditions[i].LeftCondition.ConditionType)
+                {
+                    case eConditionType.ColumnName:
+                        leftValue = $" {treeConditions[i].LeftCondition.DisplayName} ";
+                        if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
+                        {
+                            rightValue = $"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                            sqlEntity.DbParams.Add(new MySqlParameter(rightValue, treeConditions[i].RightCondition.DisplayName));
+                        }
+                        else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
+                        {
+                            //非常量
+                            rightValue = $" {treeConditions[i].RightCondition.DisplayName}";
+                        }
+                        break;
+                    case eConditionType.Constant:
+                        if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
+                        {
+                            leftValue = $"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                            sqlEntity.DbParams.Add(new MySqlParameter(leftValue, treeConditions[i].LeftCondition.DisplayName));
+
+                            rightValue = $"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                            sqlEntity.DbParams.Add(new MySqlParameter(rightValue, treeConditions[i].RightCondition.DisplayName));
+                        }
+                        else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
+                        {
+                            leftValue = $" {treeConditions[i].RightCondition.DisplayName} ";
+                            rightValue = $"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                            sqlEntity.DbParams.Add(new MySqlParameter(rightValue, treeConditions[i].LeftCondition.DisplayName));
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                if (treeConditions[i].RelationCondition.ConditionType.Equals(eConditionType.Method))
+                {
+                    sqlEntity.StrSqlValue.Append(MysqlConst.MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue));
+                }
+                else
+                {
+                    sqlEntity.StrSqlValue.Append($"{leftValue}{MysqlConst.cStrSign[(int)treeConditions[i].RelationCondition.SignType]}{rightValue}");
+                }
                 foreach (var sign in treeConditions[i].RightBracket)
                 {
                     sqlEntity.StrSqlValue.Append(MysqlConst.cStrSign[(int)sign]);
                 }
 
-                if (conditions.Count>i)
+                if (conditions.Count > i)
                 {
                     sqlEntity.StrSqlValue.Append(MysqlConst.cStrSign[(int)conditions[i].SignType]);
                 }
@@ -397,25 +402,53 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <typeparam name="TData"></typeparam>
         public void GetSelect<TData>()
         {
-           
+
         }
         /// <summary>
         /// 拼接分页
         /// </summary>
         /// <param name="sqlEntity"></param>
-        private void SetPageList(SqlEntity sqlEntity)
+        private void SetPageList(QueryEntity sqlEntity)
         {
-            if (sqlEntity.PageNumber<0)
+            if (sqlEntity.PageNumber < 0)
             {
-                sqlEntity.PageNumber =1;
+                sqlEntity.PageNumber = 1;
             }
             if (sqlEntity.PageSize <= 0)
             {
                 sqlEntity.PageSize = 100;
             }
             sqlEntity.StrSqlValue.Append(" Limit @SkipNumber,@TakeNumber");
-            sqlEntity.DbParams.Add(new MySqlParameter("@SkipNumber",(sqlEntity.PageNumber -1)*sqlEntity.PageSize));
-            sqlEntity.DbParams.Add(new MySqlParameter("@TakeNumber",sqlEntity.PageSize));
+            sqlEntity.DbParams.Add(new MySqlParameter("@SkipNumber", (sqlEntity.PageNumber - 1) * sqlEntity.PageSize));
+            sqlEntity.DbParams.Add(new MySqlParameter("@TakeNumber", sqlEntity.PageSize));
+
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entity"></param>
+        private void OrderBy(List<OrderByEntity> OrderByInfos, QueryEntity entity)
+        {
+            if (!Check.IsNull(OrderByInfos) && OrderByInfos.Where(o => o.IsOrderBy).Any())
+            {
+                entity.StrSqlValue.Append(" Order By ");
+                entity.StrSqlValue.Append(string.Join(',', OrderByInfos.Where(o => o.IsOrderBy).OrderBy(o => o.OrderSoft).Select(o => $"{o.TableName}.{o.ColumnName} {MysqlConst.AscendOrDescend(o.OrderType)}")));
+                entity.StrSqlValue.Append(" ");
+            }
+
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entity"></param>
+        private void GroupBy(List<OrderByEntity> OrderByInfos, QueryEntity entity)
+        {
+            if (!Check.IsNull(OrderByInfos) && OrderByInfos.Where(g => g.IsGroupBy).Any())
+            {
+                entity.StrSqlValue.Append(" Group By ");
+                entity.StrSqlValue.Append(string.Join(',', OrderByInfos.Where(g => g.IsGroupBy).OrderBy(g => g.GroupSoft).Select(g => $"{g.TableName}.{g.ColumnName}")));
+                entity.StrSqlValue.Append(" ");
+            }
 
         }
     }

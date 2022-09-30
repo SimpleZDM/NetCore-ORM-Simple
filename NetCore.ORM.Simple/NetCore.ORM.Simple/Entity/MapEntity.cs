@@ -30,6 +30,10 @@ namespace NetCore.ORM.Simple.Entity
         /// </summary>
         public string PropName { get { return propName; } set { propName = value; } }
         /// <summary>
+        /// 最后出现非匿名对象的属性名称
+        /// </summary>
+        public string LastPropName { get { return lastPropName; } set { lastPropName = value; } }
+        /// <summary>
         /// 对应数据库表名称
         /// </summary>
         public string TableName { get { return tableName; } set { tableName = value; } }
@@ -51,6 +55,9 @@ namespace NetCore.ORM.Simple.Entity
         /// </summary>
         public bool IsNeed { get { return isNeed; } set { isNeed = value; } }
 
+        public string ClassName { get { return className; } set { className = value; } }
+
+
 
 
         private string propName;
@@ -59,6 +66,9 @@ namespace NetCore.ORM.Simple.Entity
         private string asColumnName;
         private bool isNeed;
         private string methodName;
+        private string lastPropName;
+        private string className;
+       
 
     }
 }

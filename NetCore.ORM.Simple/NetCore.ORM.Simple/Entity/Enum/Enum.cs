@@ -72,4 +72,18 @@ namespace NetCore.ORM.Simple.Entity
         IgnoreSign//忽视的符号
 
     }
+
+    public enum eOrderOrGroupType
+    {
+        OrderBy=0,
+        GroupBy
+    }
+    /// <summary>
+    /// 升序降序
+    /// </summary>
+    public enum eOrderType
+    {
+       Ascending=0,
+       Descending=1,
+    }
 }

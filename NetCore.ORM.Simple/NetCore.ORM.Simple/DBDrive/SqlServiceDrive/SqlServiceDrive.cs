@@ -34,12 +34,12 @@ namespace NetCore.ORM.Simple
             throw new NotImplementedException();
         }
 
-        public Task<int> ExcuteAsync(SqlEntity entity)
+        public Task<int> ExcuteAsync(SqlCommandEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task<TEntity> ExcuteAsync<TEntity>(SqlEntity entity, string query) where TEntity : class
+        public Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
         {
             throw new NotImplementedException();
         }
@@ -49,7 +49,7 @@ namespace NetCore.ORM.Simple
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<TResult>> ReadAsync<TResult>(SqlEntity entity)
+        public Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
         {
             throw new NotImplementedException();
         }

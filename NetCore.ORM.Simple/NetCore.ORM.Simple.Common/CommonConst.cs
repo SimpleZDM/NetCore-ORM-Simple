@@ -17,6 +17,7 @@ namespace NetCore.ORM.Simple.Common
 {
     public static class CommonConst
     {
+        const string Anonymity = "<>f__AnonymousType";
         public static string[]
           cStrSign =
           new string[] { "(", ")", "=", ">=", "<=", ">", "<", "AND", "OR", "<>" };
@@ -30,5 +31,15 @@ namespace NetCore.ORM.Simple.Common
           'A','B','C','D','E','F','G','H','I','J'
          ,'K','L','M','N','O','P','Q','R','S','T'
          ,'U','V','W','X','Y','Z'};
+
+        public static bool IsAnonymityObject<T>()
+        {
+            Type type = typeof(T);
+            if (type.GetClassName().Contains(Anonymity))
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

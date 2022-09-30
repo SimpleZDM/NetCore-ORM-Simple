@@ -21,12 +21,12 @@ namespace NetCore.ORM.Simple
     {
         public Task BeginTransactionAsync(); 
         public Task CommitAsync();
-        public Task<int> ExcuteAsync(SqlEntity entity);
+        public Task<int> ExcuteAsync(SqlCommandEntity entity);
 
-        public Task<TEntity> ExcuteAsync<TEntity>(SqlEntity entity, string query) where TEntity : class;
+        public Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class;
 
         public  Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params);
-        public  Task<IEnumerable<TResult>> ReadAsync<TResult>(SqlEntity entity);
+        public  Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity);
 
 
 

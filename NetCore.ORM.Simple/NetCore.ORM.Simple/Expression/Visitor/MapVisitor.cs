@@ -20,7 +20,7 @@ namespace NetCore.ORM.Simple.Visitor
 {
     public class MapVisitor : ExpressionVisitor
     {
-      
+
         /// <summary>
         /// 所有的表
         /// </summary>
@@ -40,7 +40,11 @@ namespace NetCore.ORM.Simple.Visitor
 
         private MapEntity currentmapInfo;
         private bool IsAgain;
-        public MapVisitor(TableEntity table,List<MapEntity> MapInfos)
+        /// <summary>
+        /// 匿名类标记
+        /// </summary>
+        private bool isAnonymity;
+        public MapVisitor(TableEntity table, List<MapEntity> MapInfos)
         {
             if (Check.IsNull(table))
             {
@@ -48,7 +52,7 @@ namespace NetCore.ORM.Simple.Visitor
             }
             Table = table;
             currentTables = new Dictionary<string, int>();
-            mapInfos = new List<MapEntity>();
+            mapInfos = MapInfos;
         }
 
         public List<MapEntity> GetMapInfos()
@@ -71,31 +75,23 @@ namespace NetCore.ORM.Simple.Visitor
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public Expression Modify(Expression expression)
+        public Expression Modify(Expression expression, bool IsAnonymity = false)
         {
             currentTables.Clear();
-            if (Check.IsNull(mapInfos)||mapInfos.Count==0)
+            if (IsAgain)
             {
-                mapInfos = new List<MapEntity>();
-                IsAgain = false;
-            }
-            else
-            {
-                if (IsAgain)
+                isAnonymity = IsAnonymity;
+                for (int i = 0; i < mapInfos.Count; i++)
                 {
-                    for (int i = 0; i < mapInfos.Count; i++)
-                    {
-                        mapInfos[i].IsNeed = false;
-                    }
+                    mapInfos[i].IsNeed = false;
                 }
             }
-
             foreach (ParameterExpression item in ((dynamic)expression).Parameters)
             {
-                currentTables.Add(item.Name,currentTables.Count);
+                currentTables.Add(item.Name, currentTables.Count);
             }
             Visit(expression);
-            
+
             IsAgain = true;
             return expression;
         }
@@ -282,6 +278,12 @@ namespace NetCore.ORM.Simple.Visitor
         protected override MemberBinding VisitMemberBinding(MemberBinding node)
         {
             base.VisitMemberBinding(node);
+           
+                if (!isAnonymity)
+                {
+                  //非匿名对象属性名称
+                  currentmapInfo.LastPropName = node.Member.Name;
+                }
             currentmapInfo.PropName = node.Member.Name;
             return node;
         }
@@ -313,15 +315,17 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override Expression VisitMember(MemberExpression node)
         {
-            base.VisitMember(node);
+            //base.VisitMember(node);
             Console.WriteLine(node.ToString());
             if (currentTables.ContainsKey(node.Expression.ToString()))
             {
                 if (IsAgain)
                 {
 
-                     currentmapInfo=mapInfos.FirstOrDefault(m=>m.PropName.Equals(node.Member.Name));
-                     currentmapInfo.IsNeed = true;
+                    currentmapInfo = mapInfos.FirstOrDefault(m => m.PropName.Equals(node.Member.Name));
+                    currentmapInfo.IsNeed = true;
+
+                   
                 }
                 else
                 {
@@ -330,7 +334,7 @@ namespace NetCore.ORM.Simple.Visitor
                     currentmapInfo.ColumnName = node.Member.Name;
                     currentmapInfo.TableName = Table.TableNames[currentTables[node.Expression.ToString()]];
                 }
-
+                currentmapInfo.ClassName = Table.DicTable[currentmapInfo.TableName].ClassType.Name;
             }
             return node;
         }
@@ -412,7 +416,7 @@ namespace NetCore.ORM.Simple.Visitor
             }
             if (node.Right is ConstantExpression constant)
             {
-               // qValue.Enqueue(constant.Value.ToString());
+                // qValue.Enqueue(constant.Value.ToString());
             }
         }
 
@@ -425,7 +429,7 @@ namespace NetCore.ORM.Simple.Visitor
         {
             //qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.LeftBracket]);
             base.Visit(node.Left);
-           // qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.RightBracket]);
+            // qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.RightBracket]);
             if (!Check.IsNull(action))
             {
                 action.Invoke(null);

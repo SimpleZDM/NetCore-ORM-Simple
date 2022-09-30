@@ -46,5 +46,35 @@ namespace NetCore.ORM.Simple.Common
             names[3] = GetTypeName<T4>();
             return names;
         }
+
+        public static Type GetType<T>()
+        {
+            Type type = typeof(T);
+            return type;
+        }
+        public static Type[] GetType<T, T2>()
+        {
+            Type[] types = new Type[2];
+            types[0] = GetType<T>();
+            types[2] = GetType<T2>();
+            return types;
+        }
+        public static Type[] GetType<T, T2, T3>()
+        {
+            Type[] types = new Type[3];
+            types[0] = GetType<T>();
+            types[1] = GetType<T2>();
+            types[2] = GetType<T3>();
+            return types;
+        }
+        public static Type[] GetType<T, T2, T3, T4>()
+        {
+            Type[] types = new Type[4];
+            types[0] = GetType<T>();
+            types[1] = GetType<T2>();
+            types[2] = GetType<T3>();
+            types[3] = GetType<T4>();
+            return types;
+        }
     }
 }

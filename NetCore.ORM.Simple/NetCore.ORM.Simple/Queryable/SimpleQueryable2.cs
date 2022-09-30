@@ -23,8 +23,8 @@ namespace NetCore.ORM.Simple.Queryable
     {
         public SimpleQueryable(Expression<Func<T1,T2,JoinInfoEntity>>expression,Builder builder,DBDrive dbDrive)
         {
-            string []tableNames = ReflectExtension.GetTypeName<T1,T2>();
-            Init(builder,dbDrive,tableNames);
+            Type []types = ReflectExtension.GetType<T1,T2>();
+            Init(builder,dbDrive,types);
             //joinVisitor.Modify(expression);
             visitor.VisitJoin(expression);
         }
@@ -39,6 +39,11 @@ namespace NetCore.ORM.Simple.Queryable
         public ISimpleQueryable<T1, T2> Where(Expression<Func<T1, T2, bool>> expression)
         {
             visitor.VisitorCondition(expression);
+            return this;
+        }
+        public ISimpleQueryable<T1, T2> OrderBy<TOrder>(Expression<Func<T1,T2,TOrder>>expression)
+        {
+            visitor.OrderBy(expression);
             return this;
         }
     }

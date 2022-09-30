@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using NetCore.ORM.Simple.Entity;
@@ -24,14 +25,14 @@ namespace NetCore.ORM.Simple.Client
     public class SimpleClient:ISimpleClient
     {
         private DataBaseConfiguration configuration;
-        private List<SqlEntity> sqls;
+        private List<SqlCommandEntity> sqls;
         private Builder builder;
         private DBDrive dbDrive;
         public SimpleClient(DataBaseConfiguration _configuration)
         {
             configuration=_configuration;
             builder = new Builder(configuration.CurrentConnectInfo.DBType);
-            sqls = new List<SqlEntity>();
+            sqls = new List<SqlCommandEntity>();
             dbDrive = new DBDrive(configuration);
         }
         /// <summary>
@@ -103,6 +104,49 @@ namespace NetCore.ORM.Simple.Client
                     default:
                         break;
                 }
+            }
+            return result;
+        }
+
+        public List<T2> GetEntity<T, T1, T2>(T t,Expression<Func<T,T1>>expression,Expression<Func<T1,T2>>expression1)
+        {
+            var result = new List<T2>();
+            //T1 t1=(T1)expression.Compile().Invoke(t);
+            //T2 t2=(T2)expression1.Compile().Invoke(t1);
+            dynamic[] dys = new dynamic[] { expression.Compile(), expression1.Compile() };
+            for (int i = 0; i < 100000; i++)
+            {
+                var t11 = dys[0].Invoke(t);
+                T2 t22 = dys[1].Invoke(t11);
+                result.Add(t22);
+            }
+            //result.Add(t2);
+             
+            return result;
+        }
+
+        public List<T> GetEntity<T>(Dictionary<string,object>data)
+        {
+            List<T> result = new List<T>();
+            Type type = typeof(T);
+            Dictionary<string,PropertyInfo> dic = new Dictionary<string,PropertyInfo>();
+
+            foreach (var item in type.GetProperties())
+            {
+                dic.Add(item.Name,item);
+            }
+
+            for (int i = 0; i < 100000; i++)
+            {
+                T t=(T)Activator.CreateInstance(type);
+                foreach (var item in data)
+                {
+                    if (dic.ContainsKey(item.Key))
+                    {
+                        dic[item.Key].SetValue(t,item.Value);
+                    }
+                }
+                result.Add(t);
             }
             return result;
         }

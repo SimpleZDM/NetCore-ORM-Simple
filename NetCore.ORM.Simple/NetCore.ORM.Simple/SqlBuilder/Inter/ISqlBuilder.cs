@@ -19,9 +19,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
 {
     public interface ISqlBuilder
     {
-        public SqlEntity GetInsert<TData>(TData data, int random = 0);
+        public SqlCommandEntity GetInsert<TData>(TData data, int random = 0);
 
-        public SqlEntity GetUpdate<TData>(TData data,int random=0);
+        public SqlCommandEntity GetUpdate<TData>(TData data,int random=0);
 
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <typeparam name="TData"></typeparam>
         /// <param name="datas"></param>
         /// <returns></returns>
-        public SqlEntity GetInsert<TData>(IEnumerable<TData> datas);
+        public SqlCommandEntity GetInsert<TData>(IEnumerable<TData> datas);
 
         /// <summary>
         /// 拼装单挑查询语句
@@ -44,7 +44,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// </summary>
         /// <typeparam name="TData"></typeparam>
         /// <returns></returns>
-        public SqlEntity GetWhereSql<TData>(Expression<Func<TData, bool>> matchCondition);
+        public SqlCommandEntity GetWhereSql<TData>(Expression<Func<TData, bool>> matchCondition);
 
 
         /// <summary>
@@ -54,8 +54,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="joinInfos">连接部分</param>
         /// <param name="condition">条件部分</param>
         /// <returns></returns>
-        public void GetSelect<TData>(SelectEntity select, SqlEntity entity);
+        public void GetSelect<TData>(SelectEntity select,QueryEntity entity);
 
-        public void GetLastInsert<TData>(SqlEntity sql);
+        public void GetLastInsert<TData>(QueryEntity sql);
     }
 }

@@ -67,7 +67,7 @@ namespace NetCore.ORM.Simple
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> ExcuteAsync(SqlEntity entity)
+        public async Task<int> ExcuteAsync(SqlCommandEntity entity)
         {
             return await MatchDBDrive(() => mysqlDrive.ExcuteAsync(entity));
         }
@@ -85,7 +85,7 @@ namespace NetCore.ORM.Simple
         /// <typeparam name="TResult"></typeparam>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(SqlEntity entity)
+        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
         {
             return await MatchDBDrive(() => mysqlDrive.ReadAsync<TResult>(entity));
         }
@@ -96,7 +96,7 @@ namespace NetCore.ORM.Simple
         /// <param name="entity"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<TEntity> ExcuteAsync<TEntity>(SqlEntity entity,string query) where TEntity : class
+        public async Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity,string query) where TEntity : class
         {
             return await MatchDBDrive(() => mysqlDrive.ExcuteAsync<TEntity>(entity,query));
         }

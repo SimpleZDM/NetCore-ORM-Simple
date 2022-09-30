@@ -75,14 +75,14 @@ namespace NetCore.ORM.Simple
         /// <typeparam name="TResult"></typeparam>
         /// <param name="sql"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql,params DbParameter[] Params)
+        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params)
         {
             if (!IsOpenConnect())
             {
                 Open();
             }
             command = new MySqlCommand(sql, connection);
-            if (!Check.IsNull(Params)&&Params.Length>0)
+            if (!Check.IsNull(Params) && Params.Length > 0)
             {
                 command.Parameters.AddRange(Params);
             }
@@ -102,21 +102,22 @@ namespace NetCore.ORM.Simple
         /// <param name="sql"></param>
         /// <param name="Params"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(SqlEntity entity)
+        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
         {
             if (!IsOpenConnect())
             {
                 Open();
             }
             command = new MySqlCommand(entity.StrSqlValue.ToString(), connection);
-            if (!Check.IsNull(entity.DbParams) && entity.DbParams.Count> 0)
+            if (!Check.IsNull(entity.DbParams) && entity.DbParams.Count > 0)
             {
                 command.Parameters.AddRange(entity.DbParams.ToArray());
             }
             dataRead = await command.ExecuteReaderAsync();
-            var data = MapData<TResult>(entity.MapInfos);
+            var data = MapData<TResult>(entity);
             if (configuration.CurrentConnectInfo.IsAutoClose)
             {
+                command.Dispose();
                 Close();
             }
             return data;
@@ -145,7 +146,7 @@ namespace NetCore.ORM.Simple
             List<TResult> data = new List<TResult>();
             while (dataRead.Read())
             {
-                TResult tresult = Activator.CreateInstance<TResult>();
+                TResult tresult = (TResult)Activator.CreateInstance(type, new object[] { });
                 for (int i = 0; i < dataRead.FieldCount; i++)
                 {
                     string key = dataRead.GetName(i);
@@ -161,7 +162,7 @@ namespace NetCore.ORM.Simple
             return data;
         }
 
-        private IEnumerable<TResult> MapData<TResult>(MapEntity[]mapInfos)
+        private IEnumerable<TResult> MapData<TResult>(QueryEntity entity)
         {
             if (Check.IsNull(dataRead))
             {
@@ -170,19 +171,43 @@ namespace NetCore.ORM.Simple
             Type type = typeof(TResult);
             Dictionary<string, PropertyInfo> PropMapNames = GetPropMapNames(type.GetProperties());
             List<TResult> data = new List<TResult>();
-            while (dataRead.Read())
+            if (entity.LastAnonymity)
             {
-                TResult tresult = Activator.CreateInstance<TResult>();
-
-                foreach (var item in mapInfos)
+                if (entity.LastType.Count().Equals(1))
                 {
-                    if (PropMapNames.ContainsKey(item.PropName))
+                    while (dataRead.Read())
                     {
-                        PropMapNames[item.PropName].SetPropValue(tresult,dataRead[item.AsColumnName]);
+                        object obj = Activator.CreateInstance(entity.LastType[0]);
+                       
+                        
+                            foreach (var item in entity.MapInfos.Where(m=>m.IsNeed))
+                            {
+                                var Prop = entity.LastType[0].GetProperty(item.LastPropName);
+                                Prop.SetPropValue(obj,dataRead[item.AsColumnName]);
+                            }
+                        TResult tResult = entity.GetResult<TResult>(obj);
+                        data.Add(tResult);
                     }
                 }
-                data.Add(tresult);
+
             }
+            else
+            {
+                while (dataRead.Read())
+                {
+                    TResult tresult = Activator.CreateInstance<TResult>();
+
+                    foreach (var item in entity.MapInfos)
+                    {
+                        if (PropMapNames.ContainsKey(item.PropName))
+                        {
+                            PropMapNames[item.PropName].SetPropValue(tresult, dataRead[item.AsColumnName]);
+                        }
+                    }
+                    data.Add(tresult);
+                }
+            }
+
             return data;
         }
 
@@ -192,7 +217,7 @@ namespace NetCore.ORM.Simple
         /// <param name="sql"></param>
         /// <param name=""></param>
         /// <returns></returns>
-        public async Task<int> ExcuteAsync(SqlEntity entity)
+        public async Task<int> ExcuteAsync(SqlCommandEntity entity)
         {
             if (!IsOpenConnect())
             {
@@ -219,7 +244,7 @@ namespace NetCore.ORM.Simple
         /// <param name="sql"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<TEntity> ExcuteAsync<TEntity>(SqlEntity entity, string query) where TEntity : class
+        public async Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
         {
             if (!IsOpenConnect())
             {
@@ -228,7 +253,7 @@ namespace NetCore.ORM.Simple
             command = new MySqlCommand(entity.StrSqlValue.ToString(), connection);
             if (!Check.IsNull(entity.DbParams))
             {
-                 command.Parameters.Add(entity.DbParams.ToArray());
+                command.Parameters.Add(entity.DbParams.ToArray());
             }
             int result = await command.ExecuteNonQueryAsync();
             if (result == 0)
@@ -332,11 +357,11 @@ namespace NetCore.ORM.Simple
         {
             if (Check.IsNull(connection))
             {
-                if (Check.IsNullOrEmpty(connectStr))
+                if (Check.IsNullOrEmpty(configuration.CurrentConnectInfo.ConnectStr))
                 {
                     throw new ArgumentException("连接字符串不能为空!");
                 }
-                connection = new MySqlConnection(connectStr);
+                connection = new MySqlConnection(configuration.CurrentConnectInfo.ConnectStr);
             }
             if (connection.State == System.Data.ConnectionState.Broken)
             {
@@ -373,10 +398,11 @@ namespace NetCore.ORM.Simple
             if (!Check.IsNull(connection))
             {
                 connection.Close();
+                connection.Dispose();
             }
         }
 
-        private Dictionary<string,PropertyInfo> GetPropMapNames(PropertyInfo[] Props)
+        private Dictionary<string, PropertyInfo> GetPropMapNames(PropertyInfo[] Props)
         {
             Dictionary<string, PropertyInfo> PropsMapNames = new Dictionary<string, PropertyInfo>();
             foreach (var item in Props)

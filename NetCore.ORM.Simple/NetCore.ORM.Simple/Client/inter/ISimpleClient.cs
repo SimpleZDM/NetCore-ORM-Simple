@@ -50,5 +50,9 @@ namespace NetCore.ORM.Simple.Client
         /// </summary>
         /// <returns></returns>
         public Task<int> SaveChangeAsync();
+
+        public List<T2> GetEntity<T, T1, T2>(T t, Expression<Func<T, T1>> expression, Expression<Func<T1, T2>> expression1);
+
+        public List<T> GetEntity<T>(Dictionary<string, object> data);
     }
 }

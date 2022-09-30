@@ -30,17 +30,17 @@ namespace NetCore.ORM.Simple.SqlBuilder
             sqlServiceBuilder = new SqlServiceBuilder();
         }
 
-        public SqlEntity GetInsert<TData>(TData data, int random = 0)
+        public SqlCommandEntity GetInsert<TData>(TData data, int random = 0)
         {
             return MatchDBType(() => mysqlBuilder.GetInsert(data,random));
         }
 
-        public SqlEntity GetUpdate<TData>(TData data,int random=0)
+        public SqlCommandEntity GetUpdate<TData>(TData data,int random=0)
         {
             return MatchDBType(() => mysqlBuilder.GetUpdate(data,random));
         }
 
-        public SqlEntity GetInsert<TData>(IEnumerable<TData> datas)
+        public SqlCommandEntity GetInsert<TData>(IEnumerable<TData> datas)
         {
             return MatchDBType(() => mysqlBuilder.GetInsert(datas));
         }
@@ -50,17 +50,25 @@ namespace NetCore.ORM.Simple.SqlBuilder
         //    return MatchDBType(() =>mysqlBuilder.GetSelect<TData>());
         //}
 
-        public SqlEntity GetWhereSql<TData>(Expression<Func<TData, bool>> matchCondition)
+        public SqlCommandEntity GetWhereSql<TData>(Expression<Func<TData, bool>> matchCondition)
         {
             return MatchDBType(() => mysqlBuilder.GetWhereSql(matchCondition));
         }
-
-        public void GetSelect<TData>(SelectEntity select,SqlEntity entity)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TData"></typeparam>
+        /// <param name="select"></param>
+        /// <param name="entity"></param>
+        public void GetSelect<TData>(SelectEntity select,QueryEntity entity)
         {
+             entity.LastAnonymity=select.LastAnonymity;
+             entity.LastType=select.LastType;
+             entity.DyToMap = select.DyToMap;
              MatchDBType(() => mysqlBuilder.GetSelect<TData>(select,entity));
         }
 
-        public SqlEntity MatchDBType(params Func<SqlEntity>[] funcs)
+        public SqlCommandEntity MatchDBType(params Func<SqlCommandEntity>[] funcs)
         {
             if (Check.IsNull(funcs))
             {
@@ -84,7 +92,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             }
         }
 
-        public SqlEntity GetSelect(List<MapEntity> mapInfos,string condition)
+        public SqlCommandEntity GetSelect(List<MapEntity> mapInfos,string condition)
         {
             throw new NotImplementedException();
         }
@@ -94,7 +102,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             throw new NotImplementedException();
         }
 
-        public void GetLastInsert<TData>(SqlEntity sql)
+        public void GetLastInsert<TData>(QueryEntity sql)
         {
              MatchDBType(() => mysqlBuilder.GetLastInsert<TData>(sql));
         }

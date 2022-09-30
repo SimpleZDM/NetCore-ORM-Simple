@@ -21,9 +21,17 @@ namespace NetCore.ORM.Simple.Entity
         {
 
         }
+        /// <summary>
+        /// 类的实际名称
+        /// </summary>
         public string DisplayNmae { get { return name; } set { name = value; } }
+        /// <summary>
+        /// 数量
+        /// </summary>
         public int Count { get { return count; } set { count=value; } }
+        public Type ClassType { get { return classType; } set { classType = value; } }
         private string name;
         private int count;
+        private Type classType;
     }
 }

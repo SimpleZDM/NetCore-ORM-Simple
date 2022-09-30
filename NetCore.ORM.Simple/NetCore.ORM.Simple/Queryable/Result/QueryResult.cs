@@ -27,7 +27,7 @@ namespace NetCore.ORM.Simple.Queryable
         protected eDBType DBType;
         protected Builder builder;
         protected SimpleVisitor visitor;
-        protected SqlEntity sqlEntity;
+        protected QueryEntity sqlEntity;
         protected int PageNumber;
         protected int PageSize;
         protected DBDrive DbDrive;
@@ -37,15 +37,15 @@ namespace NetCore.ORM.Simple.Queryable
         /// </summary>
         /// <param name="DbType"></param>
         /// <param name="tableNames"></param>
-        protected void Init(Builder _builder,DBDrive DbDrive,params string[] tableNames)
+        protected void Init(Builder _builder,DBDrive DbDrive,params Type[] typs)
         {
-            visitor = new SimpleVisitor(tableNames);
+            visitor = new SimpleVisitor(typs);
             this.DbDrive = DbDrive;
             builder = _builder;
         }
         public QueryResult()
         {
-            sqlEntity = new SqlEntity();
+            sqlEntity = new QueryEntity();
         }
         public QueryResult(
             SimpleVisitor _visitor,
@@ -53,7 +53,7 @@ namespace NetCore.ORM.Simple.Queryable
         {
             visitor = _visitor;
             builder = _builder;
-            sqlEntity=new SqlEntity();
+            sqlEntity=new QueryEntity();
             this.DbDrive = DbDrive;
         }
 
@@ -70,6 +70,8 @@ namespace NetCore.ORM.Simple.Queryable
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ToListAsync()
         {
+            sqlEntity.StrSqlValue.Clear();
+            sqlEntity.DbParams.Clear(); 
             builder.GetSelect<TResult>(visitor.GetSelectInfo(),sqlEntity);
             return await DbDrive.ReadAsync<TResult>(sqlEntity);
         }
@@ -92,17 +94,20 @@ namespace NetCore.ORM.Simple.Queryable
             return this;
         }
 
-        public IQueryResult<TResult> OrderBy<TOrder>(Expression<Func<TResult, TOrder>> expression)
+        public virtual ISimpleGroupByQueryable<TResult,TOrder> OrderBy<TOrder>(Expression<Func<TResult,TOrder>> expression)
         {
-            return this;
+            visitor.GroupBy(expression);
+            ISimpleGroupByQueryable<TResult,TOrder> simpleOrder = new SimpleGroupByQueryable<TResult,TOrder>(visitor, builder, DbDrive);
+            return simpleOrder;
         }
 
-        public ISimpleGroupByQueryable<TGroup> GroupBy<TGroup>(Expression<Func<TResult,TGroup>> expression)
+        public  ISimpleGroupByQueryable<TResult, TGroup> GroupBy<TGroup>(Expression<Func<TResult,TGroup>> expression)
         {
-            ISimpleGroupByQueryable<TGroup> simpleGroupBy = new SimpleGroupByQueryable<TGroup>();
+            visitor.GroupBy(expression);
+            ISimpleGroupByQueryable<TResult, TGroup> simpleGroupBy = new SimpleGroupByQueryable<TResult,TGroup>(visitor,builder,DbDrive);
             return simpleGroupBy;
         }
-        public IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<TResult,TNewResult>>expression)
+        public virtual IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<TResult,TNewResult>>expression)
         {
             visitor.VisitMap(expression);
             IQueryResult<TNewResult> query = new QueryResult<TNewResult>(visitor,builder,DbDrive);

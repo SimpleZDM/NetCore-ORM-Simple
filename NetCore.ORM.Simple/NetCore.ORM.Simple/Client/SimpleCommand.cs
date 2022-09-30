@@ -19,12 +19,12 @@ namespace NetCore.ORM.Simple.Client
 {
     public class SimpleCommand<TEntity>:ISimpleCommand<TEntity>where TEntity : class
     {
-        private List<SqlEntity> sqls;
-        private SqlEntity currentSql;
+        private List<SqlCommandEntity> sqls;
+        private SqlCommandEntity currentSql;
         private Builder builder;
         private DBDrive dbDrive;
 
-        public SimpleCommand(Builder builder,eDBType dbType,SqlEntity sql,List<SqlEntity>_sqls,DBDrive dBDrive)
+        public SimpleCommand(Builder builder,eDBType dbType,SqlCommandEntity sql,List<SqlCommandEntity>_sqls,DBDrive dBDrive)
         {
             sqls = _sqls;
             currentSql= sql;
@@ -43,7 +43,7 @@ namespace NetCore.ORM.Simple.Client
             switch (currentSql.DbCommandType)
             {
                 case eDbCommandType.Insert:
-                     SqlEntity GetInsertSql=new SqlEntity();
+                     QueryEntity GetInsertSql=new QueryEntity();
                      builder.GetLastInsert<TEntity>(GetInsertSql);
                      return await dbDrive.ExcuteAsync<TEntity>(currentSql,GetInsertSql.StrSqlValue.ToString());
                 case eDbCommandType.Update:

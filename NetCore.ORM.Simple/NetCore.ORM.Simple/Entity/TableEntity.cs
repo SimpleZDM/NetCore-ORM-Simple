@@ -25,17 +25,17 @@ namespace NetCore.ORM.Simple.Entity
         public Dictionary<string,NameEntity> DicTable { get { return dicTable; } private set { dicTable = value; } }
         public string[] TableNames { get { return tableNames; } private set { tableNames = value; } }
 
-        public TableEntity(params string[] tableNames)
+        public TableEntity(params Type[] types)
         {
-            if (Check.IsNull(tableNames)||tableNames.Length<=CommonConst.ZeroOrNull)
+            if (Check.IsNull(types) ||types.Length<=CommonConst.ZeroOrNull)
             {
-                throw new ArgumentException(nameof(tableNames));
+                throw new ArgumentException(nameof(types));
             }
             DicTable=new Dictionary<string,NameEntity>();
-            TableNames=new string[tableNames.Length];
-            for (int i = 0; i < tableNames.Length; i++)
+            TableNames=new string[types.Length];
+            for (int i = 0; i <types.Length; i++)
             {
-                AddTableName(tableNames[i],i);
+                AddTableName(types[i],i);
             }
         }
         private Dictionary<string, NameEntity> dicTable;
@@ -46,27 +46,29 @@ namespace NetCore.ORM.Simple.Entity
         /// 
         /// </summary>
         /// <param name="Name"></param>
-        private void AddTableName(string Name,int index)
+        private void AddTableName(Type type,int index)
         {
-            if (Check.IsNullOrEmpty(Name))
+            if (Check.IsNull(type))
             {
                 throw new Exception("table name can't null!");
             } 
             var newEity = new NameEntity()
                 {
-                    DisplayNmae=Name
-             };
-            if (DicTable.ContainsKey(Name))
+                    DisplayNmae=type.GetClassName(),
+                    ClassType=type,
+                };
+            if (DicTable.ContainsKey(newEity.DisplayNmae))
             {
-                var entity=DicTable[Name];
+                var entity=DicTable[newEity.DisplayNmae];
                
-                TableNames[index] = $"{Name}{CommonConst.Letters[entity.Count]}";
+                TableNames[index] = $"{newEity.DisplayNmae}{CommonConst.Letters[entity.Count]}";
                 entity.Count++;
             }
             else
             {
-                TableNames[index]=Name;
-            }DicTable.Add(TableNames[index],newEity);
+                TableNames[index]=newEity.DisplayNmae;
+            }
+            DicTable.Add(TableNames[index],newEity);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using NetCore.ORM.Simple.Common;
+using NetCore.ORM.Simple.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,5 +65,24 @@ namespace NetCore.ORM.Simple.SqlBuilder
         public static string[]
           cStrSign =
           new string[] { "(", ")", "=", ">=", "<=", ">", "<", "AND", "OR", "<>" };
+
+        public static string AscendOrDescend(eOrderType OrderType)
+        {
+            string value=string.Empty;
+            switch (OrderType)
+            {
+                case eOrderType.Ascending:
+                    value = "ASC";
+                    break;
+                case eOrderType.Descending:
+                    value = "DESC";
+                    break;
+                default:
+                    break;
+            }
+            return value;
+        }
+
+
     }
 }

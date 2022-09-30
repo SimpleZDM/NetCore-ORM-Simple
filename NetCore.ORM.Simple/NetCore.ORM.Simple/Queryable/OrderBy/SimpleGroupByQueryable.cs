@@ -1,9 +1,11 @@
-﻿using System;
+﻿using NetCore.ORM.Simple.Visitor;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using NetCore.ORM.Simple.SqlBuilder;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.Queryable.OrderBy
@@ -16,45 +18,49 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Queryable
 {
-    public class SimpleGroupByQueryable<TGroup>:QueryResult<TGroup>,ISimpleGroupByQueryable<TGroup>
+    public class SimpleGroupByQueryable<TResult,TGroup>:QueryResult<TGroup>,ISimpleGroupByQueryable<TResult,TGroup>
     {
+        public SimpleGroupByQueryable(SimpleVisitor visitor,Builder builder,DBDrive dBDrive):base(visitor,builder,dBDrive)
+        {
+            //visitor,builder,DbDrive
+        }
         public TGroup Key { get; set; }
-        public double Sum(Expression<Func<TGroup,double>>expression)
+        public double Sum(Expression<Func<TResult, double>>expression)
         {
             return default(double);
         }
-        public float Sum(Expression<Func<TGroup,float>> expression)
+        public float Sum(Expression<Func<TResult, float>> expression)
         {
             return default(float);
         }
-        public int Sum(Expression<Func<TGroup,int>> expression)
+        public int Sum(Expression<Func<TResult, int>> expression)
         {
             return default(int);
         }
 
-        public decimal Sum(Expression<Func<TGroup,decimal>> expression)
+        public decimal Sum(Expression<Func<TResult, decimal>> expression)
         {
             return default(decimal);
         }
 
-        public decimal Average(Expression<Func<TGroup,decimal>> expression)
+        public decimal Average(Expression<Func<TResult, decimal>> expression)
         {
             return default(decimal);
         }
-        public double Average(Expression<Func<TGroup, double>> expression)
+        public double Average(Expression<Func<TResult, double>> expression)
         {
             return default(double);
         }
-        public float Average(Expression<Func<TGroup, float>> expression)
+        public float Average(Expression<Func<TResult, float>> expression)
         {
             return default(float);
         }
 
-        public int Average(Expression<Func<TGroup,int>> expression)
+        public int Average(Expression<Func<TResult, int>> expression)
         {
             return default(int);
         }
-        public int Count<TField>(Expression<Func<TGroup,TField>> expression)
+        public int Count<TField>(Expression<Func<TResult, TField>> expression)
         {
             return default(int);
         }
@@ -62,9 +68,15 @@ namespace NetCore.ORM.Simple.Queryable
         {
             return default(int);
         }
-        public ISimpleGroupByQueryable<TGroup> Select<TResult>(Expression<Func<SimpleGroupByQueryable<TGroup>,TResult>> expression)
+        public virtual IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<ISimpleGroupByQueryable<TResult,TGroup>,TNewResult>> expression)
         {
-
+            visitor.VisitMap(expression);
+            IQueryResult<TNewResult> result = new QueryResult<TNewResult>(visitor,builder, DbDrive);
+            return result;
+        }
+        public ISimpleGroupByQueryable<TResult,TGroup> OrderBy<TOrder>(Expression<Func<ISimpleGroupByQueryable<TResult,TGroup>,TOrder>> expression)
+        {
+            visitor.OrderBy(expression);
             return this;
         }
 
