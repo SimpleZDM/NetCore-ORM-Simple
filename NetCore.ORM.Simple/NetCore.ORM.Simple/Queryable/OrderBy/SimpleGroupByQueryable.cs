@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using NetCore.ORM.Simple.SqlBuilder;
 
 /*********************************************************
- * 命名空间 NetCore.ORM.Simple.Queryable.OrderBy
+ * 命名空间 NetCore.ORM.Simple.Queryable
  * 接口名称 SimpleOrderByQueryable
  * 开发人员：-nhy
  * 创建时间：2022/9/27 10:50:46
@@ -33,7 +33,7 @@ namespace NetCore.ORM.Simple.Queryable
         {
             return default(float);
         }
-        public int Sum(Expression<Func<TResult, int>> expression)
+        public int Sum(Expression<Func<TResult,int>> expression)
         {
             return default(int);
         }

@@ -149,7 +149,9 @@ public static class Program
 
         for (int i = 0; i < 20; i++)
         {
-            var data=simpleClient.Queryable<MissionDetailEntity>().Where(m => !m.IsDelete || (m.EndTime < DateTime.Now && m.StartTime > DateTime.MinValue)).Take(500).ToListAsync().Result;
+            var data=simpleClient.Queryable<MissionDetailEntity>().
+                Where(m => !m.IsDelete || (m.EndTime < DateTime.Now && m.StartTime >
+                DateTime.MinValue)).Take(500).GroupBy(s=>new {s.EndTime}).Select(t=>new {age=t.Average(x=>x.)});
             Console.WriteLine(i);
         }
        
