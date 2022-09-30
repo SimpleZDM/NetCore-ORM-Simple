@@ -124,47 +124,116 @@ public static class Program
               RoleID= 10
           });
 
-
+        TestSimple();
         //Expression<Func<UserEntity, UserEntity>> expression = (u) => new UserEntity { Name=u.Name};
         //expression.Compile().Invoke(new UserEntity());
+
+        return 0;
+    }
+    public static void TestSimple()
+    {
+        Console.WriteLine("*******************Simple*************************");
         Stopwatch watch = new Stopwatch();
         watch.Start();
-        for (int i = 0; i < 5000; i++)
-        {
-            var query = simpleClient.Queryable<UserEntity, RoleEntity, CompanyEntity>(
-            (u, r, c) =>
-                new JoinInfoEntity(
-                    new JoinMapEntity(eJoinType.Inner, u.RoleID == r.Id && u.RoleID > ((int)eConditionType.Sign)),
-                    new JoinMapEntity(eJoinType.Inner, u.CompanyId == c.ID)
-                )
-             )
-            .Select((user, r, c) => new ViewView
-            {
-                UserId = r.Id,
-                DisplayName = user.Name,
-                CompanyName = c.CompanyName,
-                RoleName = r.DisplayName,
-            }).Where(v => v.UserId > 0).Select(v => new ViewView2
-            {
-                RID = v.UserId,
-                DisplayName = v.DisplayName
-            }).GroupBy(v=> new{ v.RID}).
-            OrderBy(v => new { Id =v.Key.RID }).Select(v => new
-            {
-                SUMAge=v.Sum(s=>s.RID),
+        #region
+         ISimpleClient simpleClient = new SimpleClient(
+          new DataBaseConfiguration(false,
+          new ConnectionEntity("server=49.233.33.36;database=virtualsoftplatformdb;user=root;pwd=[Txy*!14@msql*^];SSL Mode=None")
+          {
+              IsAutoClose = true,
+              DBType = eDBType.Mysql,
+              Name = "test1",
+              ReadWeight = 5,
+              WriteReadType = eWriteOrReadType.ReadOrWrite
+          }));
 
-            });
-            var data = query.ToListAsync().Result;
-            foreach (var item in data)
-            {
-                Console.WriteLine(item.SUMAge);
-            }
+        for (int i = 0; i < 20; i++)
+        {
+            var data=simpleClient.Queryable<MissionDetailEntity>().Where(m => !m.IsDelete || (m.EndTime < DateTime.Now && m.StartTime > DateTime.MinValue)).Take(500).ToListAsync().Result;
             Console.WriteLine(i);
         }
+       
+        #endregion
         watch.Stop();
         Console.WriteLine($"******************用时:{watch.ElapsedMilliseconds}********************");
-        Console.WriteLine($"*********************单次时长:{watch.ElapsedMilliseconds / (5000 + 0.0)}毫秒*****************");
-        return 0;
+        Console.WriteLine($"*********************单次时长:{watch.ElapsedMilliseconds / (20 + 0.0)}毫秒*****************");
+    }
+
+    public class TastClass
+    {
+        public int AVG { get; set; }
+    }
+
+    [ClassName("missiondetailtable")]
+    public class MissionDetailEntity
+    {
+        public MissionDetailEntity()
+        {
+            //ID = Guid.NewGuid();
+            //GroupID = Guid.NewGuid();
+            //MissionRole = -1;
+        }
+
+        public Guid Id { get; set; }
+        public Guid ProductId { get; set; }
+        public Guid ProductDeviceId { get; set; }
+        public Guid MissionId { get; set; }
+        public Guid UserId { get; set; }
+
+        public int MissionRole { get; set; }
+
+        public int StatusId { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public decimal Score { get; set; }
+        public string OperationRecord { get; set; }
+        public Guid GroupID { get; set; }
+        public Guid MissionTimeId { get; set; }
+
+        private bool isDelete = false;
+        private string concurrencyStamp;
+        private DateTime creationTime;
+        private DateTime deletionTime;
+        private Guid? creatorID;
+        private DateTime lastModificationTime;
+        private Guid? lastModifierID;
+        private Guid? deleterID;
+
+        /// <summary>
+        /// 修改标记--防止并发冲突
+        /// </summary>
+        public string ConcurrencyStamp { get { return concurrencyStamp; } set { concurrencyStamp = value; } }
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreationTime { get { return creationTime; } set { creationTime = value; } }
+
+        /// <summary>
+        /// 创建者Id
+        /// </summary>
+        public Guid? CreatorID { get { return creatorID; } set { creatorID = value; } }
+        /// <summary>
+        /// 最后跟新时间
+        /// </summary>
+        public DateTime LastModificationTime { get { return lastModificationTime; } set { lastModificationTime = value; } }
+
+        /// <summary>
+        /// 最后修改的id
+        /// </summary>
+        public Guid? LastModifierID { get { return lastModifierID; } set { lastModifierID = value; } }
+        /// <summary>
+        /// 是否删除
+        /// </summary>
+        public bool IsDelete { get { return isDelete; } set { isDelete = value; } }
+
+        /// <summary>
+        /// 删除者id
+        /// </summary>
+        public Guid? DeleterID { get { return deleterID; } set { deleterID = value; } }
+        /// <summary>
+        /// 删除时间
+        /// </summary>
+        public DateTime DeletionTime { get { return deletionTime; } set { deletionTime = value; } }
     }
 }
 

@@ -282,7 +282,16 @@ namespace NetCore.ORM.Simple.SqlBuilder
                             sqlEntity.StrSqlValue.Append(",");
                         }
                         mapInfos[i].AsColumnName = $"{mapInfos[i].TableName}{charConnectSign}{mapInfos[i].ColumnName}";
-                        sqlEntity.StrSqlValue.Append($" {mapInfos[i].TableName}.{mapInfos[i].ColumnName} AS {mapInfos[i].AsColumnName} ");
+                        if (Check.IsNullOrEmpty(mapInfos[i].MethodName))
+                        {
+                            sqlEntity.StrSqlValue.Append($" { mapInfos[i].TableName}.{mapInfos[i].ColumnName} AS {mapInfos[i].AsColumnName} ");
+                        }
+                        else
+                        {
+                            string vaule = MysqlConst.MapMethod(mapInfos[i].MethodName,$"{mapInfos[i].TableName}.{mapInfos[i].ColumnName}",string.Empty);
+                            sqlEntity.StrSqlValue.Append($" {vaule} AS {mapInfos[i].AsColumnName} ");
+                        }
+                        
 
                     }
                 }

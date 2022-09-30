@@ -56,6 +56,23 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         value = $"{rightValue} IS NULL";
                     }
                     break;
+                case "Sum":
+                    value = $" SUM({leftValue}) ";
+                    break;
+                case "Min":
+                    value = $" Min({leftValue}) ";
+                    break;
+                case "Max":
+                    value = $" Max({leftValue}) ";
+                    break;
+                case "Count":
+                    var star = "*";
+                    leftValue = Check.IsNullOrEmpty(leftValue) ? star : leftValue;
+                    value = $" COUNT({leftValue}) ";
+                    break;
+                case "Average":
+                    value = $" AVG({leftValue}) ";
+                    break;
                 default:
                     break;
             }

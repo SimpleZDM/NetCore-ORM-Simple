@@ -59,7 +59,7 @@ namespace NetCore.ORM.Simple.Visitor
         /// </summary>
         /// 
         private int firstConditionIndex;
-        public ConditionVisitor(TableEntity table,List<ConditionEntity> Conditions,List<TreeConditionEntity> TreeConditions)
+        public ConditionVisitor(TableEntity table, List<ConditionEntity> Conditions, List<TreeConditionEntity> TreeConditions)
         {
             if (Check.IsNull(table))
             {
@@ -262,7 +262,7 @@ namespace NetCore.ORM.Simple.Visitor
         }
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (currentTables.Count>CommonConst.ZeroOrNull)
+            if (currentTables.Count > CommonConst.ZeroOrNull)
             {
                 if (Check.IsNull(currentTree))
                 {
@@ -323,6 +323,7 @@ namespace NetCore.ORM.Simple.Visitor
             if (node.Left is MemberExpression leftMember)
             {
                 currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
+                currentTree.LeftCondition.PropertyType = leftMember.Type;
                 GetMemberValue(leftMember, currentTree.LeftCondition);
             }
             else if (node.Left is ConstantExpression leftConstant)
@@ -345,7 +346,7 @@ namespace NetCore.ORM.Simple.Visitor
                 currentTree.RightCondition = new ConditionEntity(eConditionType.ColumnName);
                 GetMemberValue(rightMember, currentTree.RightCondition);
             }
-            treeConditions.Add(currentTree);
+            
             IsComplete = true;
         }
 
@@ -392,7 +393,7 @@ namespace NetCore.ORM.Simple.Visitor
 
                 if (IsMultipleMap)
                 {
-                    var mapInfo = mapInfos.Where(map=>map.PropName.Equals(member.Member.Name)).FirstOrDefault();
+                    var mapInfo = mapInfos.Where(map => map.PropName.Equals(member.Member.Name)).FirstOrDefault();
                     if (!Check.IsNull(mapInfo))
                     {
                         condition.DisplayName = $"{mapInfo.TableName}.{mapInfo.ColumnName}";
@@ -402,11 +403,27 @@ namespace NetCore.ORM.Simple.Visitor
                 {
                     if (tableNames.TableNames.Length > SimpleConst.minTableCount)
                     {
-                        if (currentTables.ContainsKey(member.Expression.ToString()))
+                        if (!Check.IsNull(member.Expression))
                         {
-                            mName = $"{tableNames.TableNames[currentTables[member.Expression.ToString()]]}.{member.Member.Name}";
-                            condition.DisplayName = mName;
+                            if (currentTables.ContainsKey(member.Expression.ToString()))
+                            {
+                                mName = $"{tableNames.TableNames[currentTables[member.Expression.ToString()]]}.{member.Member.Name}";
+                                condition.DisplayName = mName;
+                            }
                         }
+                        else
+                        {
+                            if (member.ToString().Equals("DateTime.Now")) 
+                            {
+                                condition.DisplayName = DateTime.Now.ToString("yyyy-MM-dd H:m:s");
+                                condition.ConditionType = eConditionType.Constant;
+                                
+                            }else if (member.ToString().Equals("DateTime.Now"))
+                            {
+
+                            }
+                        }
+
                     }
                     else
                     {

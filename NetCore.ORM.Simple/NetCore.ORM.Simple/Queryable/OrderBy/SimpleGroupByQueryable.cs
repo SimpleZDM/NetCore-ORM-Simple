@@ -68,6 +68,40 @@ namespace NetCore.ORM.Simple.Queryable
         {
             return default(int);
         }
+        public double Max(Expression<Func<TResult, double>> expression)
+        {
+            return default(double);
+        }
+        public float Max(Expression<Func<TResult, float>> expression)
+        {
+            return default(float);
+        }
+        public int Max(Expression<Func<TResult, int>> expression)
+        {
+            return default(int);
+        }
+
+        public decimal Max(Expression<Func<TResult, decimal>> expression)
+        {
+            return default(decimal);
+        }
+        public double Min(Expression<Func<TResult, double>> expression)
+        {
+            return default(double);
+        }
+        public float Min(Expression<Func<TResult, float>> expression)
+        {
+            return default(float);
+        }
+        public int Min(Expression<Func<TResult, int>> expression)
+        {
+            return default(int);
+        }
+
+        public decimal Min(Expression<Func<TResult, decimal>> expression)
+        {
+            return default(decimal);
+        }
         public virtual IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<ISimpleGroupByQueryable<TResult,TGroup>,TNewResult>> expression)
         {
             visitor.VisitMap(expression);

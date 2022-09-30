@@ -40,6 +40,8 @@ namespace NetCore.ORM.Simple.Visitor
 
         private MapEntity currentmapInfo;
         private bool IsAgain;
+
+        private string CurrentMethodName;
         /// <summary>
         /// 匿名类标记
         /// </summary>
@@ -91,7 +93,7 @@ namespace NetCore.ORM.Simple.Visitor
                 currentTables.Add(item.Name, currentTables.Count);
             }
             Visit(expression);
-
+            currentmapInfo= null;
             IsAgain = true;
             return expression;
         }
@@ -250,7 +252,14 @@ namespace NetCore.ORM.Simple.Visitor
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            // Console.WriteLine(node.Method.Name);
+            if (Check.IsNull(currentmapInfo))
+            {
+                CurrentMethodName= node.Method.Name;
+            }
+            else
+            {
+               currentmapInfo.MethodName=node.Method.Name;
+            }
             return base.VisitMethodCall(node);
         }
 
@@ -278,12 +287,12 @@ namespace NetCore.ORM.Simple.Visitor
         protected override MemberBinding VisitMemberBinding(MemberBinding node)
         {
             base.VisitMemberBinding(node);
-           
-                if (!isAnonymity)
-                {
-                  //非匿名对象属性名称
-                  currentmapInfo.LastPropName = node.Member.Name;
-                }
+
+            if (!isAnonymity)
+            {
+                //非匿名对象属性名称
+                currentmapInfo.LastPropName = node.Member.Name;
+            }
             currentmapInfo.PropName = node.Member.Name;
             return node;
         }
@@ -317,25 +326,27 @@ namespace NetCore.ORM.Simple.Visitor
         {
             //base.VisitMember(node);
             Console.WriteLine(node.ToString());
-            if (currentTables.ContainsKey(node.Expression.ToString()))
+            if (IsAgain)
             {
-                if (IsAgain)
-                {
 
-                    currentmapInfo = mapInfos.FirstOrDefault(m => m.PropName.Equals(node.Member.Name));
-                    currentmapInfo.IsNeed = true;
-
-                   
-                }
-                else
+                currentmapInfo = mapInfos.FirstOrDefault(m => m.PropName.Equals(node.Member.Name));
+                if (!Check.IsNullOrEmpty(CurrentMethodName))
                 {
-                    currentmapInfo = new MapEntity();
-                    mapInfos.Add(currentmapInfo);
-                    currentmapInfo.ColumnName = node.Member.Name;
-                    currentmapInfo.TableName = Table.TableNames[currentTables[node.Expression.ToString()]];
+                    currentmapInfo.MethodName = CurrentMethodName;
+                    CurrentMethodName = string.Empty;
                 }
-                currentmapInfo.ClassName = Table.DicTable[currentmapInfo.TableName].ClassType.Name;
+                currentmapInfo.IsNeed = true;
+
+
             }
+            else if (currentTables.ContainsKey(node.Expression.ToString()))
+            {
+                currentmapInfo = new MapEntity();
+                mapInfos.Add(currentmapInfo);
+                currentmapInfo.ColumnName = node.Member.Name;
+                currentmapInfo.TableName = Table.TableNames[currentTables[node.Expression.ToString()]];
+            }
+            currentmapInfo.ClassName = Table.DicTable[currentmapInfo.TableName].ClassType.Name;
             return node;
         }
 

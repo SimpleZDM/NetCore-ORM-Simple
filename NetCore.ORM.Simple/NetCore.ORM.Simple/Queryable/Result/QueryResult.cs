@@ -73,6 +73,7 @@ namespace NetCore.ORM.Simple.Queryable
             sqlEntity.StrSqlValue.Clear();
             sqlEntity.DbParams.Clear(); 
             builder.GetSelect<TResult>(visitor.GetSelectInfo(),sqlEntity);
+            //Console.WriteLine(sqlEntity.StrSqlValue.ToString());
             return await DbDrive.ReadAsync<TResult>(sqlEntity);
         }
 
