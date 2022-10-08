@@ -22,16 +22,22 @@ namespace NetCore.ORM.Simple.Client
     public interface ISimpleClient
     {
         public ISimpleCommand<TEntity> Insert<TEntity>(TEntity entity) where TEntity : class, new();
+        public ISimpleCommand<TEntity> Insert<TEntity>(IEnumerable<TEntity> entitys) where TEntity : class, new();
 
         /// <summary>
         /// 插入数据库
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="entity"></param>
-        public void Update<TEntity>(TEntity entity) where TEntity : class, new();
+        public ISimpleCommand<TEntity> Update<TEntity>(TEntity entity) where TEntity : class, new();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="expression"></param>
 
-
-        public void Delete<TEntity>(Expression<Func<TEntity, bool>> expression) where TEntity : class, new();
+        public ISimpleCommand<TEntity> Delete<TEntity>(Expression<Func<TEntity, bool>> expression) where TEntity : class, new();
+        public ISimpleCommand<TEntity> Delete<TEntity>(TEntity entity) where TEntity : class, new();
 
         /// <summary>
         /// 

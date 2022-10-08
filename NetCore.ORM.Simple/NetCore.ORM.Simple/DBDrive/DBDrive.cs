@@ -95,7 +95,12 @@ namespace NetCore.ORM.Simple
                 () => mysqlDrive.ExcuteAsync(entity)
                );
         }
-       
+        public async Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand)
+        {
+            return await MatchDBDrive(
+                () => mysqlDrive.ExcuteAsync(sqlCommand)
+               );
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -235,7 +240,7 @@ namespace NetCore.ORM.Simple
             }
             return default(TResult);
         }
-    
 
+       
     }
 }

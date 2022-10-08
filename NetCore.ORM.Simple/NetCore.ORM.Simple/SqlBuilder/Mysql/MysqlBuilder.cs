@@ -128,7 +128,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                       sql.DbParams.Add(new MySqlParameter(key, p.GetValue(data)));
                       return key;
                   })));
-                sql.StrSqlValue.Append(" (");
+                sql.StrSqlValue.Append(" )");
                 if (count == MysqlConst.INSERTMAX)
                 {
                     sql.StrSqlValue.Append(";");
@@ -136,7 +136,14 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 }
                 else
                 {
-                    sql.StrSqlValue.Append(",");
+                    if (Index == datas.Count())
+                    {
+                        sql.StrSqlValue.Append(";");
+                    }
+                    else
+                    {
+                        sql.StrSqlValue.Append(",");
+                    }
                 }
             }
 
@@ -166,7 +173,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 sql = new QueryEntity();
             }
             sql.StrSqlValue.Append($"SELECT " +
-                $"{string.Join(',', type.GetNoIgnore())} " +
+                $"{string.Join(',', type.GetNoIgnore().Select(p=>p.GetColName()))} " +
                 $"FROM {type.GetClassName()} ");
         }
 

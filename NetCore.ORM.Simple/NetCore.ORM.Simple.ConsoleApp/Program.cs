@@ -12,7 +12,7 @@ public static class Program
 {
     public static int Main(string []args)
     {
-        string [] arry=new string[] { "sdfsd", "sdfsd", "sdfasd" };
+        //string [] arry=new string[] { "sdfsd", "sdfsd", "sdfasd" };
         //Console.WriteLine(DateTime.Now.ToString("yyyy-M-dd HH:mm"));
         //eJoinType join=eJoinType.Inner;
         //Console.WriteLine(join.ToString());
@@ -67,16 +67,16 @@ public static class Program
         //var text=Activator.CreateInstance(type);
        
         
-        ISimpleClient simpleClient = new SimpleClient(
-            new DataBaseConfiguration(false,
-            new ConnectionEntity("server=127.0.0.1;database=testdb;user=root;pwd=123456;") 
-            { 
-                IsAutoClose = true,
-                DBType=eDBType.Mysql,
-                Name="test1",
-                ReadWeight=5,
-                WriteReadType=eWriteOrReadType.ReadOrWrite
-            }));
+        //ISimpleClient simpleClient = new SimpleClient(
+        //    new DataBaseConfiguration(false,
+        //    new ConnectionEntity("server=127.0.0.1;database=testdb;user=root;pwd=123456;") 
+        //    { 
+        //        IsAutoClose = true,
+        //        DBType=eDBType.Mysql,
+        //        Name="test1",
+        //        ReadWeight=5,
+        //        WriteReadType=eWriteOrReadType.ReadOrWrite
+        //    }));
         //       Stopwatch watch = new Stopwatch();
         //       int lenght = 100;
         //       watch.Start();
@@ -124,9 +124,11 @@ public static class Program
         //      RoleID= 10
         //  });
 
-        TestSimpleQuery();
+        //TestSimpleQuery();
         //Expression<Func<UserEntity, UserEntity>> expression = (u) => new UserEntity { Name=u.Name};
         //expression.Compile().Invoke(new UserEntity());
+
+        UpdateTest();
 
         return 0;
     }
@@ -157,6 +159,7 @@ public static class Program
 
             var count = simpleClient.Queryable<MissionDetailEntity>().
                 Take(500).Count();
+            var data1 = simpleClient.Queryable<UserEntity, CompanyEntity>((u,c)=>new JoinInfoEntity(new JoinMapEntity(eJoinType.Inner,u.CompanyId==c.ID))).FirstOrDefault();
             var Any = simpleClient.Queryable<MissionDetailEntity>().
            Take(500).Any();
             var firest = simpleClient.Queryable<MissionDetailEntity>().First();
@@ -169,6 +172,91 @@ public static class Program
         watch.Stop();
         Console.WriteLine($"******************用时:{watch.ElapsedMilliseconds}********************");
         Console.WriteLine($"*********************单次时长:{watch.ElapsedMilliseconds / (20 + 0.0)}毫秒*****************");
+    }
+
+    public static void InsertSimpleInsert()
+    {
+        ISimpleClient simpleClient = new SimpleClient(
+          new DataBaseConfiguration(false,
+          new ConnectionEntity("server=49.233.33.36;database=virtualsoftplatformdb;user=root;pwd=[Txy*!14@msql*^];SSL Mode=None")
+          {
+              IsAutoClose = true,
+              DBType = eDBType.Mysql,
+              Name = "test1",
+              ReadWeight = 5,
+              WriteReadType = eWriteOrReadType.ReadOrWrite
+          }));
+        simpleClient.SetAPOLog((sql, Params) =>
+        {
+            Console.WriteLine(sql);
+        });
+        var watch = new Stopwatch();
+        watch.Start();
+        List<DictionEntity> dics = new List<DictionEntity>();
+        for (int i = 0; i < 100; i++)
+        {
+
+            dics.Add(new DictionEntity() { MainID=100,RowID=i,RowDesc=$"SimpleTest_{i}",RowName=$"Simple-1.0{i}"});
+            dics.Add(new DictionEntity() { MainID=100,RowID=i,RowDesc=$"SimpleTest_{i}",RowName=$"Simple-1.0{i}"});
+        }
+        simpleClient.Insert(new DictionEntity());
+        int result = simpleClient.SaveChangeAsync().Result;
+        watch.Stop();
+        Console.WriteLine($"******************用时:{watch.ElapsedMilliseconds}********************");
+        Console.WriteLine($"*********************单次时长:{watch.ElapsedMilliseconds / (100 + 0.0)}毫秒*****************");
+    }
+
+    public static void UpdateTest()
+    {
+        ISimpleClient simpleClient = new SimpleClient(
+          new DataBaseConfiguration(false,
+          new ConnectionEntity("server=49.233.33.36;database=virtualsoftplatformdb;user=root;pwd=[Txy*!14@msql*^];SSL Mode=None")
+          {
+              IsAutoClose = true,
+              DBType = eDBType.Mysql,
+              Name = "test1",
+              ReadWeight = 5,
+              WriteReadType = eWriteOrReadType.ReadOrWrite
+          }));
+        simpleClient.SetAPOLog((sql, Params) =>
+        {
+            Console.WriteLine(sql);
+        });
+        var watch = new Stopwatch();
+        watch.Start();
+        var entity=simpleClient.Queryable<DictionEntity>().Where(d=>d.ID.Equals(500)).FirstOrDefault();
+        entity.RowName = "testUpdate";
+        var result=simpleClient.Update(entity).SaveChangeAsync().Result;
+        watch.Stop();
+        Console.WriteLine($"******************用时:{watch.ElapsedMilliseconds}********************");
+        Console.WriteLine($"*********************单次时长:{watch.ElapsedMilliseconds / (100 + 0.0)}毫秒*****************");
+    }
+
+    public static void QueryTest()
+    {
+        ISimpleClient simpleClient = new SimpleClient(
+         new DataBaseConfiguration(false,
+         new ConnectionEntity("server=49.233.33.36;database=virtualsoftplatformdb;user=root;pwd=[Txy*!14@msql*^];SSL Mode=None")
+         {
+             IsAutoClose = true,
+             DBType = eDBType.Mysql,
+             Name = "test1",
+             ReadWeight = 5,
+             WriteReadType = eWriteOrReadType.ReadOrWrite
+         }));
+        simpleClient.SetAPOLog((sql, Params) =>
+        {
+            Console.WriteLine(sql);
+        });
+        var watch = new Stopwatch();
+        watch.Start();
+        List<DictionEntity> dics = new List<DictionEntity>();
+        var entity = simpleClient.Queryable<DictionEntity>().Select(d=>new{Name=d.RowName,Id=d.ID}).FirstOrDefault();
+        var entity1 = simpleClient.Queryable<DictionEntity>().Select(d=>new{Name=d.RowName,Id=d.ID}).Where(d=>d.Name.Equals("test")).FirstOrDefault();
+       
+        watch.Stop();
+        Console.WriteLine($"******************用时:{watch.ElapsedMilliseconds}********************");
+        Console.WriteLine($"*********************单次时长:{watch.ElapsedMilliseconds / (100 + 0.0)}毫秒*****************");
     }
 
     public class TastClass
@@ -246,6 +334,34 @@ public static class Program
         /// 删除时间
         /// </summary>
         public DateTime DeletionTime { get { return deletionTime; } set { deletionTime = value; } }
+    }
+
+    [ClassName("dictionarytable")]
+    public class DictionEntity
+    {
+        [Key(true)]
+        public int ID { get; set; }
+        public int MainID { get; set; }
+        public int RowID { get; set; }
+        public string RowName { get; set; }
+        public string RowDesc { get; set; }
+    }
+
+    [ClassName("UserTable")]
+    public class UserEntity
+    {
+        [Key(true)]
+        public int ID { get; set; }
+        public int UserName { get; set; }
+        public int CompanyId { get; set; }
+    }
+
+    [ClassName("CompanyTable")]
+    public class CompanyEntity
+    {
+        [Key(true)]
+        public int ID { get; set; }
+        public int CompanyName { get; set; }
     }
 }
 

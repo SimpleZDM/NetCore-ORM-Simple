@@ -62,6 +62,8 @@ namespace NetCore.ORM.Simple
         /// <returns></returns>
         public  Task<int> ExcuteAsync(SqlCommandEntity entity);
 
+        public  Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand);
+
 
         /// <summary>
         /// 添加成功后返回单个实体

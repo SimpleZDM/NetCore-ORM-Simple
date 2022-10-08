@@ -18,8 +18,41 @@ namespace NetCore.ORM.Simple.Queryable
 {
     public interface ISimpleQueryable<T1,T2,T3,T4,T5>:IQueryResult<T1> where T1 : class
     {
-        public ISimpleQueryable<T1, T2, T3, T4,T5> Where();
-        public IQueryResult<TResult> Select<TResult>(Expression<Func<T1,T2,T3,T4,T5, TResult>> expression);
+        public IQueryResult<TResult> Select<TResult>(Expression<Func<T1, T2, TResult>> expression) where TResult : class;
         
+        public IQueryResult<TResult> Select<TResult>(Expression<Func<T1, T2, T3, TResult>> expression) where TResult : class;
+       
+        public IQueryResult<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, TResult>> expression) where TResult : class;
+        
+        public IQueryResult<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, T5, TResult>> expression) where TResult : class;
+        
+        public ISimpleQueryable<T1, T2, T3, T4, T5> Where(Expression<Func<T1, T2, bool>> expression);
+        
+        public ISimpleQueryable<T1, T2, T3, T4, T5> Where(Expression<Func<T1, T2, T3, bool>> expression);
+
+
+        public ISimpleQueryable<T1, T2, T3, T4, T5> Where(Expression<Func<T1, T2, T3, T4, bool>> expression);
+       
+        public ISimpleQueryable<T1, T2, T3, T4, T5> Where(Expression<Func<T1, T2, T3, T4, T5, bool>> expression);
+        
+        public ISimpleQueryable<T1, T2, T3, T4, T5> OrderBy<TOrder>(Expression<Func<T1, T2, TOrder>> expression);
+       
+         public ISimpleQueryable<T1, T2, T3, T4, T5> OrderBy<TOrder>(Expression<Func<T1, T2, T3, TOrder>> expression);
+
+         public ISimpleQueryable<T1, T2, T3, T4, T5> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, TOrder>> expression);
+
+
+        public ISimpleQueryable<T1, T2, T3, T4, T5> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, T5, TOrder>> expression);
+
+
+        public ISimpleQueryable<T1, T2, T3, T4, T5> GroupBy<TGroup>(Expression<Func<T1, T2, TGroup>> expression);
+
+        public ISimpleQueryable<T1, T2, T3, T4, T5> GroupBy<TGroup>(Expression<Func<T1, T2, T3, TGroup>> expression);
+        
+        public ISimpleQueryable<T1, T2, T3, T4, T5> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, TGroup>> expression);
+       
+        public ISimpleQueryable<T1, T2, T3, T4, T5> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, TGroup>> expression);
+
+
     }
 }

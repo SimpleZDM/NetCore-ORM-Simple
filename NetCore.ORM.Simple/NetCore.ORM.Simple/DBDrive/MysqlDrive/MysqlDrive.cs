@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
+using NetCore.ORM.Simple.SqlBuilder;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -39,7 +40,7 @@ namespace NetCore.ORM.Simple
             }
         }
 
-        public Action<string, DbParameter[]> AOPSqlLog { get{ return aopSqlLog; } set{ aopSqlLog = value; } }
+        public Action<string, DbParameter[]> AOPSqlLog { get { return aopSqlLog; } set { aopSqlLog = value; } }
 
         private MySqlConnection connection;
         private MySqlCommand command;
@@ -82,7 +83,7 @@ namespace NetCore.ORM.Simple
         public async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params)
         {
 
-            var entity=new QueryEntity();
+            var entity = new QueryEntity();
             entity.StrSqlValue.Append(sql);
             entity.DbParams.AddRange(Params);
             IEnumerable<TResult> data = null;
@@ -103,21 +104,21 @@ namespace NetCore.ORM.Simple
         public async Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity) where TResult : class
         {
             IEnumerable<TResult> data = null;
-            await ExcuteAsync(entity,async(command) =>
+            await ExcuteAsync(entity, async (command) =>
             {
-              dataRead = await command.ExecuteReaderAsync();
-              data = MapData<TResult>(entity);
+                dataRead = await command.ExecuteReaderAsync();
+                data = MapData<TResult>(entity);
             });
             return data;
         }
         public IEnumerable<TResult> Read<TResult>(QueryEntity entity) where TResult : class
         {
             IEnumerable<TResult> data = null;
-             Excute(entity, (command) =>
-            {
-                dataRead = command.ExecuteReader();
-                 data = MapData<TResult>(entity);
-            });
+            Excute(entity, (command) =>
+           {
+               dataRead = command.ExecuteReader();
+               data = MapData<TResult>(entity);
+           });
             return data;
         }
         public TResult ReadFirstOrDefault<TResult>(QueryEntity entity) where TResult : class
@@ -133,9 +134,9 @@ namespace NetCore.ORM.Simple
         public async Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity) where TResult : class
         {
             TResult data = null;
-            await ExcuteAsync(entity, async(command) =>
+            await ExcuteAsync(entity, async (command) =>
             {
-                dataRead =await command.ExecuteReaderAsync();
+                dataRead = await command.ExecuteReaderAsync();
                 data = MapDataFirstOrDefault<TResult>(entity);
             });
             return data;
@@ -143,27 +144,27 @@ namespace NetCore.ORM.Simple
         public int ReadCount(QueryEntity entity)
         {
             //TResult data = null;
-            int value=0;
-             Excute(entity,  (command) =>
-            {
-                dataRead =  command.ExecuteReader();
-                while (dataRead.Read())
-                {
-                    string strValue=dataRead[CommonConst.StrDataCount].ToString();
-                    int.TryParse(strValue,out value);
-                }
-                //var data = MapDataFirstOrDefault<TResult>(entity);
-            });
+            int value = 0;
+            Excute(entity, (command) =>
+           {
+               dataRead = command.ExecuteReader();
+               while (dataRead.Read())
+               {
+                   string strValue = dataRead[CommonConst.StrDataCount].ToString();
+                   int.TryParse(strValue, out value);
+               }
+               //var data = MapDataFirstOrDefault<TResult>(entity);
+           });
             return value;
         }
 
         public async Task<int> ReadCountAsync(QueryEntity entity)
         {
             //TResult data = null;
-            int value=0;
-            await ExcuteAsync(entity, async(command) =>
+            int value = 0;
+            await ExcuteAsync(entity, async (command) =>
             {
-                dataRead =await command.ExecuteReaderAsync();
+                dataRead = await command.ExecuteReaderAsync();
                 while (dataRead.Read())
                 {
                     string strValue = dataRead[CommonConst.StrDataCount].ToString();
@@ -176,11 +177,11 @@ namespace NetCore.ORM.Simple
 
         public async Task<bool> ReadAnyAsync(QueryEntity entity)
         {
-            return await ReadCountAsync(entity)>CommonConst.ZeroOrNull;
+            return await ReadCountAsync(entity) > CommonConst.ZeroOrNull;
         }
-        public  bool ReadAny(QueryEntity entity)
+        public bool ReadAny(QueryEntity entity)
         {
-            return  ReadCount(entity) >CommonConst.ZeroOrNull;
+            return ReadCount(entity) > CommonConst.ZeroOrNull;
         }
 
 
@@ -193,10 +194,34 @@ namespace NetCore.ORM.Simple
         public async Task<int> ExcuteAsync(SqlCommandEntity entity)
         {
             int result = 0;
-            await ExcuteAsync(entity, async(command) =>
+            await ExcuteAsync(entity, async (command) =>
             {
-              result = await command.ExecuteNonQueryAsync();
+                result = await command.ExecuteNonQueryAsync();
             });
+            return result;
+        }
+
+        public async Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand)
+        {
+            int result = 0;
+            int count = 0;
+            int current = 0;
+            for (int i = 1; i < sqlCommand.Length; i++)
+            {
+                if (count > MysqlConst.INSERTMAXCOUNT)
+                {
+                    await ExcuteAsync(sqlCommand[current], async (command) =>
+                        {
+                            result += await command.ExecuteNonQueryAsync();
+                        });
+                    count= 0;
+                    current=i;
+                    i++;
+                }
+                sqlCommand[current].StrSqlValue.Append(sqlCommand[i].StrSqlValue.ToString());
+                sqlCommand[current].DbParams.AddRange(sqlCommand[i].DbParams);
+                count++;
+            }
             return result;
         }
 
@@ -209,7 +234,7 @@ namespace NetCore.ORM.Simple
         /// <returns></returns>
         public async Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
         {
-            TEntity result=null;
+            TEntity Entity = null;
             await ExcuteAsync(entity, async (command) =>
             {
                 int result = await command.ExecuteNonQueryAsync();
@@ -220,9 +245,9 @@ namespace NetCore.ORM.Simple
                 command.CommandText = query;
                 command.Parameters.Clear();
                 dataRead = await command.ExecuteReaderAsync();
-                var data = MapData<TEntity>().FirstOrDefault();
+                Entity = MapData<TEntity>().FirstOrDefault();
             });
-            return result;
+            return Entity;
         }
 
 
@@ -280,7 +305,7 @@ namespace NetCore.ORM.Simple
                     AOPSqlLog.Invoke(entity.StrSqlValue.ToString(), entity.DbParams.ToArray());
                 }
                 action(command);
-               
+
                 if (configuration.CurrentConnectInfo.IsAutoClose)
                 {
                     command.Dispose();
@@ -310,7 +335,7 @@ namespace NetCore.ORM.Simple
                 AOPSqlLog.Invoke(entity.StrSqlValue.ToString(), entity.DbParams.ToArray());
             }
             action(command);
-           
+
             if (configuration.CurrentConnectInfo.IsAutoClose && !isBeginTransaction)
             {
                 Close();
@@ -336,7 +361,7 @@ namespace NetCore.ORM.Simple
                 }
                 if (!Check.IsNull(AOPSqlLog))
                 {
-                    AOPSqlLog.Invoke(entity.StrSqlValue.ToString(),entity.DbParams.ToArray());
+                    AOPSqlLog.Invoke(entity.StrSqlValue.ToString(), entity.DbParams.ToArray());
                 }
                 action(command);
 

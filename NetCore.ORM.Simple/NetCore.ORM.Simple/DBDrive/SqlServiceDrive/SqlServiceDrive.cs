@@ -46,6 +46,11 @@ namespace NetCore.ORM.Simple
             throw new NotImplementedException();
         }
 
+        public Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<TResult> Read<TResult>(QueryEntity entity) where TResult : class
         {
             throw new NotImplementedException();

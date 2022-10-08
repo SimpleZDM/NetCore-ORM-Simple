@@ -54,29 +54,43 @@ namespace NetCore.ORM.Simple.Client
             ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,configuration.CurrentConnectInfo.DBType,sql,sqls,dbDrive);
             return command;
         }
+        public ISimpleCommand<TEntity> Insert<TEntity>(IEnumerable<TEntity> entitys) where TEntity : class, new()
+        {
+            var sql = builder.GetInsert(entitys);
+            sqls.Add(sql);
+            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, configuration.CurrentConnectInfo.DBType, sql, sqls, dbDrive);
+            return command;
+        }
         /// <summary>
         /// 插入数据库
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="entity"></param>
-        public void Update<TEntity>(TEntity entity) where TEntity : class, new()
+        public ISimpleCommand<TEntity> Update<TEntity>(TEntity entity) where TEntity : class, new()
         {
             var sql = builder.GetUpdate(entity,sqls.Count);
-            sqls.Add(sql);
+            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, configuration.CurrentConnectInfo.DBType, sql, sqls, dbDrive);
+            return command;
         }
 
-        public void Delete<TEntity>(Expression<Func<TEntity,bool>>expression) where TEntity : class, new()
+        public ISimpleCommand<TEntity> Delete<TEntity>(Expression<Func<TEntity,bool>>expression) where TEntity : class, new()
         {
             List<ConditionEntity> conditions = new List<ConditionEntity>();
             List<TreeConditionEntity> treeConditions = new List<TreeConditionEntity>();
             Type type = typeof(TEntity);
             var Visitor = new ConditionVisitor(new TableEntity(type),conditions,treeConditions);
             Visitor.Modify(expression);
-            sqls.Add(builder.GetDelete<TEntity>(type,conditions,treeConditions));
+            var sql = builder.GetDelete<TEntity>(type, conditions, treeConditions);
+            sqls.Add(sql);
+            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, configuration.CurrentConnectInfo.DBType, sql, sqls, dbDrive);
+            return command;
         }
-        public void Delete<TEntity>(TEntity entity) where TEntity : class, new()
+        public ISimpleCommand<TEntity> Delete<TEntity>(TEntity entity) where TEntity : class, new()
         {
-            sqls.Add(builder.GetDelete(entity));
+            var sql = builder.GetDelete(entity);
+            sqls.Add(sql);
+            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, configuration.CurrentConnectInfo.DBType, sql, sqls, dbDrive);
+            return command;
         }
         /// <summary>
         /// 
@@ -106,20 +120,14 @@ namespace NetCore.ORM.Simple.Client
         public async Task<int> SaveChangeAsync()
         {
             int result=0;
-            foreach (var entity in sqls)
+            var array = sqls.Where(command => !command.DbCommandType.Equals(eDbCommandType.Query)).ToArray();
+            if (array.Length>1)
             {
-                switch (entity.DbCommandType)
-                {
-                    case eDbCommandType.Insert:
-                    case eDbCommandType.Update:
-                    case eDbCommandType.Delete:
-                        result +=await dbDrive.ExcuteAsync(entity);
-                        break;
-                    case eDbCommandType.Query:
-                        break;
-                    default:
-                        break;
-                }
+                result = await dbDrive.ExcuteAsync(array);
+            }
+            else if(array.Length==1)
+            {
+                result =await dbDrive.ExcuteAsync(array[0]);
             }
             return result;
         }

@@ -29,13 +29,15 @@ namespace NetCore.ORM.Simple.Client
             sqls = _sqls;
             currentSql= sql;
             this.builder = builder;
+            dbDrive=dBDrive;
         }
-        public bool GetResult()
+        public async Task<int> SaveChangeAsync()
         {
             ///执行完了之后
             sqls.Remove(currentSql);
-            return true;
+            return await dbDrive.ExcuteAsync(currentSql);
         }
+
         public async Task<TEntity> ReturnEntityAsync()
         {
 

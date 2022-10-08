@@ -28,6 +28,18 @@ namespace NetCore.ORM.Simple.Queryable
             Init(builder,dBDrive,types);
             visitor.VisitJoin(expression);
         }
+        public IQueryResult<TResult> Select<TResult>(Expression<Func<T1, T2, TResult>> expression) where TResult : class
+        {
+            visitor.VisitMap(expression);
+            IQueryResult<TResult> query = new QueryResult<TResult>(visitor, builder, DbDrive);
+            return query;
+        }
+        public IQueryResult<TResult> Select<TResult>(Expression<Func<T1, T2, T3, TResult>> expression) where TResult : class
+        {
+            visitor.VisitMap(expression);
+            IQueryResult<TResult> query = new QueryResult<TResult>(visitor, builder, DbDrive);
+            return query;
+        }
 
         public IQueryResult<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, TResult>> expression)where TResult : class
         {
@@ -35,10 +47,51 @@ namespace NetCore.ORM.Simple.Queryable
             IQueryResult<TResult> query = new QueryResult<TResult>(visitor,builder,DbDrive);
             return query;
         }
+        public ISimpleQueryable<T1, T2, T3, T4> Where(Expression<Func<T1, T2,bool>> expression)
+        {
+            visitor.VisitorCondition(expression);
+            return this;
+        }
+
+        public ISimpleQueryable<T1, T2, T3, T4> Where(Expression<Func<T1, T2, T3, bool>> expression)
+        {
+            visitor.VisitorCondition(expression);
+            return this;
+        }
 
         public ISimpleQueryable<T1, T2, T3, T4> Where(Expression<Func<T1,T2,T3,T4,bool>>expression)
         {
             visitor.VisitorCondition(expression);
+            return this;
+        }
+        public ISimpleQueryable<T1, T2, T3, T4> OrderBy<TOrder>(Expression<Func<T1, T2, TOrder>> expression)
+        {
+            visitor.OrderBy(expression);
+            return this;
+        }
+        public ISimpleQueryable<T1, T2, T3, T4> OrderBy<TOrder>(Expression<Func<T1, T2, T3, TOrder>> expression)
+        {
+            visitor.OrderBy(expression);
+            return this;
+        }
+        public ISimpleQueryable<T1, T2, T3,T4> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, TOrder>> expression)
+        {
+            visitor.OrderBy(expression);
+            return this;
+        }
+        public ISimpleQueryable<T1, T2, T3, T4> GroupBy<TGroup>(Expression<Func<T1, T2, TGroup>> expression)
+        {
+            visitor.GroupBy(expression);
+            return this;
+        }
+        public ISimpleQueryable<T1, T2, T3, T4> GroupBy<TGroup>(Expression<Func<T1, T2, T3, TGroup>> expression)
+        {
+            visitor.GroupBy(expression);
+            return this;
+        }
+        public ISimpleQueryable<T1, T2, T3,T4> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, TGroup>> expression)
+        {
+            visitor.GroupBy(expression);
             return this;
         }
     }

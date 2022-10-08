@@ -76,5 +76,114 @@ namespace NetCore.ORM.Simple.Common
             types[3] = GetType<T4>();
             return types;
         }
+        public static Type[] GetType<T, T2, T3, T4,T5>()
+        {
+            Type[] types = new Type[5];
+            types[0] = GetType<T>();
+            types[1] = GetType<T2>();
+            types[2] = GetType<T3>();
+            types[3] = GetType<T4>();
+            types[4] = GetType<T5>();
+            return types;
+        }
+        public static Type[] GetType<T,T2, T3, T4, T5,T6>()
+        {
+            Type[] types = new Type[6];
+            types[0] = GetType<T>();
+            types[1] = GetType<T2>();
+            types[2] = GetType<T3>();
+            types[3] = GetType<T4>();
+            types[4] = GetType<T5>();
+            types[5] = GetType<T6>();
+            return types;
+        }
+        public static Type[] GetType<T, T2, T3, T4, T5, T6,T7>()
+        {
+            Type[] types = new Type[7];
+            types[0] = GetType<T>();
+            types[1] = GetType<T2>();
+            types[2] = GetType<T3>();
+            types[3] = GetType<T4>();
+            types[4] = GetType<T5>();
+            types[5] = GetType<T6>();
+            types[6] = GetType<T7>();
+            return types;
+        }
+
+        public static Type[] GetType<T, T2, T3, T4, T5, T6, T7,T8>()
+        {
+            Type[] types = new Type[8];
+            types[0] = GetType<T>();
+            types[1] = GetType<T2>();
+            types[2] = GetType<T3>();
+            types[3] = GetType<T4>();
+            types[4] = GetType<T5>();
+            types[5] = GetType<T6>();
+            types[6] = GetType<T7>();
+            types[7] = GetType<T8>();
+            return types;
+        }
+        public static Type[] GetType<T, T2, T3, T4, T5, T6, T7, T8,T9>()
+        {
+            Type[] types = new Type[9];
+            types[0] = GetType<T>();
+            types[1] = GetType<T2>();
+            types[2] = GetType<T3>();
+            types[3] = GetType<T4>();
+            types[4] = GetType<T5>();
+            types[5] = GetType<T6>();
+            types[6] = GetType<T7>();
+            types[7] = GetType<T8>();
+            types[8] = GetType<T9>();
+            return types;
+        }
+        public static Type[] GetType<T, T2, T3, T4, T5, T6, T7, T8, T9,T10>()
+        {
+            Type[] types = new Type[10];
+            types[0] = GetType<T>();
+            types[1] = GetType<T2>();
+            types[2] = GetType<T3>();
+            types[3] = GetType<T4>();
+            types[4] = GetType<T5>();
+            types[5] = GetType<T6>();
+            types[6] = GetType<T7>();
+            types[7] = GetType<T8>();
+            types[8] = GetType<T9>();
+            types[9] = GetType<T10>();
+            return types;
+        }
+        public static Type[] GetType<T, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11>()
+        {
+            Type[] types = new Type[11];
+            types[0] = GetType<T>();
+            types[1] = GetType<T2>();
+            types[2] = GetType<T3>();
+            types[3] = GetType<T4>();
+            types[4] = GetType<T5>();
+            types[5] = GetType<T6>();
+            types[6] = GetType<T7>();
+            types[7] = GetType<T8>();
+            types[8] = GetType<T9>();
+            types[9] = GetType<T10>();
+            types[10] = GetType<T11>();
+            return types;
+        }
+        public static Type[] GetType<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11,T12>()
+        {
+            Type[] types = new Type[12];
+            types[0] = GetType<T>();
+            types[1] = GetType<T2>();
+            types[2] = GetType<T3>();
+            types[3] = GetType<T4>();
+            types[4] = GetType<T5>();
+            types[5] = GetType<T6>();
+            types[6] = GetType<T7>();
+            types[7] = GetType<T8>();
+            types[8] = GetType<T9>();
+            types[9] = GetType<T10>();
+            types[10] = GetType<T11>();
+            types[11] = GetType<T12>();
+            return types;
+        }
     }
 }

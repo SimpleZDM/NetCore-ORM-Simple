@@ -17,7 +17,7 @@ namespace NetCore.ORM.Simple.Client
 {
     public interface ISimpleCommand<TEntity>
     {
-        public bool GetResult();
+        public  Task<int> SaveChangeAsync();
 
         public  Task<TEntity> ReturnEntityAsync();
     }
