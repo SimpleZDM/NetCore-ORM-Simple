@@ -11,7 +11,7 @@ using NetCore.ORM.Simple.Common;
 using System.Data.Common;
 
 /*********************************************************
- * 命名空间 NetCore.ORM.Simple.Queryable.Result
+ * 命名空间 NetCore.ORM.Simple.Queryable
  * 接口名称 QueryResult
  * 开发人员：-nhy
  * 创建时间：2022/9/21 9:14:25
@@ -21,7 +21,7 @@ using System.Data.Common;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Queryable
 {
-    public class QueryResult<TResult> : IQueryResult<TResult> where TResult : class
+    public class QueryResult<TResult> : IQueryResult<TResult>
     {
 
         protected eDBType DBType;
@@ -77,14 +77,13 @@ namespace NetCore.ORM.Simple.Queryable
             return this;
         }
 
-        public virtual ISimpleGroupByQueryable<TResult,TOrder> OrderBy<TOrder>(Expression<Func<TResult,TOrder>> expression)where TOrder :class
+        public virtual IQueryResult<TResult> OrderBy<TOrder>(Expression<Func<TResult,TOrder>> expression)
         {
-            visitor.GroupBy(expression);
-            ISimpleGroupByQueryable<TResult,TOrder> simpleOrder = new SimpleGroupByQueryable<TResult,TOrder>(visitor, builder, DbDrive);
-            return simpleOrder;
+            visitor.OrderBy(expression);
+            return this;
         }
 
-        public  ISimpleGroupByQueryable<TResult, TGroup> GroupBy<TGroup>(Expression<Func<TResult,TGroup>> expression)where TGroup : class
+        public  ISimpleGroupByQueryable<TResult, TGroup> GroupBy<TGroup>(Expression<Func<TResult,TGroup>> expression)
         {
             visitor.GroupBy(expression);
             ISimpleGroupByQueryable<TResult, TGroup> simpleGroupBy = new SimpleGroupByQueryable<TResult,TGroup>(visitor,builder,DbDrive);
@@ -161,19 +160,19 @@ namespace NetCore.ORM.Simple.Queryable
             builder.GetSelect<TResult>(visitor.GetSelectInfo(),sqlEntity);
             return await DbDrive.ReadFirstOrDefaultAsync<TResult>(sqlEntity);
         }
-        public IEnumerable<TResult> ToList()
+        public List<TResult> ToList()
         {
 
             builder.GetSelect<TResult>(visitor.GetSelectInfo(), sqlEntity);
-            return DbDrive.Read<TResult>(sqlEntity);
+            return DbDrive.Read<TResult>(sqlEntity).ToList();
         }
       
-        public async Task<IEnumerable<TResult>> ToListAsync()
+        public async Task<List<TResult>> ToListAsync()
         {
             sqlEntity.StrSqlValue.Clear();
             sqlEntity.DbParams.Clear();
             builder.GetSelect<TResult>(visitor.GetSelectInfo(), sqlEntity);
-            return await DbDrive.ReadAsync<TResult>(sqlEntity);
+            return (await DbDrive.ReadAsync<TResult>(sqlEntity)).ToList();
         }
 
 

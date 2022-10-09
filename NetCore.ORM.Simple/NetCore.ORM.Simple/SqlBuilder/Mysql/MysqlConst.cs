@@ -26,6 +26,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         public static char EqualSign = '=';
 
         public const int INSERTMAX = 800;
+
         public const int INSERTMAXCOUNT = 30;
 
         public static string[] StrJoins;

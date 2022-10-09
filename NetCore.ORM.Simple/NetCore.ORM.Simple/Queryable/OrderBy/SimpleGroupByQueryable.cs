@@ -19,7 +19,7 @@ using NetCore.ORM.Simple.SqlBuilder;
 namespace NetCore.ORM.Simple.Queryable
 {
     public class SimpleGroupByQueryable<TResult,TGroup>:QueryResult<TGroup>,
-        ISimpleGroupByQueryable<TResult,TGroup> where TGroup : class
+        ISimpleGroupByQueryable<TResult,TGroup>
     {
         public SimpleGroupByQueryable(SimpleVisitor visitor,Builder builder,DBDrive dBDrive):base(visitor,builder,dBDrive)
         {

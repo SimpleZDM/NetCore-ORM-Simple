@@ -22,6 +22,8 @@ namespace NetCore.ORM.Simple.Common
           cStrSign =
           new string[] { "(", ")", "=", ">=", "<=", ">", "<", "AND", "OR", "<>" };
 
+        public static string[] ErrorDescriptions = new string[] {"错误!","没有为实体配置主键!"}; 
+
         public static int ZeroOrNull=0;
 
         public static char[] Letters = new char[] 
@@ -43,5 +45,19 @@ namespace NetCore.ORM.Simple.Common
         }
 
         public static string StrDataCount = "Number";
+
+        public static string GetErrorInfo(this ErrorType type)
+        {
+            if ((int)type<= ErrorDescriptions.Length)
+            {
+                return ErrorDescriptions[(int)type];
+            }
+            return ErrorDescriptions[0];
+        }
+    }
+    public enum ErrorType
+    {
+        Error=0,
+        NotKey
     }
 }

@@ -60,8 +60,14 @@ namespace NetCore.ORM.Simple
         /// <returns></returns>
         public async Task CommitAsync()
         {
-             await MatchDBDrive(
-                 () => mysqlDrive.CommitAsync()
+            await MatchDBDrive(
+                () => mysqlDrive.CommitAsync()
+                );
+        }
+        public void Commit()
+        {
+             MatchDBDrive(
+                () => mysqlDrive.Commit()
                 );
         }
         /// <summary>
@@ -73,15 +79,27 @@ namespace NetCore.ORM.Simple
               await MatchDBDrive(
                   () =>mysqlDrive.RollBackAsync()
                   );
-        } 
-       /// <summary>
-       /// 
-       /// </summary>
-       /// <returns></returns>
+        }
+        public void RollBack()
+        {
+               MatchDBDrive(
+                () => mysqlDrive.RollBack()
+               );
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task BeginTransactionAsync()
         {
             await MatchDBDrive(
                 () => mysqlDrive.BeginTransactionAsync()
+               );
+        }
+        public void BeginTransaction()
+        {
+             MatchDBDrive(
+                () => mysqlDrive.BeginTransaction()
                );
         }
         /// <summary>
@@ -95,10 +113,22 @@ namespace NetCore.ORM.Simple
                 () => mysqlDrive.ExcuteAsync(entity)
                );
         }
+        public int Excute(SqlCommandEntity entity)
+        {
+            return  MatchDBDrive(
+                () => mysqlDrive.Excute(entity)
+               );
+        }
         public async Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand)
         {
             return await MatchDBDrive(
                 () => mysqlDrive.ExcuteAsync(sqlCommand)
+               );
+        }
+        public int Excute(SqlCommandEntity[] sqlCommand)
+        {
+            return  MatchDBDrive(
+                () => mysqlDrive.Excute(sqlCommand)
                );
         }
         /// <summary>
@@ -114,7 +144,7 @@ namespace NetCore.ORM.Simple
         /// <typeparam name="TResult"></typeparam>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)where TResult : class
+        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
         {
             return await MatchDBDrive(
                 () => mysqlDrive.ReadAsync<TResult>(entity)
@@ -133,6 +163,12 @@ namespace NetCore.ORM.Simple
                 () => mysqlDrive.ExcuteAsync<TEntity>(entity,query)
                );
         }
+        public  TEntity Excute<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
+        {
+            return  MatchDBDrive(
+                () => mysqlDrive.Excute<TEntity>(entity, query)
+               );
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -149,21 +185,21 @@ namespace NetCore.ORM.Simple
        
       
 
-        public IEnumerable<TResult> Read<TResult>(QueryEntity entity) where TResult : class
+        public IEnumerable<TResult> Read<TResult>(QueryEntity entity)
         {
             return  MatchDBDrive(
                        () => mysqlDrive.Read<TResult>(entity)
                     );
         }
 
-        public TResult ReadFirstOrDefault<TResult>(QueryEntity entity) where TResult : class
+        public TResult ReadFirstOrDefault<TResult>(QueryEntity entity)
         {
             return MatchDBDrive(
                        () => mysqlDrive.ReadFirstOrDefault<TResult>(entity)
                     );
         }
 
-        public async Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity) where TResult : class
+        public async Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity) 
         {
             return await MatchDBDrive(
                        () => mysqlDrive.ReadFirstOrDefaultAsync<TResult>(entity)
@@ -241,6 +277,17 @@ namespace NetCore.ORM.Simple
             return default(TResult);
         }
 
-       
+        private void MatchDBDrive(params Action[] funcs)
+        {
+            if (!Check.IsNull(funcs))
+            {
+                if ((int)configuration.CurrentConnectInfo.DBType < funcs.Length)
+                {
+                     funcs[(int)configuration.CurrentConnectInfo.DBType].Invoke();
+                }
+            }
+        }
+
+
     }
 }

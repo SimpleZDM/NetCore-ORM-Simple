@@ -19,11 +19,14 @@ namespace NetCore.ORM.Simple
 {
     public interface IDBDrive:IDisposable
     {
-        public Action<string, DbParameter[]> AOPSqlLog { get; set; }
+        public Action<string,DbParameter[]> AOPSqlLog { get; set; }
         public Task BeginTransactionAsync(); 
+        public void BeginTransaction(); 
         public Task CommitAsync();
+        public void Commit();
 
         public  Task RollBackAsync();
+        public  void RollBack();
 
         public  Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params);
        
@@ -34,13 +37,13 @@ namespace NetCore.ORM.Simple
         /// <param name="sql"></param>
         /// <param name="Params"></param>
         /// <returns></returns>
-        public  Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity) where TResult : class;
+        public  Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity);
         
-        public IEnumerable<TResult> Read<TResult>(QueryEntity entity) where TResult : class;
-      
-        public TResult ReadFirstOrDefault<TResult>(QueryEntity entity) where TResult : class;
+        public IEnumerable<TResult> Read<TResult>(QueryEntity entity) ;
+
+        public TResult ReadFirstOrDefault<TResult>(QueryEntity entity);
         
-        public  Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity) where TResult : class;
+        public  Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity);
         
         public int ReadCount(QueryEntity entity);
        
@@ -61,8 +64,10 @@ namespace NetCore.ORM.Simple
         /// <param name=""></param>
         /// <returns></returns>
         public  Task<int> ExcuteAsync(SqlCommandEntity entity);
+        public  int Excute(SqlCommandEntity entity);
 
         public  Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand);
+        public  int Excute(SqlCommandEntity[] sqlCommand);
 
 
         /// <summary>
@@ -73,6 +78,7 @@ namespace NetCore.ORM.Simple
         /// <param name="query"></param>
         /// <returns></returns>
         public  Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class;
+        public TEntity Excute<TEntity>(SqlCommandEntity entity, string query) where TEntity : class;
 
     }
 }

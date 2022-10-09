@@ -34,15 +34,20 @@ namespace NetCore.ORM.Simple.SqlBuilder
         {
             return MatchDBType(() => mysqlBuilder.GetInsert(data,random));
         }
+        
 
         public SqlCommandEntity GetUpdate<TData>(TData data,int random=0)
         {
             return MatchDBType(() => mysqlBuilder.GetUpdate(data,random));
         }
-
-        public SqlCommandEntity GetInsert<TData>(IEnumerable<TData> datas)
+        public SqlCommandEntity GetUpdate<TData>(List<TData> datas, int offset = 0)
         {
-            return MatchDBType(() => mysqlBuilder.GetInsert(datas));
+            return MatchDBType(() => mysqlBuilder.GetUpdate(datas,offset));
+        }
+
+        public SqlCommandEntity GetInsert<TData>(List<TData> datas,int offset=0)
+        {
+            return MatchDBType(() => mysqlBuilder.GetInsert(datas,offset));
         }
 
         //public SqlEntity GetSelect<TData>()
@@ -114,9 +119,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <typeparam name="TData"></typeparam>
         /// <param name="data"></param>
         /// <returns></returns>
-        public SqlCommandEntity GetDelete<TData>(TData data)
+        public SqlCommandEntity GetDelete<TData>(TData data,int random)
         {
-            return MatchDBType(() => mysqlBuilder.GetDelete(data));
+            return MatchDBType(() => mysqlBuilder.GetDelete(data,random));
         }
 
         public void GetCount(SelectEntity select, QueryEntity entity)

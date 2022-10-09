@@ -21,7 +21,17 @@ namespace NetCore.ORM.Simple
     {
         public Action<string, DbParameter[]> AOPSqlLog { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+        public void BeginTransaction()
+        {
+            throw new NotImplementedException();
+        }
+
         public Task BeginTransactionAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Commit()
         {
             throw new NotImplementedException();
         }
@@ -36,12 +46,22 @@ namespace NetCore.ORM.Simple
             throw new NotImplementedException();
         }
 
-        public Task<int> ExcuteAsync(SqlCommandEntity entity)
+        public int Excute(SqlCommandEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
+        public int Excute(SqlCommandEntity[] sqlCommand)
+        {
+            throw new NotImplementedException();
+        }
+
+        public TEntity Excute<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> ExcuteAsync(SqlCommandEntity entity)
         {
             throw new NotImplementedException();
         }
@@ -51,7 +71,12 @@ namespace NetCore.ORM.Simple
             throw new NotImplementedException();
         }
 
-        public IEnumerable<TResult> Read<TResult>(QueryEntity entity) where TResult : class
+        public Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<TResult> Read<TResult>(QueryEntity entity)
         {
             throw new NotImplementedException();
         }
@@ -71,7 +96,7 @@ namespace NetCore.ORM.Simple
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity) where TResult : class
+        public Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
         {
             throw new NotImplementedException();
         }
@@ -86,12 +111,17 @@ namespace NetCore.ORM.Simple
             throw new NotImplementedException();
         }
 
-        public TResult ReadFirstOrDefault<TResult>(QueryEntity entity) where TResult : class
+        public TResult ReadFirstOrDefault<TResult>(QueryEntity entity) 
         {
             throw new NotImplementedException();
         }
 
-        public Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity) where TResult : class
+        public Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity) 
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RollBack()
         {
             throw new NotImplementedException();
         }

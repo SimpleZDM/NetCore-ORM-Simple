@@ -139,40 +139,47 @@ namespace NetCore.ORM.Simple.Queryable
             visitor.OrderBy(expression);
             return this;
         }
-        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8> GroupBy<TGroup>(Expression<Func<T1, T2, TGroup>> expression)
+        public ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, TGroup>> expression)
         {
             visitor.GroupBy(expression);
-            return this;
+            ISimpleGroupByQueryable<T1, TGroup> simpleGroupBy = new SimpleGroupByQueryable<T1, TGroup>(visitor, builder, DbDrive);
+            return simpleGroupBy;
         }
-        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8> GroupBy<TGroup>(Expression<Func<T1, T2, T3, TGroup>> expression)
+        public ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, TGroup>> expression)
         {
             visitor.GroupBy(expression);
-            return this;
+            ISimpleGroupByQueryable<T1, TGroup> simpleGroupBy = new SimpleGroupByQueryable<T1, TGroup>(visitor, builder, DbDrive);
+            return simpleGroupBy;
         }
-        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, TGroup>> expression)
+        public ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, TGroup>> expression)
         {
             visitor.GroupBy(expression);
-            return this;
+            ISimpleGroupByQueryable<T1, TGroup> simpleGroupBy = new SimpleGroupByQueryable<T1, TGroup>(visitor, builder, DbDrive);
+            return simpleGroupBy;
         }
-        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, TGroup>> expression)
+        public ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, TGroup>> expression)
         {
             visitor.GroupBy(expression);
-            return this;
+            ISimpleGroupByQueryable<T1, TGroup> simpleGroupBy = new SimpleGroupByQueryable<T1, TGroup>(visitor, builder, DbDrive);
+            return simpleGroupBy;
         }
-        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, TGroup>> expression)
+        public ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, TGroup>> expression)
         {
             visitor.GroupBy(expression);
-            return this;
+            ISimpleGroupByQueryable<T1, TGroup> simpleGroupBy = new SimpleGroupByQueryable<T1, TGroup>(visitor, builder, DbDrive);
+            return simpleGroupBy;
         }
-        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, TGroup>> expression)
+        public ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, TGroup>> expression)
         {
             visitor.GroupBy(expression);
-            return this;
+            ISimpleGroupByQueryable<T1, TGroup> simpleGroupBy = new SimpleGroupByQueryable<T1, TGroup>(visitor, builder, DbDrive);
+            return simpleGroupBy;
         }
-        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7,T8> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, TGroup>> expression)
+        public ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, TGroup>> expression)
         {
             visitor.GroupBy(expression);
-            return this;
+            ISimpleGroupByQueryable<T1, TGroup> simpleGroupBy = new SimpleGroupByQueryable<T1, TGroup>(visitor, builder, DbDrive);
+            return simpleGroupBy;
         }
     }
 }

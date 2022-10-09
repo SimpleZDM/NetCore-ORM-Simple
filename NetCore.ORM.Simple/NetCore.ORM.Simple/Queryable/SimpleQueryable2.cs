@@ -45,6 +45,12 @@ namespace NetCore.ORM.Simple.Queryable
             visitor.OrderBy(expression);
             return this;
         }
+        public ISimpleGroupByQueryable<T1,TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, TGroup>> expression)
+        {
+            visitor.GroupBy(expression);
+            ISimpleGroupByQueryable<T1,TGroup> simpleGroupBy = new SimpleGroupByQueryable<T1,TGroup>(visitor, builder, DbDrive);
+            return simpleGroupBy;
+        }
 
     }
 }

@@ -1,4 +1,4 @@
-﻿using MySql.Data.MySqlClient;
+﻿using MySqlConnector;
 using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
 using NetCore.ORM.Simple.Visitor;
@@ -49,7 +49,15 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 {
                     string key = $"@{random}{p.GetColName()}";
                     sql.DbParams.Add(new MySqlParameter(key, p.GetValue(data)));
-                    return key;
+                    //if (p.PropertyType==typeof(string))
+                    //{
+                    //    return $"'{p.GetValue(data)}'";
+                    //}
+                    //else
+                    //{
+                    //    return $"{p.GetValue(data)}";
+                    //}
+                   return key;
                 })));
             sql.StrSqlValue.Append(");");
 
@@ -68,29 +76,36 @@ namespace NetCore.ORM.Simple.SqlBuilder
         {
             SqlCommandEntity sql = new SqlCommandEntity();
             Type type = typeof(TData);
-            var Props = type.GetNoIgnore().ToArray();
+            var Props = type.GetNotKeyAndIgnore();
             var pKey = type.GetKey();
-            string keyName = $"@{pKey.GetColName()}";
-            sql.DbParams.Add(new MySqlParameter(keyName, pKey.GetValue(data)));
-
-
-            sql.StrSqlValue.Append($"UPDATE {type.GetClassName()} SET ");
-
-            sql.StrSqlValue.Append(string.Join(',',
-                Props.Select(p =>
-                {
-                    string key = $"{p.GetColName()}";
-                    sql.DbParams.Add(new MySqlParameter($"@{key}{random}", p.GetValue(data)));
-                    return $"{key}=@{key}{random}";
-                })));
             if (Check.IsNull(pKey))
             {
-                throw new Exception("没有主键请为实体设置主键!");
+                throw new Exception(ErrorType.NotKey.GetErrorInfo());
             }
-            sql.StrSqlValue.Append(" Where ");
+            string keyName = $"@{pKey.GetColName()}";
+            Update(sql,keyName,type.GetClassName(),pKey,data,Props,random);
+            sql.DbCommandType = eDbCommandType.Update;
+            return sql;
+        }
 
-            sql.StrSqlValue.Append($"{pKey.GetColName()}={keyName}");
-            sql.StrSqlValue.Append(";");
+        public SqlCommandEntity GetUpdate<TData>(List<TData> datas,int offset)
+        {
+            SqlCommandEntity sql = new SqlCommandEntity();
+            Type type = typeof(TData);
+            var Props = type.GetNotKeyAndIgnore();
+            var pKey = type.GetKey();
+            string tableName=type.GetClassName();
+            int Index = offset;
+            if (Check.IsNull(pKey))
+            {
+                throw new Exception(ErrorType.NotKey.GetErrorInfo());
+            } 
+            string keyName = $"@{pKey.GetColName()}";
+            foreach (var data in datas)
+            {
+                Update(sql,keyName,tableName,pKey, data, Props, Index);
+                Index++;
+            }
             sql.DbCommandType = eDbCommandType.Update;
             return sql;
         }
@@ -101,13 +116,13 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <typeparam name="TData"></typeparam>
         /// <param name="datas"></param>
         /// <returns></returns>
-        public SqlCommandEntity GetInsert<TData>(IEnumerable<TData> datas)
+        public SqlCommandEntity GetInsert<TData>(List<TData> datas,int offset)
         {
             SqlCommandEntity sql = new SqlCommandEntity();
             Type type = typeof(TData);
             var Props = type.GetNotKeyAndIgnore();
             int count = 0;
-            int Index = 0;
+            int Index =0;
             foreach (var data in datas)
             {
                 if (count == 0)
@@ -124,8 +139,11 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 sql.StrSqlValue.Append(string.Join(',',
                   Props.Select(p =>
                   {
-                      string key = $"@{Index}{charConnectSign}{p.GetColName()}";
-                      sql.DbParams.Add(new MySqlParameter(key, p.GetValue(data)));
+                      string key = $"@{Index+offset}{charConnectSign}{p.GetColName()}";
+                      MySqlParameter Param=null;
+                     
+                      Param = new MySqlParameter(key, p.GetValue(data));
+                      sql.DbParams.Add(Param);
                       return key;
                   })));
                 sql.StrSqlValue.Append(" )");
@@ -173,7 +191,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 sql = new QueryEntity();
             }
             sql.StrSqlValue.Append($"SELECT " +
-                $"{string.Join(',', type.GetNoIgnore().Select(p=>p.GetColName()))} " +
+                $"{string.Join(',', type.GetNoIgnore().Select(p => p.GetColName()))} " +
                 $"FROM {type.GetClassName()} ");
         }
 
@@ -256,9 +274,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
 
 
-            GroupBy(select.OrderInfos,entity);
+            GroupBy(select.OrderInfos, entity);
 
-            OrderBy(select.OrderInfos,entity);
+            OrderBy(select.OrderInfos, entity);
             //分页部分
             SetPageList(entity);
         }
@@ -273,7 +291,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 throw new ArgumentNullException(nameof(select));
             }
-          
+
             //视图
             entity.StrSqlValue.Append("SELECT COUNT(*) As Number");
 
@@ -300,7 +318,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// </summary>
         /// <typeparam name="TDate"></typeparam>
         /// <param name="entity"></param>
-        public SqlCommandEntity GetDelete<TDate>(Type type,List<ConditionEntity> conditions,List<TreeConditionEntity>treeConditions)
+        public SqlCommandEntity GetDelete<TDate>(Type type, List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions)
         {
             //var PropKey=type.GetKey();
             //if (Check.IsNull(PropKey))
@@ -309,12 +327,12 @@ namespace NetCore.ORM.Simple.SqlBuilder
             //}
             SqlCommandEntity sqlCommand = new SqlCommandEntity();
             sqlCommand.StrSqlValue.Append($"DELETE  FROM {type.GetClassName()} ");
-            if (Check.IsNull(treeConditions)||treeConditions.Count.Equals(CommonConst.ZeroOrNull))
+            if (Check.IsNull(treeConditions) || treeConditions.Count.Equals(CommonConst.ZeroOrNull))
             {
                 throw new Exception("删除数据,请指定删除的条件");
             }
             sqlCommand.StrSqlValue.Append(" Where ");
-            LinkConditions(conditions,treeConditions,sqlCommand);
+            LinkConditions(conditions, treeConditions, sqlCommand);
             return sqlCommand;
         }
         /// <summary>
@@ -323,22 +341,22 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <typeparam name="TData"></typeparam>
         /// <param name="data"></param>
         /// <exception cref="Exception"></exception>
-        public SqlCommandEntity GetDelete<TData>(TData data)
+        public SqlCommandEntity GetDelete<TData>(TData data,int random)
         {
-            Type type=typeof(TData);
+            Type type = typeof(TData);
             var PropKey = type.GetKey();
             if (Check.IsNull(PropKey))
             {
                 throw new Exception("请为实体配置主键!");
             }
             SqlCommandEntity sqlCommand = new SqlCommandEntity();
-            var key = $"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 4)}";
-            sqlCommand.StrSqlValue.Append($" DELETE FROM {type.GetClassName()} WHERE {PropKey.GetColName()}=@{key}");
-            sqlCommand.DbParams.Append(new MySqlParameter(key,PropKey.GetValue(data)));
+            var key = $"@{PropKey.GetColName()}{random}";
+            sqlCommand.StrSqlValue.Append($" DELETE FROM `{type.GetClassName()}` WHERE `{PropKey.GetColName()}`={key}");
+            sqlCommand.DbParams.Append(new MySqlParameter(key, PropKey.GetValue(data)));
             return sqlCommand;
         }
 
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -373,10 +391,10 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         }
                         else
                         {
-                            string vaule = MysqlConst.MapMethod(mapInfos[i].MethodName,$"{mapInfos[i].TableName}.{mapInfos[i].ColumnName}",string.Empty);
+                            string vaule = MysqlConst.MapMethod(mapInfos[i].MethodName, $"{mapInfos[i].TableName}.{mapInfos[i].ColumnName}", string.Empty);
                             sqlEntity.StrSqlValue.Append($" {vaule} AS {mapInfos[i].AsColumnName} ");
                         }
-                        
+
 
                     }
                 }
@@ -623,6 +641,22 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 entity.StrSqlValue.Append(" ");
             }
 
+        }
+
+        private void Update<TEntity>(SqlCommandEntity sql,string keyName,string tableName,PropertyInfo pKey,TEntity data,IEnumerable<PropertyInfo> Props,int i)
+        {
+            sql.DbParams.Add(new MySqlParameter($"{keyName}{i}", pKey.GetValue(data)));
+            sql.StrSqlValue.Append($"UPDATE {tableName} SET ");
+            sql.StrSqlValue.Append(string.Join(',',
+            Props.Select(p =>
+            {
+                string colName = $"{p.GetColName()}";
+                sql.DbParams.Add(new MySqlParameter($"@{colName}{i}", p.GetValue(data)));
+                return $"{colName}=@{colName}{i}";
+            })));
+            sql.StrSqlValue.Append(" Where ");
+            sql.StrSqlValue.Append($"{pKey.GetColName()}={keyName}{i}");
+            sql.StrSqlValue.Append(";");
         }
     }
 }

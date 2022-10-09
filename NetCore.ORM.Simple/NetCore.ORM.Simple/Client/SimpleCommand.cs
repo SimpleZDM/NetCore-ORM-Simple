@@ -37,6 +37,12 @@ namespace NetCore.ORM.Simple.Client
             sqls.Remove(currentSql);
             return await dbDrive.ExcuteAsync(currentSql);
         }
+        public int SaveChange()
+        {
+            ///执行完了之后
+            sqls.Remove(currentSql);
+            return  dbDrive.Excute(currentSql);
+        }
 
         public async Task<TEntity> ReturnEntityAsync()
         {
@@ -48,6 +54,25 @@ namespace NetCore.ORM.Simple.Client
                      QueryEntity GetInsertSql=new QueryEntity();
                      builder.GetLastInsert<TEntity>(GetInsertSql);
                      return await dbDrive.ExcuteAsync<TEntity>(currentSql,GetInsertSql.StrSqlValue.ToString());
+                case eDbCommandType.Update:
+                    break;
+                default:
+                    break;
+            }
+            sqls.Remove(currentSql);
+
+            return default(TEntity);
+        }
+        public TEntity ReturnEntity()
+        {
+
+            ///执行完了之后
+            switch (currentSql.DbCommandType)
+            {
+                case eDbCommandType.Insert:
+                    QueryEntity GetInsertSql = new QueryEntity();
+                    builder.GetLastInsert<TEntity>(GetInsertSql);
+                    return  dbDrive.Excute<TEntity>(currentSql, GetInsertSql.StrSqlValue.ToString());
                 case eDbCommandType.Update:
                     break;
                 default:

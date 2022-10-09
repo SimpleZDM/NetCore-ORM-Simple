@@ -22,6 +22,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         public SqlCommandEntity GetInsert<TData>(TData data, int random = 0);
 
         public SqlCommandEntity GetUpdate<TData>(TData data,int random=0);
+        public SqlCommandEntity GetUpdate<TData>(List<TData> datas, int offset);
 
 
         /// <summary>
@@ -30,7 +31,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <typeparam name="TData"></typeparam>
         /// <param name="datas"></param>
         /// <returns></returns>
-        public SqlCommandEntity GetInsert<TData>(IEnumerable<TData> datas);
+        public SqlCommandEntity GetInsert<TData>(List<TData> datas,int offset);
 
         /// <summary>
         /// 拼装单挑查询语句
@@ -58,7 +59,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
         public SqlCommandEntity GetDelete<TDate>(Type type, List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions);
 
-        public SqlCommandEntity GetDelete<TData>(TData data);
+        public SqlCommandEntity GetDelete<TData>(TData data,int random);
 
         public void GetLastInsert<TData>(QueryEntity sql);
     }

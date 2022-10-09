@@ -74,6 +74,10 @@ namespace NetCore.ORM.Simple.Common
 
         public static string GetColName(this PropertyInfo prop)
         {
+            if (Check.IsNull(prop))
+            {
+                return null;
+            }
             if (prop.IsDefined(typeof(ColNameAttribute), false))
             {
                 ColNameAttribute classNameAttribute = (ColNameAttribute)prop.GetCustomAttributes(typeof(ColNameAttribute),false)[0];

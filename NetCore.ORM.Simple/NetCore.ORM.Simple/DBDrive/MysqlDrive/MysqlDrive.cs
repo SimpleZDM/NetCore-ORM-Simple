@@ -1,4 +1,4 @@
-﻿using MySql.Data.MySqlClient;
+﻿using MySqlConnector;
 using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
 using NetCore.ORM.Simple.SqlBuilder;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 /*********************************************************
- * 命名空间 NetCore.ORM.Simple.DBDrive.MysqlDrive
+ * 命名空间 NetCore.ORM.Simple.DBDrive
  * 接口名称 MysqlDrive
  * 开发人员：-nhy
  * 创建时间：2022/9/21 14:50:01
@@ -101,7 +101,7 @@ namespace NetCore.ORM.Simple
         /// <param name="sql"></param>
         /// <param name="Params"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity) where TResult : class
+        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
         {
             IEnumerable<TResult> data = null;
             await ExcuteAsync(entity, async (command) =>
@@ -111,7 +111,7 @@ namespace NetCore.ORM.Simple
             });
             return data;
         }
-        public IEnumerable<TResult> Read<TResult>(QueryEntity entity) where TResult : class
+        public IEnumerable<TResult> Read<TResult>(QueryEntity entity)
         {
             IEnumerable<TResult> data = null;
             Excute(entity, (command) =>
@@ -121,9 +121,9 @@ namespace NetCore.ORM.Simple
            });
             return data;
         }
-        public TResult ReadFirstOrDefault<TResult>(QueryEntity entity) where TResult : class
+        public TResult ReadFirstOrDefault<TResult>(QueryEntity entity)
         {
-            TResult data = null;
+            TResult data = default(TResult);
             Excute(entity, (command) =>
             {
                 dataRead = command.ExecuteReader();
@@ -131,9 +131,9 @@ namespace NetCore.ORM.Simple
             });
             return data;
         }
-        public async Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity) where TResult : class
+        public async Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity)
         {
-            TResult data = null;
+            TResult data = default(TResult);
             await ExcuteAsync(entity, async (command) =>
             {
                 dataRead = await command.ExecuteReaderAsync();
@@ -200,8 +200,51 @@ namespace NetCore.ORM.Simple
             });
             return result;
         }
+        public int Excute(SqlCommandEntity entity)
+        {
+            int result = 0;
+            Excute(entity, (command) =>
+            {
+                result = command.ExecuteNonQuery();
+            });
+            return result;
+        }
 
         public async Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand)
+        {
+            int result = 0;
+            int count = 0;
+            int current = 0;
+            if (sqlCommand.Length == 1)
+            {
+                await ExcuteAsync(sqlCommand[0], async (command) =>
+                {
+                    result = await command.ExecuteNonQueryAsync();
+                });
+            }
+            else
+            {
+                for (int i = 1; i < sqlCommand.Length; i++)
+                {
+                    if (count > MysqlConst.INSERTMAXCOUNT)
+                    {
+                        await ExcuteAsync(sqlCommand[current], async (command) =>
+                            {
+                                result += await command.ExecuteNonQueryAsync();
+                            });
+                        count = 0;
+                        current = i;
+                        i++;
+                    }
+                    sqlCommand[current].StrSqlValue.Append(sqlCommand[i].StrSqlValue.ToString());
+                    sqlCommand[current].DbParams.AddRange(sqlCommand[i].DbParams);
+                    count++;
+                }
+            }
+
+            return result;
+        }
+        public int Excute(SqlCommandEntity[] sqlCommand)
         {
             int result = 0;
             int count = 0;
@@ -210,12 +253,12 @@ namespace NetCore.ORM.Simple
             {
                 if (count > MysqlConst.INSERTMAXCOUNT)
                 {
-                    await ExcuteAsync(sqlCommand[current], async (command) =>
-                        {
-                            result += await command.ExecuteNonQueryAsync();
-                        });
-                    count= 0;
-                    current=i;
+                    Excute(sqlCommand[current], (command) =>
+                    {
+                        result += command.ExecuteNonQuery();
+                    });
+                    count = 0;
+                    current = i;
                     i++;
                 }
                 sqlCommand[current].StrSqlValue.Append(sqlCommand[i].StrSqlValue.ToString());
@@ -245,6 +288,24 @@ namespace NetCore.ORM.Simple
                 command.CommandText = query;
                 command.Parameters.Clear();
                 dataRead = await command.ExecuteReaderAsync();
+                Entity = MapData<TEntity>().FirstOrDefault();
+            });
+            return Entity;
+        }
+        public TEntity Excute<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
+        {
+            TEntity Entity = null;
+
+            Excute(entity, (command) =>
+            {
+                int result = command.ExecuteNonQuery();
+                if (result == 0)
+                {
+                    return;
+                }
+                command.CommandText = query;
+                command.Parameters.Clear();
+                dataRead = command.ExecuteReader();
                 Entity = MapData<TEntity>().FirstOrDefault();
             });
             return Entity;
@@ -413,7 +474,7 @@ namespace NetCore.ORM.Simple
             }
             return data;
         }
-        private IEnumerable<TResult> MapData<TResult>(QueryEntity entity) where TResult : class
+        private IEnumerable<TResult> MapData<TResult>(QueryEntity entity)
         {
             if (Check.IsNull(dataRead))
             {
@@ -437,15 +498,15 @@ namespace NetCore.ORM.Simple
 
             return data;
         }
-        private TResult MapDataFirstOrDefault<TResult>(QueryEntity entity) where TResult : class
+        private TResult MapDataFirstOrDefault<TResult>(QueryEntity entity)
         {
             if (Check.IsNull(dataRead))
             {
-                return null;
+                return default(TResult);
             }
             Type type = typeof(TResult);
             Dictionary<string, PropertyInfo> PropMapNames = GetPropMapNames(type.GetProperties());
-            TResult tResult = null;
+            TResult tResult = default(TResult);
             if (entity.LastAnonymity)
             {
                 if (entity.LastType.Count().Equals(1))
@@ -460,9 +521,9 @@ namespace NetCore.ORM.Simple
             }
             return tResult;
         }
-        private TResult ReadDataAnonymityFirstOrDefault<TResult>(QueryEntity entity) where TResult : class
+        private TResult ReadDataAnonymityFirstOrDefault<TResult>(QueryEntity entity)
         {
-            TResult tResult = null;
+            TResult tResult = default(TResult);
             while (dataRead.Read())
             {
                 object obj = Activator.CreateInstance(entity.LastType[0]);
@@ -478,7 +539,7 @@ namespace NetCore.ORM.Simple
             return tResult;
         }
 
-        private IEnumerable<TResult> ReadDataAnonymity<TResult>(QueryEntity entity) where TResult : class
+        private IEnumerable<TResult> ReadDataAnonymity<TResult>(QueryEntity entity)
         {
             List<TResult> data = new List<TResult>();
             while (dataRead.Read())
@@ -495,9 +556,9 @@ namespace NetCore.ORM.Simple
             return data;
         }
 
-        private TResult ReadDataFirstOrDefault<TResult>(QueryEntity entity, Dictionary<string, PropertyInfo> PropMapNames) where TResult : class
+        private TResult ReadDataFirstOrDefault<TResult>(QueryEntity entity, Dictionary<string, PropertyInfo> PropMapNames)
         {
-            TResult tResult = null;
+            TResult tResult = default(TResult);
             while (dataRead.Read())
             {
                 tResult = Activator.CreateInstance<TResult>();
@@ -514,7 +575,7 @@ namespace NetCore.ORM.Simple
             return tResult;
         }
 
-        private IEnumerable<TResult> ReadData<TResult>(QueryEntity entity, Dictionary<string, PropertyInfo> PropMapNames) where TResult : class
+        private IEnumerable<TResult> ReadData<TResult>(QueryEntity entity, Dictionary<string, PropertyInfo> PropMapNames)
         {
             List<TResult> data = new List<TResult>();
             while (dataRead.Read())
@@ -551,6 +612,20 @@ namespace NetCore.ORM.Simple
             transaction = await connection.BeginTransactionAsync();
             isBeginTransaction = true;
         }
+        public void BeginTransaction()
+        {
+            if (isBeginTransaction)
+            {
+                Console.WriteLine("上一个事务没有提交!");
+                return;
+            }
+            if (!IsOpenConnect())
+            {
+                Open();
+            }
+            transaction = connection.BeginTransaction();
+            isBeginTransaction = true;
+        }
 
         /// <summary>
         /// 回滚事务
@@ -566,6 +641,16 @@ namespace NetCore.ORM.Simple
             isBeginTransaction = false;
             await transaction.DisposeAsync();
         }
+        public void RollBack()
+        {
+            if (!isBeginTransaction)
+            {
+                return;
+            }
+            transaction.Rollback();
+            isBeginTransaction = false;
+            transaction.Dispose();
+        }
 
         /// <summary>
         /// 事务提交
@@ -580,6 +665,17 @@ namespace NetCore.ORM.Simple
             await transaction.CommitAsync();
             isBeginTransaction = false;
             await transaction.DisposeAsync();
+        }
+
+        public void Commit()
+        {
+            if (!isBeginTransaction)
+            {
+                return;
+            }
+            transaction.Commit();
+            isBeginTransaction = false;
+            transaction.Dispose();
         }
 
         /// <summary>
@@ -660,7 +756,6 @@ namespace NetCore.ORM.Simple
             if (!Check.IsNull(connection))
             {
                 connection.Close();
-                connection.Dispose();
             }
         }
         private Dictionary<string, PropertyInfo> GetPropMapNames(PropertyInfo[] Props)

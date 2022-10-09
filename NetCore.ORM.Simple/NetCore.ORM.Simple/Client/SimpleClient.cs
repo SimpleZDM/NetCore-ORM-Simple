@@ -30,12 +30,14 @@ namespace NetCore.ORM.Simple.Client
         private List<SqlCommandEntity> sqls;
         private Builder builder;
         private DBDrive dbDrive;
+        private int changeOffset;
         public SimpleClient(DataBaseConfiguration _configuration)
         {
             configuration=_configuration;
             builder = new Builder(configuration.CurrentConnectInfo.DBType);
             sqls = new List<SqlCommandEntity>();
             dbDrive = new DBDrive(configuration);
+            changeOffset = 0;
         }
 
         public void SetAPOLog(Action<string,DbParameter[]> action)
@@ -49,16 +51,18 @@ namespace NetCore.ORM.Simple.Client
         /// <param name="entity"></param>
         public ISimpleCommand<TEntity> Insert<TEntity>(TEntity entity)where TEntity : class,new ()
         {
-            var sql=builder.GetInsert(entity,sqls.Count);
+            var sql=builder.GetInsert(entity, changeOffset);
             sqls.Add(sql);
             ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,configuration.CurrentConnectInfo.DBType,sql,sqls,dbDrive);
+            changeOffset++;
             return command;
         }
-        public ISimpleCommand<TEntity> Insert<TEntity>(IEnumerable<TEntity> entitys) where TEntity : class, new()
+        public ISimpleCommand<TEntity> Insert<TEntity>(List<TEntity> entitys) where TEntity : class, new()
         {
-            var sql = builder.GetInsert(entitys);
+            var sql = builder.GetInsert(entitys,changeOffset);
             sqls.Add(sql);
             ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, configuration.CurrentConnectInfo.DBType, sql, sqls, dbDrive);
+            changeOffset = entitys.Count()+ changeOffset;
             return command;
         }
         /// <summary>
@@ -68,8 +72,16 @@ namespace NetCore.ORM.Simple.Client
         /// <param name="entity"></param>
         public ISimpleCommand<TEntity> Update<TEntity>(TEntity entity) where TEntity : class, new()
         {
-            var sql = builder.GetUpdate(entity,sqls.Count);
+            var sql = builder.GetUpdate(entity,changeOffset);
             ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, configuration.CurrentConnectInfo.DBType, sql, sqls, dbDrive);
+            changeOffset++;
+            return command;
+        }
+        public ISimpleCommand<TEntity> Update<TEntity>(List<TEntity> entitys) where TEntity : class, new()
+        {
+            var sql = builder.GetUpdate(entitys,changeOffset);
+            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, configuration.CurrentConnectInfo.DBType, sql, sqls, dbDrive);
+            changeOffset = entitys.Count()+ changeOffset;
             return command;
         }
 
@@ -87,9 +99,10 @@ namespace NetCore.ORM.Simple.Client
         }
         public ISimpleCommand<TEntity> Delete<TEntity>(TEntity entity) where TEntity : class, new()
         {
-            var sql = builder.GetDelete(entity);
+            var sql = builder.GetDelete(entity,changeOffset);
             sqls.Add(sql);
             ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, configuration.CurrentConnectInfo.DBType, sql, sqls, dbDrive);
+            changeOffset++;
             return command;
         }
         /// <summary>
@@ -113,6 +126,38 @@ namespace NetCore.ORM.Simple.Client
         {
             return new SimpleQueryable<T1,T2,T3,T4>(expression,builder,dbDrive);
         }
+        public ISimpleQueryable<T1, T2, T3, T4,T5> Queryable<T1, T2, T3, T4,T5>(Expression<Func<T1, T2, T3, T4,T5, JoinInfoEntity>> expression) where T1 : class
+        {
+            return new SimpleQueryable<T1, T2, T3, T4,T5>(expression, builder, dbDrive);
+        }
+        public ISimpleQueryable<T1, T2, T3, T4, T5,T6> Queryable<T1, T2, T3, T4, T5,T6>(Expression<Func<T1, T2, T3, T4, T5,T6, JoinInfoEntity>> expression) where T1 : class
+        {
+            return new SimpleQueryable<T1, T2, T3, T4, T5,T6>(expression, builder, dbDrive);
+        }
+        public ISimpleQueryable<T1, T2, T3, T4, T5, T6,T7> Queryable<T1, T2, T3, T4, T5, T6,T7>(Expression<Func<T1, T2, T3, T4, T5,T6,T7, JoinInfoEntity>> expression) where T1 : class
+        {
+            return new SimpleQueryable<T1, T2, T3, T4, T5, T6,T7>(expression, builder, dbDrive);
+        }
+        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7,T8> Queryable<T1, T2, T3, T4, T5, T6, T7,T8>(Expression<Func<T1, T2, T3, T4, T5, T6, T7,T8, JoinInfoEntity>> expression) where T1 : class
+        {
+            return new SimpleQueryable<T1, T2, T3, T4, T5, T6, T7,T8>(expression, builder, dbDrive);
+        }
+        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8,T9> Queryable<T1, T2, T3, T4, T5, T6, T7, T8,T9>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8,T9, JoinInfoEntity>> expression) where T1 : class
+        {
+            return new SimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8,T9>(expression, builder, dbDrive);
+        }
+        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9,T10> Queryable<T1, T2, T3, T4, T5, T6, T7, T8, T9,T10>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9,T10, JoinInfoEntity>> expression) where T1 : class
+        {
+            return new SimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9,T10>(expression, builder, dbDrive);
+        }
+        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11> Queryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11, JoinInfoEntity>> expression) where T1 : class
+        {
+            return new SimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11>(expression, builder, dbDrive);
+        }
+        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11,T12> Queryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11,T12>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11,T12, JoinInfoEntity>> expression) where T1 : class
+        {
+            return new SimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11,T12>(expression, builder, dbDrive);
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -121,14 +166,19 @@ namespace NetCore.ORM.Simple.Client
         {
             int result=0;
             var array = sqls.Where(command => !command.DbCommandType.Equals(eDbCommandType.Query)).ToArray();
-            if (array.Length>1)
+            result = await dbDrive.ExcuteAsync(array);
+            return result;
+        }
+        public int SaveChange()
+        {
+            int result = 0;
+            var array = sqls.Where(command => !command.DbCommandType.Equals(eDbCommandType.Query)).ToArray();
+            result =  dbDrive.Excute(array);
+            foreach (var item in array)
             {
-                result = await dbDrive.ExcuteAsync(array);
+                sqls.Remove(item);
             }
-            else if(array.Length==1)
-            {
-                result =await dbDrive.ExcuteAsync(array[0]);
-            }
+            changeOffset = 0;
             return result;
         }
 
@@ -145,7 +195,7 @@ namespace NetCore.ORM.Simple.Client
         //        result.Add(t22);
         //    }
         //    //result.Add(t2);
-             
+
         //    return result;
         //}
 
