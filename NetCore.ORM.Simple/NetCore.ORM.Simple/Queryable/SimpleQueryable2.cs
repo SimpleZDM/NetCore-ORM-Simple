@@ -45,6 +45,11 @@ namespace NetCore.ORM.Simple.Queryable
             visitor.OrderBy(expression);
             return this;
         }
+        public ISimpleQueryable<T1, T2> OrderByDescending<TOrder>(Expression<Func<T1, T2, TOrder>> expression)
+        {
+            visitor.OrderByDescending(expression);
+            return this;
+        }
         public ISimpleGroupByQueryable<T1,TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, TGroup>> expression)
         {
             visitor.GroupBy(expression);

@@ -80,9 +80,10 @@ namespace NetCore.ORM.Simple.Visitor
         public Expression Modify(Expression expression, bool IsAnonymity = false)
         {
             currentTables.Clear();
+            isAnonymity = IsAnonymity;
             if (IsAgain)
             {
-                isAnonymity = IsAnonymity;
+                
                 for (int i = 0; i < mapInfos.Count; i++)
                 {
                     mapInfos[i].IsNeed = false;
@@ -324,8 +325,8 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override Expression VisitMember(MemberExpression node)
         {
-            //base.VisitMember(node);
-            Console.WriteLine(node.ToString());
+            base.VisitMember(node);
+            //Console.WriteLine(node.ToString());
             if (IsAgain)
             {
 
@@ -345,8 +346,12 @@ namespace NetCore.ORM.Simple.Visitor
                 mapInfos.Add(currentmapInfo);
                 currentmapInfo.ColumnName = node.Member.Name;
                 currentmapInfo.TableName = Table.TableNames[currentTables[node.Expression.ToString()]];
+                currentmapInfo.PropName=node.Member.Name;
+                currentmapInfo.LastPropName=node.Member.Name;
+
             }
             currentmapInfo.ClassName = Table.DicTable[currentmapInfo.TableName].ClassType.Name;
+            currentmapInfo.EntityType = Table.DicTable[currentmapInfo.TableName].ClassType;
             return node;
         }
 

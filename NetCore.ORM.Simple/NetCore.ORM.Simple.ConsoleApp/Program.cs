@@ -13,8 +13,9 @@ public static class Program
     public static int Main(string []args)
     {
         SimpleMysqlTest MysqlTest=new SimpleMysqlTest();
-        MysqlTest.UpdateTest();
-       // InsertSimpleInsert();
+        //MysqlTest.InsertTest();
+         MysqlTest.QueryTest();
+        //InsertSimpleInsert();
         return 0;
     }
 }

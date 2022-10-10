@@ -22,7 +22,12 @@ namespace NetCore.ORM.Simple.Common
           cStrSign =
           new string[] { "(", ")", "=", ">=", "<=", ">", "<", "AND", "OR", "<>" };
 
-        public static string[] ErrorDescriptions = new string[] {"错误!","没有为实体配置主键!"}; 
+        public static string[] ErrorDescriptions = new string[] 
+        {    "错误!",
+            "没有为实体配置主键!", 
+            "删除数据,请指定删除的条件!",
+            "sql 语句条件部分解析有误!"
+        }; 
 
         public static int ZeroOrNull=0;
 
@@ -58,6 +63,8 @@ namespace NetCore.ORM.Simple.Common
     public enum ErrorType
     {
         Error=0,
-        NotKey
+        NotKey,
+        DeleteNotMatch,
+        SqlAnalysis
     }
 }

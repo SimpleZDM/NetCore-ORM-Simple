@@ -56,6 +56,7 @@ namespace NetCore.ORM.Simple.Entity
         public bool IsNeed { get { return isNeed; } set { isNeed = value; } }
 
         public string ClassName { get { return className; } set { className = value; } }
+        public Type EntityType { get { return entityType; } set { entityType = value; } }
 
 
 
@@ -68,6 +69,7 @@ namespace NetCore.ORM.Simple.Entity
         private string methodName;
         private string lastPropName;
         private string className;
+        public Type entityType;
        
 
     }

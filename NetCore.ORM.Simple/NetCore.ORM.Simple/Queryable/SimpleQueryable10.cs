@@ -171,6 +171,52 @@ namespace NetCore.ORM.Simple.Queryable
             visitor.OrderBy(expression);
             return this;
         }
+
+        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> OrderByDescending<TOrder>(Expression<Func<T1, T2, TOrder>> expression)
+        {
+            visitor.OrderByDescending(expression);
+            return this;
+        }
+        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, TOrder>> expression)
+        {
+            visitor.OrderByDescending(expression);
+            return this;
+        }
+        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, TOrder>> expression)
+        {
+            visitor.OrderByDescending(expression);
+            return this;
+        }
+        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, TOrder>> expression)
+        {
+            visitor.OrderByDescending(expression);
+            return this;
+        }
+        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, TOrder>> expression)
+        {
+            visitor.OrderByDescending(expression);
+            return this;
+        }
+        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, TOrder>> expression)
+        {
+            visitor.OrderByDescending(expression);
+            return this;
+        }
+        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, TOrder>> expression)
+        {
+            visitor.OrderByDescending(expression);
+            return this;
+        }
+        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TOrder>> expression)
+        {
+            visitor.OrderByDescending(expression);
+            return this;
+        }
+        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TOrder>> expression)
+        {
+            visitor.OrderByDescending(expression);
+            return this;
+        }
         public ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, TGroup>> expression)
         {
             visitor.GroupBy(expression);

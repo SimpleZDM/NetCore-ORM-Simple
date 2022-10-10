@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,12 +21,18 @@ namespace NetCore.ORM.Simple.Entity
         public ConditionEntity(eConditionType type)
         {
             ConditionType = type;
+            Index = -1;
+            ConstFieldType = new List<FieldInfo>();
         }
         public string DisplayName { get { return displayName; } set { displayName = value; } }
         public eConditionType ConditionType { get { return conditionType; } set { conditionType = value; } }
         public eSignType SignType { get { return signType; } set { signType = value; } }
 
         public Type PropertyType { get { return propertyType; } set { propertyType = value; } }
+        public PropertyInfo ConstPropType { get { return constType; } set { constType = value; } }
+        public List<FieldInfo> ConstFieldType { get { return constFieldType; } set { constFieldType = value; } }
+        public int Index { get { return index; } set { index = value; } }
+        public string Key { get { return key; } set { key = value; } }
 
 
 
@@ -33,5 +40,9 @@ namespace NetCore.ORM.Simple.Entity
         private eConditionType conditionType;
         private eSignType signType;
         private Type propertyType;
+        private PropertyInfo constType;
+        private List<FieldInfo> constFieldType;
+        private int index;
+        private string key;
     }
 }

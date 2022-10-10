@@ -82,7 +82,11 @@ namespace NetCore.ORM.Simple.Queryable
             visitor.OrderBy(expression);
             return this;
         }
-
+        public virtual IQueryResult<TResult> OrderByDescending<TOrder>(Expression<Func<TResult, TOrder>> expression)
+        {
+            visitor.OrderByDescending(expression);
+            return this;
+        }
         public  ISimpleGroupByQueryable<TResult, TGroup> GroupBy<TGroup>(Expression<Func<TResult,TGroup>> expression)
         {
             visitor.GroupBy(expression);

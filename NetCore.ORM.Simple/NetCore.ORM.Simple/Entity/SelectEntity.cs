@@ -24,7 +24,7 @@ namespace NetCore.ORM.Simple.Entity
             Conditions=new List<ConditionEntity>(15);
             TreeConditions = new List<TreeConditionEntity>(15);
             OrderInfos = new List<OrderByEntity>(5);
-            LastType = new List<Type>();
+            LastType = new Dictionary<string,Type>();
             DyToMap = new List<dynamic>();
             LastAnonymity = false;
         }
@@ -50,7 +50,7 @@ namespace NetCore.ORM.Simple.Entity
 
         public List<dynamic> DyToMap { get { return dyToMap; } set { dyToMap = value; } }
 
-        public List<Type> LastType { get { return lastType; } set { lastType = value; } }
+        public Dictionary<string,Type> LastType { get { return lastType; } set { lastType = value; } }
 
         private List<MapEntity> mapInfos;
         private Dictionary<string,JoinTableEntity> joinInfos;
@@ -59,6 +59,6 @@ namespace NetCore.ORM.Simple.Entity
         private List<OrderByEntity> orderInfos;
         private bool lastAnonymity;
         private List<dynamic> dyToMap;
-        private List<Type> lastType;
+        private Dictionary<string,Type> lastType;
     }
 }

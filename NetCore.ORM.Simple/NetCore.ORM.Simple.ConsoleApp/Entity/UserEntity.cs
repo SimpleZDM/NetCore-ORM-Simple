@@ -27,6 +27,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
         public int RoleId { get; set; }
         public Guid gIdColumn { get; set; }
         public int Age { get; set; }
+        public int IDDD;
     }
     [ClassName("RoleTable")]
     public class RoleEntity

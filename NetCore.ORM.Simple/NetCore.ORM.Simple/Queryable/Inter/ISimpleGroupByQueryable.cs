@@ -16,7 +16,7 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Queryable
 {
-    public interface ISimpleGroupByQueryable<TResult,TGroup>:IQueryResult<TGroup>
+    public interface ISimpleGroupByQueryable<TResult,TGroup>:IQueryResult<TResult>
     {
         public TGroup Key { get; set; }
         public double Sum(Expression<Func<TResult, double>> expression);

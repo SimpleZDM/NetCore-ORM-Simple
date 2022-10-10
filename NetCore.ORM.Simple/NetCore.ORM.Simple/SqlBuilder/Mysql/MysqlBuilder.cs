@@ -39,9 +39,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
             Type type = typeof(TData);
             var Props = type.GetNotKeyAndIgnore().ToArray();
 
-            sql.StrSqlValue.Append($"INSERT INTO {type.GetClassName()} ");
+            sql.StrSqlValue.Append($"INSERT INTO `{type.GetClassName()}` ");
             sql.StrSqlValue.Append("(");
-            sql.StrSqlValue.Append(string.Join(',', Props.Select(p => p.GetColName())));
+            sql.StrSqlValue.Append(string.Join(',', Props.Select(p => $"`{p.GetColName()}`")));
             sql.StrSqlValue.Append(") ");
             sql.StrSqlValue.Append(" VALUE(");
             sql.StrSqlValue.Append(string.Join(',',
@@ -127,9 +127,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 if (count == 0)
                 {
-                    sql.StrSqlValue.Append($"INSERT INTO {type.GetClassName()} ");
+                    sql.StrSqlValue.Append($"INSERT INTO `{type.GetClassName()}` ");
                     sql.StrSqlValue.Append("(");
-                    sql.StrSqlValue.Append(string.Join(',', Props.Select(p => p.GetColName())));
+                    sql.StrSqlValue.Append(string.Join(',', Props.Select(p => $"`{p.GetColName()}`")));
                     sql.StrSqlValue.Append(") ");
                     sql.StrSqlValue.Append(" VALUE");
                 }
@@ -326,10 +326,10 @@ namespace NetCore.ORM.Simple.SqlBuilder
             //    throw new Exception("请为实体配置主键!");
             //}
             SqlCommandEntity sqlCommand = new SqlCommandEntity();
-            sqlCommand.StrSqlValue.Append($"DELETE  FROM {type.GetClassName()} ");
+            sqlCommand.StrSqlValue.Append($"DELETE  FROM `{type.GetClassName()}` ");
             if (Check.IsNull(treeConditions) || treeConditions.Count.Equals(CommonConst.ZeroOrNull))
             {
-                throw new Exception("删除数据,请指定删除的条件");
+                throw new Exception(ErrorType.DeleteNotMatch.GetErrorInfo());
             }
             sqlCommand.StrSqlValue.Append(" Where ");
             LinkConditions(conditions, treeConditions, sqlCommand);
@@ -347,12 +347,12 @@ namespace NetCore.ORM.Simple.SqlBuilder
             var PropKey = type.GetKey();
             if (Check.IsNull(PropKey))
             {
-                throw new Exception("请为实体配置主键!");
+                throw new Exception(ErrorType.NotKey.GetErrorInfo());
             }
             SqlCommandEntity sqlCommand = new SqlCommandEntity();
             var key = $"@{PropKey.GetColName()}{random}";
-            sqlCommand.StrSqlValue.Append($" DELETE FROM `{type.GetClassName()}` WHERE `{PropKey.GetColName()}`={key}");
-            sqlCommand.DbParams.Append(new MySqlParameter(key, PropKey.GetValue(data)));
+            sqlCommand.StrSqlValue.Append($"DELETE FROM `{type.GetClassName()}` WHERE `{PropKey.GetColName()}`={key}");
+            sqlCommand.DbParams.Add(new MySqlParameter(key, PropKey.GetValue(data)));
             return sqlCommand;
         }
 
@@ -522,7 +522,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             }
             if (treeConditions.Count > 0 && conditions.Count != treeConditions.Count - 1)
             {
-                throw new Exception("sql 语句条件部分解析有误!");
+                throw new Exception(ErrorType.SqlAnalysis.GetErrorInfo());
             }
             for (int i = 0; i < treeConditions.Count(); i++)
             {
@@ -545,7 +545,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
                         {
                             //非常量
-                            rightValue = $" {treeConditions[i].RightCondition.DisplayName}";
+                            rightValue = $"{treeConditions[i].RightCondition.DisplayName}";
                         }
                         break;
                     case eConditionType.Constant:
@@ -559,7 +559,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         }
                         else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
                         {
-                            leftValue = $" {treeConditions[i].RightCondition.DisplayName} ";
+                            leftValue = $" {treeConditions[i].RightCondition.DisplayName}";
                             rightValue = $"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
                             sqlEntity.DbParams.Add(new MySqlParameter(rightValue, treeConditions[i].LeftCondition.DisplayName));
                         }
@@ -601,13 +601,10 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="sqlEntity"></param>
         private void SetPageList(QueryEntity sqlEntity)
         {
-            if (sqlEntity.PageNumber < 0)
+
+            if (sqlEntity.PageNumber <0||sqlEntity.PageSize <= 0)
             {
-                sqlEntity.PageNumber = 1;
-            }
-            if (sqlEntity.PageSize <= 0)
-            {
-                sqlEntity.PageSize = 100;
+                return;
             }
             sqlEntity.StrSqlValue.Append(" Limit @SkipNumber,@TakeNumber");
             sqlEntity.DbParams.Add(new MySqlParameter("@SkipNumber", (sqlEntity.PageNumber - 1) * sqlEntity.PageSize));
@@ -646,13 +643,13 @@ namespace NetCore.ORM.Simple.SqlBuilder
         private void Update<TEntity>(SqlCommandEntity sql,string keyName,string tableName,PropertyInfo pKey,TEntity data,IEnumerable<PropertyInfo> Props,int i)
         {
             sql.DbParams.Add(new MySqlParameter($"{keyName}{i}", pKey.GetValue(data)));
-            sql.StrSqlValue.Append($"UPDATE {tableName} SET ");
+            sql.StrSqlValue.Append($"UPDATE `{tableName}` SET ");
             sql.StrSqlValue.Append(string.Join(',',
             Props.Select(p =>
             {
                 string colName = $"{p.GetColName()}";
                 sql.DbParams.Add(new MySqlParameter($"@{colName}{i}", p.GetValue(data)));
-                return $"{colName}=@{colName}{i}";
+                return $"`{colName}`=@{colName}{i}";
             })));
             sql.StrSqlValue.Append(" Where ");
             sql.StrSqlValue.Append($"{pKey.GetColName()}={keyName}{i}");

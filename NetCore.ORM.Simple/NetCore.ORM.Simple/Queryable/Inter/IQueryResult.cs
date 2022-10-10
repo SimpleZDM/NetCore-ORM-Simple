@@ -27,6 +27,7 @@ namespace NetCore.ORM.Simple.Queryable
         public IQueryResult<TResult> Select(Expression<Func<TResult,TResult>> expression);
         public IQueryResult<TResult> Where(Expression<Func<TResult,bool>>expression);
         public IQueryResult<TResult> OrderBy<TOrder>(Expression<Func<TResult, TOrder>> expression);
+        public  IQueryResult<TResult> OrderByDescending<TOrder>(Expression<Func<TResult, TOrder>> expression);
         public ISimpleGroupByQueryable<TResult, TGroup> GroupBy<TGroup>(Expression<Func<TResult, TGroup>> expression);
 
         public int Count();

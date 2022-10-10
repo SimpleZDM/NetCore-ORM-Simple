@@ -46,7 +46,7 @@ namespace NetCore.ORM.Simple.Entity
         /// </summary>
         public List<dynamic>DyToMap { get { return dyToMap; } set { dyToMap = value; } }
 
-        public List<Type> LastType { get { return lastType; } set { lastType = value; } }
+        public Dictionary<string,Type> LastType { get { return lastType; } set { lastType = value; } }
 
        
 
@@ -110,7 +110,7 @@ namespace NetCore.ORM.Simple.Entity
         private int pageSize;
         private List<dynamic> dyToMap;
         private bool lastAnonymity;
-        private List<Type> lastType;
+        private Dictionary<string,Type> lastType;
 
 
     }

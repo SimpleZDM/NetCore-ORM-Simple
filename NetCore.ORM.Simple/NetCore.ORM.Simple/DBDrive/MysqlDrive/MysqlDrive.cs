@@ -489,6 +489,10 @@ namespace NetCore.ORM.Simple
                 {
                     data = ReadDataAnonymity<TResult>(entity);
                 }
+                else
+                {
+                    data = ReadDataAnonymitys<TResult>(entity);
+                }
 
             }
             else
@@ -513,6 +517,10 @@ namespace NetCore.ORM.Simple
                 {
                     tResult = ReadDataAnonymityFirstOrDefault<TResult>(entity);
                 }
+                else
+                {
+                    tResult = ReadDataAnonymitysFirstOrDefault<TResult>(entity);
+                }
 
             }
             else
@@ -523,38 +531,73 @@ namespace NetCore.ORM.Simple
         }
         private TResult ReadDataAnonymityFirstOrDefault<TResult>(QueryEntity entity)
         {
-            TResult tResult = default(TResult);
-            while (dataRead.Read())
-            {
-                object obj = Activator.CreateInstance(entity.LastType[0]);
-
-                foreach (var item in entity.MapInfos.Where(m => m.IsNeed))
-                {
-                    var Prop = entity.LastType[0].GetProperty(item.LastPropName);
-                    Prop.SetPropValue(obj, dataRead[item.AsColumnName]);
-                }
-                tResult = entity.GetResult<TResult>(obj);
-                break;
-            }
-            return tResult;
+            return ReadDataAnonymity<TResult>(entity,true).FirstOrDefault();
+        }
+        private TResult ReadDataAnonymitysFirstOrDefault<TResult>(QueryEntity entity)
+        {
+            return ReadDataAnonymitys<TResult>(entity,true).FirstOrDefault();
         }
 
-        private IEnumerable<TResult> ReadDataAnonymity<TResult>(QueryEntity entity)
+        private IEnumerable<TResult> ReadDataAnonymity<TResult>(QueryEntity entity, bool IsFirst = false)
         {
+            Type type = null;
+            foreach (var item in entity.LastType)
+            {
+                type = item.Value;
+            }
+            if (Check.IsNull(type))
+            {
+                throw new Exception();
+            }
             List<TResult> data = new List<TResult>();
             while (dataRead.Read())
             {
-                object obj = Activator.CreateInstance(entity.LastType[0]);
+                object obj = Activator.CreateInstance(type);
 
                 foreach (var item in entity.MapInfos.Where(m => m.IsNeed))
                 {
-                    var Prop = entity.LastType[0].GetProperty(item.LastPropName);
+                    var Prop = type.GetProperty(item.LastPropName);
                     Prop.SetPropValue(obj, dataRead[item.AsColumnName]);
                 }
                 data.Add(entity.GetResult<TResult>(obj));
+                if (IsFirst)
+                {
+                    break;
+                }
             }
             return data;
         }
+
+        private IEnumerable<TResult> ReadDataAnonymitys<TResult>(QueryEntity entity, bool IsFirst = false)
+        {
+            Dictionary<string, object> dicobjs = new Dictionary<string,object>();
+                foreach (var item in entity.LastType)
+                {
+                    object obj = Activator.CreateInstance(item.Value);
+                    dicobjs.Add(item.Key, obj);
+                }
+            List<TResult> data = new List<TResult>();
+            while (dataRead.Read())
+            {
+
+                foreach (var item in dicobjs.Keys)
+                {
+                    dicobjs[item]= Activator.CreateInstance(entity.LastType[item]);
+                }
+                foreach (var item in entity.MapInfos.Where(m => m.IsNeed))
+                {
+                    var Prop = entity.LastType[item.ClassName].GetProperty(item.LastPropName);
+                    Prop.SetPropValue(dicobjs[item.ClassName], dataRead[item.AsColumnName]);
+                }
+                data.Add(entity.GetResult<TResult>(dicobjs.Values.ToArray()));
+                if (IsFirst)
+                {
+                    break;
+                }
+            }
+            return data;
+        }
+
 
         private TResult ReadDataFirstOrDefault<TResult>(QueryEntity entity, Dictionary<string, PropertyInfo> PropMapNames)
         {
