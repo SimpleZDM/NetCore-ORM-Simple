@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 /*********************************************************
- * 命名空间 NetCore.ORM.Simple.Client.inter
+ * 命名空间 NetCore.ORM.Simple.Client
  * 接口名称 ISimpleClient
  * 开发人员：-nhy
  * 创建时间：2022/9/20 17:40:52
@@ -78,6 +78,8 @@ namespace NetCore.ORM.Simple.Client
         public Task<int> SaveChangeAsync();
 
         public void SetAPOLog(Action<string,DbParameter[]> action);
+
+        public List<T1> GetEntity<T, T1>(T t, Expression<Func<T, T1>> expression);
 
         //public List<T2> GetEntity<T, T1, T2>(T t, Expression<Func<T, T1>> expression, Expression<Func<T1, T2>> expression1);
 

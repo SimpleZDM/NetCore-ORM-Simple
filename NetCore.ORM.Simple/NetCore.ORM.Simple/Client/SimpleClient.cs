@@ -26,10 +26,29 @@ namespace NetCore.ORM.Simple.Client
 {
     public class SimpleClient:ISimpleClient
     {
+        #region prop or ctor
+        /// <summary>
+        /// 数据库配置
+        /// </summary>
         private DataBaseConfiguration configuration;
+
+        /// <summary>
+        /// 缓存一些需要执行插入或者更新的数据
+        /// </summary>
         private List<SqlCommandEntity> sqls;
-        private Builder builder;
-        private DBDrive dbDrive;
+        /// <summary>
+        /// sql 语句构造器
+        /// </summary>
+        private ISqlBuilder builder;
+
+        /// <summary>
+        /// sql语句执行器
+        /// </summary>
+       
+        private IDBDrive dbDrive;
+        /// <summary>
+        /// 更新或者插入数据的量
+        /// </summary>
         private int changeOffset;
         public SimpleClient(DataBaseConfiguration _configuration)
         {
@@ -39,16 +58,18 @@ namespace NetCore.ORM.Simple.Client
             dbDrive = new DBDrive(configuration);
             changeOffset = 0;
         }
+        #endregion
 
+        /// <summary>
+        /// 关于sql语句和参数
+        /// </summary>
+        /// <param name="action"></param>
         public void SetAPOLog(Action<string,DbParameter[]> action)
         {
             dbDrive.AOPSqlLog = action;
         }
-        /// <summary>
-        /// 插入语句
-        /// </summary>
-        /// <typeparam name="TEntity"></typeparam>
-        /// <param name="entity"></param>
+
+        #region 执行部分
         public ISimpleCommand<TEntity> Insert<TEntity>(TEntity entity)where TEntity : class,new ()
         {
             var sql=builder.GetInsert(entity, changeOffset);
@@ -65,11 +86,6 @@ namespace NetCore.ORM.Simple.Client
             changeOffset = entitys.Count()+ changeOffset;
             return command;
         }
-        /// <summary>
-        /// 插入数据库
-        /// </summary>
-        /// <typeparam name="TEntity"></typeparam>
-        /// <param name="entity"></param>
         public ISimpleCommand<TEntity> Update<TEntity>(TEntity entity) where TEntity : class, new()
         {
             var sql = builder.GetUpdate(entity,changeOffset);
@@ -105,11 +121,9 @@ namespace NetCore.ORM.Simple.Client
             changeOffset++;
             return command;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T1"></typeparam>
-        /// <returns></returns>
+        #endregion
+
+        #region 查询部分
         public ISimpleQueryable<T1> Queryable<T1>()where T1:class,new()
         {
             return new SimpleQueryable<T1>(builder,dbDrive);
@@ -158,10 +172,9 @@ namespace NetCore.ORM.Simple.Client
         {
             return new SimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11,T12>(expression, builder, dbDrive);
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
+
+        #endregion
+
         public async Task<int> SaveChangeAsync()
         {
             int result=0;
@@ -182,11 +195,11 @@ namespace NetCore.ORM.Simple.Client
             return result;
         }
 
-        //public List<T2> GetEntity<T, T1, T2>(T t,Expression<Func<T,T1>>expression,Expression<Func<T1,T2>>expression1)
+        //public List<T2> GetEntity<T, T1, T2>(T t, Expression<Func<T, T1>> expression, Expression<Func<T1, T2>> expression1)
         //{
         //    var result = new List<T2>();
-        //    //T1 t1=(T1)expression.Compile().Invoke(t);
-        //    //T2 t2=(T2)expression1.Compile().Invoke(t1);
+        //    T1 t1 = (T1)expression.Compile().Invoke(t);
+        //    T2 t2 = (T2)expression1.Compile().Invoke(t1);
         //    dynamic[] dys = new dynamic[] { expression.Compile(), expression1.Compile() };
         //    for (int i = 0; i < 100000; i++)
         //    {
@@ -194,10 +207,23 @@ namespace NetCore.ORM.Simple.Client
         //        T2 t22 = dys[1].Invoke(t11);
         //        result.Add(t22);
         //    }
-        //    //result.Add(t2);
+        //    result.Add(t2);
 
         //    return result;
         //}
+        public List<T1> GetEntity<T,T1>(T t, Expression<Func<T, T1>> expression)
+        {
+            var result = new List<T1>();
+            T1 t1 = (T1)expression.Compile().Invoke(t);
+            dynamic[] dys = new dynamic[] { expression.Compile()};
+            for (int i = 0; i < 100000; i++)
+            {
+                var t11 = dys[0].Invoke(t);
+            }
+            result.Add(t1);
+
+            return result;
+        }
 
         //public List<T> GetEntity<T>(Dictionary<string,object>data)
         //{
