@@ -25,19 +25,19 @@ namespace NetCore.ORM.Simple.Queryable
     {
 
         protected eDBType DBType;
-        protected Builder builder;
+        protected ISqlBuilder builder;
         protected SimpleVisitor visitor;
         protected QueryEntity sqlEntity;
         protected int PageNumber;
         protected int PageSize;
-        protected DBDrive DbDrive;
+        protected IDBDrive DbDrive;
 
         /// <summary>
         /// 初始化
         /// </summary>
         /// <param name="DbType"></param>
         /// <param name="tableNames"></param>
-        protected void Init(Builder _builder,DBDrive DbDrive,params Type[] typs)
+        protected void Init(ISqlBuilder _builder,IDBDrive DbDrive,params Type[] typs)
         {
             visitor = new SimpleVisitor(typs);
             this.DbDrive = DbDrive;
@@ -49,7 +49,7 @@ namespace NetCore.ORM.Simple.Queryable
         }
         public QueryResult(
             SimpleVisitor _visitor,
-            Builder _builder,DBDrive DbDrive)
+            ISqlBuilder _builder,IDBDrive DbDrive)
         {
             visitor = _visitor;
             builder = _builder;

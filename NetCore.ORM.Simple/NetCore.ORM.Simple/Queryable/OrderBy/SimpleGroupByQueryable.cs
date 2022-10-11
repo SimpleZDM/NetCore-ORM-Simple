@@ -21,7 +21,7 @@ namespace NetCore.ORM.Simple.Queryable
     public class SimpleGroupByQueryable<TResult,TGroup>:QueryResult<TResult>,
         ISimpleGroupByQueryable<TResult,TGroup>
     {
-        public SimpleGroupByQueryable(SimpleVisitor visitor,Builder builder,DBDrive dBDrive):base(visitor,builder,dBDrive)
+        public SimpleGroupByQueryable(SimpleVisitor visitor, ISqlBuilder builder,IDBDrive dBDrive):base(visitor,builder,dBDrive)
         {
             //visitor,builder,DbDrive
         }

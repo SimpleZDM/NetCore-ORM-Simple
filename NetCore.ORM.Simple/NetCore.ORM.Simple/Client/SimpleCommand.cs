@@ -21,10 +21,10 @@ namespace NetCore.ORM.Simple.Client
     {
         private List<SqlCommandEntity> sqls;
         private SqlCommandEntity currentSql;
-        private Builder builder;
-        private DBDrive dbDrive;
+        private ISqlBuilder builder;
+        private IDBDrive dbDrive;
 
-        public SimpleCommand(Builder builder,eDBType dbType,SqlCommandEntity sql,List<SqlCommandEntity>_sqls,DBDrive dBDrive)
+        public SimpleCommand(ISqlBuilder builder,eDBType dbType,SqlCommandEntity sql,List<SqlCommandEntity>_sqls,IDBDrive dBDrive)
         {
             sqls = _sqls;
             currentSql= sql;

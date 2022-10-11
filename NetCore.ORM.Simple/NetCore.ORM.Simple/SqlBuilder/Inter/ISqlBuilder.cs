@@ -62,5 +62,6 @@ namespace NetCore.ORM.Simple.SqlBuilder
         public SqlCommandEntity GetDelete<TData>(TData data,int random);
 
         public void GetLastInsert<TData>(QueryEntity sql);
+        public void GetCount(SelectEntity select, QueryEntity entity);
     }
 }
