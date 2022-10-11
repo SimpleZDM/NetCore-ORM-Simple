@@ -111,7 +111,7 @@ namespace NetCore.ORM.Simple.Queryable
             return this;
         }
 
-        public int Count()
+        public virtual int Count()
         {
             builder.GetCount(visitor.GetSelectInfo(), sqlEntity);
             return DbDrive.ReadCount(sqlEntity);

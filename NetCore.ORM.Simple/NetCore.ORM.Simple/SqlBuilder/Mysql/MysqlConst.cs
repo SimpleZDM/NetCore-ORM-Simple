@@ -75,6 +75,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 case "Average":
                     value = $" AVG({leftValue}) ";
                     break;
+                case "FirstOrDefault":
+                    value = $" {leftValue}";
+                    break;
                 default:
                     break;
             }

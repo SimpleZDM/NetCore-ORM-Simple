@@ -253,15 +253,18 @@ namespace NetCore.ORM.Simple.Visitor
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
+            base.VisitMethodCall(node);
             if (Check.IsNull(currentmapInfo))
             {
-                CurrentMethodName= node.Method.Name;
+                currentmapInfo = new MapEntity();
+                currentmapInfo.MethodName = node.Method.Name;
+                mapInfos.Add(currentmapInfo);
             }
             else
             {
                currentmapInfo.MethodName=node.Method.Name;
             }
-            return base.VisitMethodCall(node);
+            return node;
         }
 
         protected override Expression VisitRuntimeVariables(RuntimeVariablesExpression node)
@@ -292,6 +295,11 @@ namespace NetCore.ORM.Simple.Visitor
             if (!isAnonymity)
             {
                 //非匿名对象属性名称
+                if (Check.IsNull(currentmapInfo))
+                {
+                    currentmapInfo = new MapEntity();
+                    mapInfos.Add(currentmapInfo);
+                }
                 currentmapInfo.LastPropName = node.Member.Name;
             }
             currentmapInfo.PropName = node.Member.Name;
@@ -350,7 +358,7 @@ namespace NetCore.ORM.Simple.Visitor
                 currentmapInfo.LastPropName=node.Member.Name;
 
             }
-            currentmapInfo.ClassName = Table.DicTable[currentmapInfo.TableName].ClassType.Name;
+            currentmapInfo.ClassName = Table.DicTable[currentmapInfo.TableName].ClassType.GetClassName();
             currentmapInfo.EntityType = Table.DicTable[currentmapInfo.TableName].ClassType;
             return node;
         }

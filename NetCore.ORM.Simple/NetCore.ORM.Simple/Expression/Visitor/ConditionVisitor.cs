@@ -267,9 +267,24 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override Expression VisitConstant(ConstantExpression node)
         {
+            if (Check.IsNull(currentTree))
+            {
+                currentTree = new TreeConditionEntity();
+                currentTree.LeftCondition = new ConditionEntity(eConditionType.Constant);
+                currentTree.LeftCondition.DisplayName =$"{node.Value}";
+                treeConditions.Add(currentTree);
+                return node;
+            }
             if (Check.IsNull(currentTree.RightCondition))
             {
                 currentTree.RightCondition = new ConditionEntity(eConditionType.Constant);
+            }
+            else
+            {
+                if (!currentTree.RightCondition.ConditionType.Equals(eConditionType.Constant)) 
+                {
+                    currentTree.RightCondition.ConditionType = eConditionType.Constant;
+                } 
             }
             if (!Check.IsNullOrEmpty(currentTree.RightCondition.DisplayName))
             {
@@ -301,7 +316,7 @@ namespace NetCore.ORM.Simple.Visitor
                 }
 
             }
-            else if (!Check.IsNull(currentTree.LeftCondition.ConstFieldType))
+            else if (!Check.IsNull(currentTree.LeftCondition.ConstFieldType)&& currentTree.LeftCondition.ConstFieldType.Count>0)
             {
                 if (currentTree.LeftCondition.ConstFieldType.Count >= 2)
                 {
@@ -480,7 +495,7 @@ namespace NetCore.ORM.Simple.Visitor
                 currentTree.RightCondition = new ConditionEntity(eConditionType.ColumnName);
                 GetMemberValue(rightMember, currentTree.RightCondition);
             }
-
+            treeConditions.Add(currentTree);
             IsComplete = true;
         }
 
@@ -543,6 +558,9 @@ namespace NetCore.ORM.Simple.Visitor
                             {
                                 mName = $"{tableNames.TableNames[currentTables[member.Expression.ToString()]]}.{member.Member.Name}";
                                 condition.DisplayName = mName;
+                            } else 
+                            {
+                               VisitMember(member);
                             }
                         }
                         else

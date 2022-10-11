@@ -33,14 +33,15 @@ namespace NetCore.ORM.Simple.ConsoleApp
     public class RoleEntity
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string DisplayName { get; set; }
     }
     [ClassName("CompanyTable")]
     public class CompanyEntity
     {
         [Key(true)]
         public int Id { get; set; }
-        public string Name { get; set; }
+        [ColName("CompanyName")]
+        public string CompanyName { get; set; }
     }
 
     public class ViewEntity
@@ -54,6 +55,8 @@ namespace NetCore.ORM.Simple.ConsoleApp
     {
         public int Count { get; set; }
         public int RoleId { get; set; }
+        public string FirstOrDefaultName { get; set; }
+        public int Max { get; set; }
     }
     [ClassName("missiondetailtable")]
     public class MissionDetailEntity

@@ -34,7 +34,7 @@ namespace NetCore.ORM.Simple.Visitor
         /// for table join info
         /// </summary>
 
-        private Dictionary<string,JoinTableEntity> JoinTables;
+        private Dictionary<string, JoinTableEntity> JoinTables;
         /// <summary>
         /// 正在解析连接条件
         /// </summary>
@@ -50,7 +50,7 @@ namespace NetCore.ORM.Simple.Visitor
         /// </summary>
         private bool IsComplete;
 
-        public JoinVisitor(TableEntity table,Dictionary<string,JoinTableEntity> joinInfos)
+        public JoinVisitor(TableEntity table, Dictionary<string, JoinTableEntity> joinInfos)
         {
             if (Check.IsNull(table))
             {
@@ -59,7 +59,7 @@ namespace NetCore.ORM.Simple.Visitor
             Table = table;
             currentTables = new Dictionary<string, int>();
             JoinTables = joinInfos;
-            JoinTables.Add(Table.TableNames[0],new JoinTableEntity() { DisplayName = Table.TableNames[0],TableType = eTableType.Master });
+            JoinTables.Add(Table.TableNames[0], new JoinTableEntity() { DisplayName = Table.TableNames[0], TableType = eTableType.Master });
             IsComplete = true;
         }
 
@@ -139,15 +139,17 @@ namespace NetCore.ORM.Simple.Visitor
                     case ExpressionType.Call:
                         break;
                     case ExpressionType.GreaterThan:
-                        SingleBinary(node, (queue) => { 
-                            currentTree.RelationCondition = new ConditionEntity(eConditionType.Sign) 
-                            { 
-                                SignType= eSignType.GrantThan
+                        SingleBinary(node, (queue) =>
+                        {
+                            currentTree.RelationCondition = new ConditionEntity(eConditionType.Sign)
+                            {
+                                SignType = eSignType.GrantThan
                             };
                         });
                         break;
                     case ExpressionType.GreaterThanOrEqual:
-                        SingleBinary(node, (queue) => { 
+                        SingleBinary(node, (queue) =>
+                        {
                             currentTree.RelationCondition = new ConditionEntity(eConditionType.Sign)
                             {
                                 SignType = eSignType.GreatThanOrEqual
@@ -155,7 +157,8 @@ namespace NetCore.ORM.Simple.Visitor
                         });
                         break;
                     case ExpressionType.LessThan:
-                        SingleBinary(node, (queue) => { 
+                        SingleBinary(node, (queue) =>
+                        {
                             currentTree.RelationCondition = new ConditionEntity(eConditionType.Sign)
                             {
                                 SignType = eSignType.LessThan
@@ -163,7 +166,8 @@ namespace NetCore.ORM.Simple.Visitor
                         });
                         break;
                     case ExpressionType.LessThanOrEqual:
-                        SingleBinary(node, (queue) => { 
+                        SingleBinary(node, (queue) =>
+                        {
                             currentTree.RelationCondition = new ConditionEntity(eConditionType.Sign)
                             {
                                 SignType = eSignType.LessThanOrEqual
@@ -171,7 +175,8 @@ namespace NetCore.ORM.Simple.Visitor
                         });
                         break;
                     case ExpressionType.Equal:
-                        SingleBinary(node, (queue) => { 
+                        SingleBinary(node, (queue) =>
+                        {
                             currentTree.RelationCondition = new ConditionEntity(eConditionType.Sign)
                             {
                                 SignType = eSignType.Equal
@@ -179,7 +184,8 @@ namespace NetCore.ORM.Simple.Visitor
                         });
                         break;
                     case ExpressionType.NotEqual:
-                        SingleBinary(node, (queue) => { 
+                        SingleBinary(node, (queue) =>
+                        {
                             currentTree.RelationCondition = new ConditionEntity(eConditionType.Sign)
                             {
                                 SignType = eSignType.NotEqual
@@ -225,7 +231,7 @@ namespace NetCore.ORM.Simple.Visitor
             {
                 if (IsComplete)
                 {
-                    
+
                     CurrentJoinTable = new JoinTableEntity() { TableType = eTableType.Slave };
                     currentTree = new TreeConditionEntity();
                     // JoinTables.Add(CurrentJoinTable);
@@ -359,7 +365,7 @@ namespace NetCore.ORM.Simple.Visitor
             return node;
         }
 
-      
+
         /// <summary>
         /// 用于解析值
         /// </summary>
@@ -390,16 +396,24 @@ namespace NetCore.ORM.Simple.Visitor
             return base.VisitListInit(node);
         }
 
-        
+
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            
+
             if (currentTables.ContainsKey(node.Expression.ToString()))
             {
-                currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
-                currentTree.LeftCondition.DisplayName = $"{Table.TableNames[currentTables[node.Expression.ToString()]]}.{ node.Member.Name}";
-                currentTree.LeftCondition.PropertyType = node.Type;
+                if (Check.IsNull(currentTree.LeftCondition))
+                {
+                    currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
+                    GetMemberValue(node, currentTree.LeftCondition);
+                    currentTree.LeftCondition.PropertyType = node.Type;
+                }else if(Check.IsNull(currentTree.RightCondition))
+                {
+                    currentTree.RightCondition = new ConditionEntity(eConditionType.ColumnName);
+                    GetMemberValue(node, currentTree.RightCondition);
+                }
+
             }
             else
             {
@@ -435,7 +449,7 @@ namespace NetCore.ORM.Simple.Visitor
             base.VisitNewArray(node);
             return node;
         }
-    
+
         /// <summary>
         /// 条件表达式大于小于等于
         /// </summary>
@@ -443,7 +457,7 @@ namespace NetCore.ORM.Simple.Visitor
         /// <param name="action"></param>
         private void SingleBinary(BinaryExpression node, Action<Queue<string>> action)
         {
-            
+
             if (node.Left is ConstantExpression leftConstant)
             {
                 currentTree.LeftCondition = new ConditionEntity(eConditionType.Constant);
@@ -452,7 +466,7 @@ namespace NetCore.ORM.Simple.Visitor
             else if (node.Left is MemberExpression leftMember)
             {
                 currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
-                currentTree.LeftCondition.DisplayName = GetMemberValue(leftMember);
+                GetMemberValue(leftMember, currentTree.LeftCondition);
                 currentTree.LeftCondition.PropertyType = leftMember.Type;
 
             }
@@ -469,7 +483,7 @@ namespace NetCore.ORM.Simple.Visitor
             else if (node.Right is MemberExpression rightMember)
             {
                 currentTree.RightCondition = new ConditionEntity(eConditionType.ColumnName);
-                currentTree.RightCondition.DisplayName = GetMemberValue(rightMember);
+                GetMemberValue(rightMember, currentTree.RightCondition);
                 currentTree.LeftCondition.PropertyType = rightMember.Type;
             }
             CurrentJoinTable.TreeConditions.Add(currentTree);
@@ -486,7 +500,7 @@ namespace NetCore.ORM.Simple.Visitor
         {
             if (IsComplete)
             {
-               
+
                 currentTree = new TreeConditionEntity();
                 IsComplete = false;
             }
@@ -511,7 +525,7 @@ namespace NetCore.ORM.Simple.Visitor
         /// </summary>
         /// <param name="member"></param>
         /// <returns></returns>
-        private string GetMemberValue(MemberExpression member)
+        private void GetMemberValue(MemberExpression member, ConditionEntity condition)
         {
             string mName = string.Empty;
             if (!Check.IsNull(member))
@@ -525,13 +539,18 @@ namespace NetCore.ORM.Simple.Visitor
                         {
                             CreateJoinTable(member);
                         }
-                        mName = $"{Table.TableNames[currentTables[member.Expression.ToString()]]}.{member.Member.Name}";
 
+                        condition.DisplayName = $"{Table.TableNames[currentTables[member.Expression.ToString()]]}.{member.Member.Name}";
+                        mName = condition.DisplayName;
+                    }
+                    else
+                    {
+                        VisitMember(member);
                     }
 
                 }
             }
-            return mName;
+            //return mName;
         }
         /// <summary>
         /// 

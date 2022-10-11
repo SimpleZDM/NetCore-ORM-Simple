@@ -17,7 +17,12 @@ namespace NetCore.ORM.Simple.Common
 {
     public static class CommonConst
     {
+        /// <summary>
+        /// 判断是否是匿名对象的标记
+        /// </summary>
+        
         const string Anonymity = "<>f__AnonymousType";
+
         public static string[]
           cStrSign =
           new string[] { "(", ")", "=", ">=", "<=", ">", "<", "AND", "OR", "<>" };
@@ -51,6 +56,11 @@ namespace NetCore.ORM.Simple.Common
 
         public static string StrDataCount = "Number";
 
+        /// <summary>
+        /// 获取错误描述信息
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static string GetErrorInfo(this ErrorType type)
         {
             if ((int)type<= ErrorDescriptions.Length)
@@ -62,9 +72,9 @@ namespace NetCore.ORM.Simple.Common
     }
     public enum ErrorType
     {
-        Error=0,
-        NotKey,
-        DeleteNotMatch,
-        SqlAnalysis
+        Error=0,//错误
+        NotKey,//没有主键
+        DeleteNotMatch,//删除没有指定条件
+        SqlAnalysis//sql解析错误
     }
 }

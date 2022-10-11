@@ -6,10 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NetCore.ORM.Simple.Common\NetCore.ORM.Simple.Common.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="MySqlConnector" Version="2.1.13" />
   </ItemGroup>
 

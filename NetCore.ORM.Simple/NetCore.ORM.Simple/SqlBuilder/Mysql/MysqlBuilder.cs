@@ -384,14 +384,31 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         {
                             sqlEntity.StrSqlValue.Append(",");
                         }
-                        mapInfos[i].AsColumnName = $"{mapInfos[i].TableName}{charConnectSign}{mapInfos[i].ColumnName}";
+                        if (Check.IsNullOrEmpty(mapInfos[i].TableName)&&Check.IsNullOrEmpty(mapInfos[i].ColumnName))
+                        {
+                            mapInfos[i].AsColumnName = $"{mapInfos[i].PropName}";
+                        }
+                        else
+                        {
+                            mapInfos[i].AsColumnName = $"{mapInfos[i].TableName}{charConnectSign}{mapInfos[i].ColumnName}";
+                        }
                         if (Check.IsNullOrEmpty(mapInfos[i].MethodName))
                         {
                             sqlEntity.StrSqlValue.Append($" { mapInfos[i].TableName}.{mapInfos[i].ColumnName} AS {mapInfos[i].AsColumnName} ");
                         }
                         else
                         {
-                            string vaule = MysqlConst.MapMethod(mapInfos[i].MethodName, $"{mapInfos[i].TableName}.{mapInfos[i].ColumnName}", string.Empty);
+                            string vaule = string.Empty;
+                            if (Check.IsNullOrEmpty(mapInfos[i].TableName)&&Check.IsNullOrEmpty(mapInfos[i].ColumnName))
+                            {
+                                vaule = MysqlConst.MapMethod(mapInfos[i].MethodName,String.Empty, string.Empty);
+                            }
+                            else
+                            {
+                                vaule = MysqlConst.MapMethod(mapInfos[i].MethodName, $"{mapInfos[i].TableName}.{mapInfos[i].ColumnName}", string.Empty);
+                            }
+                            
+                            
                             sqlEntity.StrSqlValue.Append($" {vaule} AS {mapInfos[i].AsColumnName} ");
                         }
 
@@ -445,15 +462,17 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 throw new Exception("sql 语句条件部分解析有误!");
             }
+            StringBuilder StrValue = new StringBuilder();
             for (int i = 0; i < treeConditions.Count(); i++)
             {
                 foreach (var sign in treeConditions[i].LeftBracket)
                 {
-                    sqlEntity.StrSqlValue.Append(MysqlConst.cStrSign[(int)sign]);
+                    StrValue.Append(MysqlConst.cStrSign[(int)sign]);
                 }
 
                 string leftValue = string.Empty;
                 string rightValue = string.Empty;
+                
                 switch (treeConditions[i].LeftCondition.ConditionType)
                 {
                     case eConditionType.ColumnName:
@@ -470,7 +489,12 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         }
                         break;
                     case eConditionType.Constant:
-                        if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
+                        if (Check.IsNull(treeConditions[i].RelationCondition))
+                        {
+                            leftValue = $"{treeConditions[i].LeftCondition.DisplayName}";
+                           // sqlEntity.DbParams.Add(new MySqlParameter(leftValue, treeConditions[i].LeftCondition.DisplayName));
+                        }
+                        else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
                         {
                             leftValue = $"@{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
                             sqlEntity.DbParams.Add(new MySqlParameter(leftValue, treeConditions[i].LeftCondition.DisplayName));
@@ -488,25 +512,34 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     default:
                         break;
                 }
-                if (treeConditions[i].RelationCondition.ConditionType.Equals(eConditionType.Method))
+                if (Check.IsNull(treeConditions[i].RelationCondition))
                 {
-                    sqlEntity.StrSqlValue.Append(MysqlConst.MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue));
+                    StrValue.Append($" ({leftValue}) ");
+                }
+                else if (treeConditions[i].RelationCondition.ConditionType.Equals(eConditionType.Method))
+                {
+                    StrValue.Append(MysqlConst.MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue));
                 }
                 else
                 {
-                    sqlEntity.StrSqlValue.Append($"{leftValue}{MysqlConst.cStrSign[(int)treeConditions[i].RelationCondition.SignType]}{rightValue}");
+                    StrValue.Append($"{leftValue}{MysqlConst.cStrSign[(int)treeConditions[i].RelationCondition.SignType]}{rightValue}");
                 }
                 foreach (var sign in treeConditions[i].RightBracket)
                 {
-                    sqlEntity.StrSqlValue.Append(MysqlConst.cStrSign[(int)sign]);
+                    StrValue.Append(MysqlConst.cStrSign[(int)sign]);
                 }
 
                 if (conditions.Count > i)
                 {
-                    sqlEntity.StrSqlValue.Append(MysqlConst.cStrSign[(int)conditions[i].SignType]);
+                    StrValue.Append(MysqlConst.cStrSign[(int)conditions[i].SignType]);
+                    
                 }
 
             }
+
+            sqlEntity.StrSqlValue.Append(StrValue.ToString());
+
+
         }
 
         private void LinkConditions(List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions, SqlCommandEntity sqlEntity)

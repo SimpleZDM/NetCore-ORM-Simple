@@ -26,82 +26,31 @@ namespace NetCore.ORM.Simple.Queryable
             //visitor,builder,DbDrive
         }
         public TGroup Key { get; set; }
-        public double Sum(Expression<Func<TResult, double>>expression)
+        public TField Sum<TField>(Expression<Func<TResult, TField>> expression)
         {
-            return default(double);
-        }
-        public float Sum(Expression<Func<TResult, float>> expression)
-        {
-            return default(float);
-        }
-        public int Sum(Expression<Func<TResult,int>> expression)
-        {
-            return default(int);
+            return default(TField);
         }
 
-        public decimal Sum(Expression<Func<TResult, decimal>> expression)
+        public TField Average<TField>(Expression<Func<TResult,TField>> expression)
         {
-            return default(decimal);
-        }
-
-        public decimal Average(Expression<Func<TResult, decimal>> expression)
-        {
-            return default(decimal);
-        }
-        public double Average(Expression<Func<TResult, double>> expression)
-        {
-            return default(double);
-        }
-        public float Average(Expression<Func<TResult, float>> expression)
-        {
-            return default(float);
-        }
-
-        public int Average(Expression<Func<TResult, int>> expression)
-        {
-            return default(int);
+            return default(TField);
         }
         public int Count<TField>(Expression<Func<TResult, TField>> expression)
         {
             return default(int);
         }
-        public int Count()
+        public override int Count()
         {
             return default(int);
         }
-        public double Max(Expression<Func<TResult, double>> expression)
+        public TField Max<TField>(Expression<Func<TResult,TField>> expression)
         {
-            return default(double);
+            return default(TField);
         }
-        public float Max(Expression<Func<TResult, float>> expression)
+     
+        public TField Min<TField>(Expression<Func<TResult,TField>> expression)
         {
-            return default(float);
-        }
-        public int Max(Expression<Func<TResult, int>> expression)
-        {
-            return default(int);
-        }
-
-        public decimal Max(Expression<Func<TResult, decimal>> expression)
-        {
-            return default(decimal);
-        }
-        public double Min(Expression<Func<TResult, double>> expression)
-        {
-            return default(double);
-        }
-        public float Min(Expression<Func<TResult, float>> expression)
-        {
-            return default(float);
-        }
-        public int Min(Expression<Func<TResult, int>> expression)
-        {
-            return default(int);
-        }
-
-        public decimal Min(Expression<Func<TResult, decimal>> expression)
-        {
-            return default(decimal);
+            return default(TField);
         }
         public virtual IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<ISimpleGroupByQueryable<TResult,TGroup>,TNewResult>> expression)where TNewResult : class
         {
@@ -114,6 +63,13 @@ namespace NetCore.ORM.Simple.Queryable
             visitor.OrderBy(expression);
             return this;
         }
+
+       
+        public TField FirstOrDefault<TField>(Expression<Func<TResult,TField>> expression)
+        {
+            return default(TField);
+        }
+
 
     }
 }
