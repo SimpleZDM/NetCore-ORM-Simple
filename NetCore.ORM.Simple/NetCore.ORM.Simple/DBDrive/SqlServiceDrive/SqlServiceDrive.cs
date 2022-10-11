@@ -1,8 +1,12 @@
-﻿using NetCore.ORM.Simple.Entity;
+﻿using NetCore.ORM.Simple.Common;
+using NetCore.ORM.Simple.Entity;
+using NetCore.ORM.Simple.SqlBuilder;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,118 +21,319 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple
 {
-    public class SqlServiceDrive : IDBDrive
+    public class SqlServiceDrive : BaseDBDrive, IDBDrive
     {
-        public Action<string, DbParameter[]> AOPSqlLog { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        public void BeginTransaction()
+        public SqlServiceDrive(DataBaseConfiguration cfg):base(cfg)
         {
-            throw new NotImplementedException();
+            connection = new SqlConnection(configuration.CurrentConnectInfo.ConnectStr);
         }
-
-        public Task BeginTransactionAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Commit()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task CommitAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
-
         public int Excute(SqlCommandEntity entity)
         {
-            throw new NotImplementedException();
+            int result = 0;
+            Excute(entity, (command) =>
+            {
+                result = command.ExecuteNonQuery();
+            });
+            return result;
         }
 
         public int Excute(SqlCommandEntity[] sqlCommand)
         {
-            throw new NotImplementedException();
+            int result = 0;
+            int count = 0;
+            int current = 0;
+            for (int i = 1; i < sqlCommand.Length; i++)
+            {
+                if (count >SqliteConst.INSERTMAXCOUNT)
+                {
+                    Excute(sqlCommand[current], (command) =>
+                    {
+                        result += command.ExecuteNonQuery();
+                    });
+                    count = 0;
+                    current = i;
+                    i++;
+                }
+                sqlCommand[current].StrSqlValue.Append(sqlCommand[i].StrSqlValue.ToString());
+                sqlCommand[current].DbParams.AddRange(sqlCommand[i].DbParams);
+                count++;
+            }
+            return result;
         }
 
-        public TEntity Excute<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
+        public TEntity Excute<TEntity>(SqlCommandEntity entity,string query) where TEntity : class
         {
-            throw new NotImplementedException();
+            TEntity Entity = null;
+
+            Excute(entity, (command) =>
+            {
+                int result = command.ExecuteNonQuery();
+                if (result == 0)
+                {
+                    return;
+                }
+                command.CommandText = query;
+                command.Parameters.Clear();
+                dataRead = command.ExecuteReader();
+                Entity = MapData<TEntity>().FirstOrDefault();
+            });
+            return Entity;
         }
 
-        public Task<int> ExcuteAsync(SqlCommandEntity entity)
+        public async Task<int> ExcuteAsync(SqlCommandEntity entity)
         {
-            throw new NotImplementedException();
+            int result = 0;
+            await ExcuteAsync(entity, async (command) =>
+            {
+                result = await command.ExecuteNonQueryAsync();
+            });
+            return result;
         }
 
-        public Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand)
+        public async Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand)
         {
-            throw new NotImplementedException();
+            int result = 0;
+            int count = 0;
+            int current = 0;
+            if (sqlCommand.Length == 1)
+            {
+                await ExcuteAsync(sqlCommand[0], async (command) =>
+                {
+                    result = await command.ExecuteNonQueryAsync();
+                });
+            }
+            else
+            {
+                for (int i = 1; i < sqlCommand.Length; i++)
+                {
+                    if (count >SqliteConst.INSERTMAXCOUNT)
+                    {
+                        await ExcuteAsync(sqlCommand[current], async (command) =>
+                        {
+                            result += await command.ExecuteNonQueryAsync();
+                        });
+                        count = 0;
+                        current = i;
+                        i++;
+                    }
+                    sqlCommand[current].StrSqlValue.Append(sqlCommand[i].StrSqlValue.ToString());
+                    sqlCommand[current].DbParams.AddRange(sqlCommand[i].DbParams);
+                    count++;
+                }
+            }
+
+            return result;
         }
 
-        public Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
+        public async Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
         {
-            throw new NotImplementedException();
+            TEntity Entity = null;
+            await ExcuteAsync(entity, async (command) =>
+            {
+                int result = await command.ExecuteNonQueryAsync();
+                if (result == 0)
+                {
+                    return;
+                }
+                command.CommandText = query;
+                command.Parameters.Clear();
+                dataRead = await command.ExecuteReaderAsync();
+                Entity = MapData<TEntity>().FirstOrDefault();
+            });
+            return Entity;
         }
 
         public IEnumerable<TResult> Read<TResult>(QueryEntity entity)
         {
-            throw new NotImplementedException();
+            IEnumerable<TResult> data = null;
+            Excute(entity, (command) =>
+            {
+                dataRead = command.ExecuteReader();
+                data = MapData<TResult>(entity);
+            });
+            return data;
         }
 
         public bool ReadAny(QueryEntity entity)
         {
-            throw new NotImplementedException();
+            return ReadCount(entity) > CommonConst.ZeroOrNull;
         }
 
-        public Task<bool> ReadAnyAsync(QueryEntity entity)
+        public async Task<bool> ReadAnyAsync(QueryEntity entity)
         {
-            throw new NotImplementedException();
+            return await ReadCountAsync(entity) > CommonConst.ZeroOrNull;
         }
 
-        public Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params)
+        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params)
         {
-            throw new NotImplementedException();
+            var entity = new QueryEntity();
+            entity.StrSqlValue.Append(sql);
+            entity.DbParams.AddRange(Params);
+            IEnumerable<TResult> data = null;
+            await ExcuteAsync(entity, async (command) =>
+            {
+                dataRead = await command.ExecuteReaderAsync();
+                data = MapData<TResult>();
+            });
+            return data;
         }
 
-        public Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
+        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
         {
-            throw new NotImplementedException();
+            IEnumerable<TResult> data = null;
+            await ExcuteAsync(entity, async (command) =>
+            {
+                dataRead = await command.ExecuteReaderAsync();
+                data = MapData<TResult>(entity);
+            });
+            return data;
         }
+
 
         public int ReadCount(QueryEntity entity)
         {
-            throw new NotImplementedException();
+            int value = 0;
+            Excute(entity, (command) =>
+            {
+                dataRead = command.ExecuteReader();
+                while (dataRead.Read())
+                {
+                    string strValue = dataRead[CommonConst.StrDataCount].ToString();
+                    int.TryParse(strValue, out value);
+                }
+            });
+            return value;
         }
 
-        public Task<int> ReadCountAsync(QueryEntity entity)
+        public async Task<int> ReadCountAsync(QueryEntity entity)
         {
-            throw new NotImplementedException();
+            int value = 0;
+            await ExcuteAsync(entity, async (command) =>
+            {
+                dataRead = await command.ExecuteReaderAsync();
+                while (dataRead.Read())
+                {
+                    string strValue = dataRead[CommonConst.StrDataCount].ToString();
+                    int.TryParse(strValue, out value);
+                }
+            });
+            return value;
         }
 
-        public TResult ReadFirstOrDefault<TResult>(QueryEntity entity) 
+        public TResult ReadFirstOrDefault<TResult>(QueryEntity entity)
         {
-            throw new NotImplementedException();
+
+            TResult data = default(TResult);
+            Excute(entity, (command) =>
+            {
+                dataRead = command.ExecuteReader();
+                data = MapDataFirstOrDefault<TResult>(entity);
+            });
+            return data;
         }
 
-        public Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity) 
+        public async Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity)
         {
-            throw new NotImplementedException();
+            TResult data = default(TResult);
+            await ExcuteAsync(entity, async (command) =>
+            {
+                dataRead = await command.ExecuteReaderAsync();
+                data = MapDataFirstOrDefault<TResult>(entity);
+            });
+            return data;
         }
 
-        public void RollBack()
+       
+
+        /// <summary>
+        /// 打开数据库连接
+        /// </summary>
+        protected override void Open()
         {
-            throw new NotImplementedException();
+            if (Check.IsNull(connection))
+            {
+                if (Check.IsNullOrEmpty(configuration.CurrentConnectInfo.ConnectStr))
+                {
+                    throw new ArgumentException(CommonConst.GetErrorInfo(ErrorType.ConnectionStrIsNull));
+                }
+                connection = new SqlConnection(configuration.CurrentConnectInfo.ConnectStr);
+            }
+            base.Open();
+        }
+    
+        private void Excute(QueryEntity entity, Action<SqlCommand> action)
+        {
+            if (Check.IsNull(action))
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+            if (!IsOpenConnect())
+            {
+                Open();
+            }
+            command = new SqlCommand(entity.StrSqlValue.ToString(), (SqlConnection)connection);
+
+            if (!Check.IsNull(entity.DbParams) && entity.DbParams.Count > 0)
+            {
+                command.Parameters.AddRange(entity.DbParams.ToArray());
+            }
+            if (!Check.IsNull(AOPSqlLog))
+            {
+                AOPSqlLog.Invoke(entity.StrSqlValue.ToString(), entity.DbParams.ToArray());
+            }
+            action((SqlCommand)command);
+
+            if (configuration.CurrentConnectInfo.IsAutoClose)
+            {
+                command.Dispose();
+                Close();
+            }
         }
 
-        public Task RollBackAsync()
+        private async Task ExcuteAsync(QueryEntity entity, Action<SqlCommand> action)
         {
-            throw new NotImplementedException();
+            await Task.Run(() =>
+            {
+                Excute(entity,action);
+            });
         }
+
+        private void Excute(SqlCommandEntity entity, Action<SqlCommand> action)
+        {
+            if (Check.IsNull(action))
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+            if (!IsOpenConnect())
+            {
+                Open();
+            }
+            command = new SqlCommand(entity.StrSqlValue.ToString(),(SqlConnection)connection);
+            if (!Check.IsNull(entity.DbParams) && entity.DbParams.Count > 0)
+            {
+                command.Parameters.AddRange(entity.DbParams.ToArray());
+            }
+
+            if (!Check.IsNull(AOPSqlLog))
+            {
+                AOPSqlLog.Invoke(entity.StrSqlValue.ToString(), entity.DbParams.ToArray());
+            }
+            action((SqlCommand)command);
+
+            if (configuration.CurrentConnectInfo.IsAutoClose && !isBeginTransaction)
+            {
+                Close();
+            }
+        }
+
+        private async Task ExcuteAsync(SqlCommandEntity entity, Action<SqlCommand> action)
+        {
+            await Task.Run(() =>
+            {
+                Excute(entity,action);
+            });
+
+        }
+
     }
 }

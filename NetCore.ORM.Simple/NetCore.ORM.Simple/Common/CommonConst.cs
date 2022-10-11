@@ -31,7 +31,8 @@ namespace NetCore.ORM.Simple.Common
         {    "错误!",
             "没有为实体配置主键!", 
             "删除数据,请指定删除的条件!",
-            "sql 语句条件部分解析有误!"
+            "sql 语句条件部分解析有误!",
+            "链接字符串为空!",
         }; 
 
         public static int ZeroOrNull=0;
@@ -75,6 +76,7 @@ namespace NetCore.ORM.Simple.Common
         Error=0,//错误
         NotKey,//没有主键
         DeleteNotMatch,//删除没有指定条件
-        SqlAnalysis//sql解析错误
+        SqlAnalysis,//sql解析错误
+        ConnectionStrIsNull
     }
 }

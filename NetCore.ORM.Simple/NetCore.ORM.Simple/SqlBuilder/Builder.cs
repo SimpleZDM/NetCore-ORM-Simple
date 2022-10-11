@@ -20,8 +20,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
 {
     public class Builder : ISqlBuilder
     {
-        MysqlBuilder mysqlBuilder { get; set; }
-        SqlServiceBuilder sqlServiceBuilder { get; set; }
+        ISqlBuilder mysqlBuilder { get; set; }
+        ISqlBuilder sqlServiceBuilder { get; set; }
         private eDBType dbType;
         public Builder(eDBType DBType)
         {

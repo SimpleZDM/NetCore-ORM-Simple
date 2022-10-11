@@ -18,7 +18,8 @@ namespace NetCore.ORM.Simple.Entity
     public enum eDBType
     {
         Mysql=0,
-        SqlService=1,
+        SqlService,
+        Sqlite
     }
     //数据库读写类型
     public enum eWriteOrReadType

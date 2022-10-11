@@ -8,20 +8,20 @@ using System.Threading.Tasks;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.SqlBuilder
- * 接口名称 MysqlConst
+ * 接口名称 SqlServiceConst
  * 开发人员：-nhy
- * 创建时间：2022/9/22 17:40:49
+ * 创建时间：2022/10/11 13:58:24
  * 描述说明：
  * 更改历史：
  * 
  * *******************************************************/
 namespace NetCore.ORM.Simple.SqlBuilder
 {
-    public static class MysqlConst
+    public class SqlServiceConst
     {
-        static MysqlConst()
+        static SqlServiceConst()
         {
-            StrJoins= new string[] { "INNER JOIN", "LEFT JOIN", "RIGHT JOIN" };
+            StrJoins = new string[] { "INNER JOIN", "LEFT JOIN", "RIGHT JOIN" };
         }
         public static char EqualSign = '=';
         /// <summary>
@@ -43,7 +43,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// </summary>
         /// <param name="methodName"></param>
         /// <returns></returns>
-        public static string MapMethod(string methodName,string leftValue,string rightValue)
+        public static string MapMethod(string methodName, string leftValue, string rightValue)
         {
             string value = EqualSign.ToString();
             if (Check.IsNullOrEmpty(methodName))
@@ -58,10 +58,11 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     value = $"{leftValue}={rightValue}";
                     break;
                 case "IsNullOrEmpty":
-                    if (!Check.IsNullOrEmpty(leftValue)) 
+                    if (!Check.IsNullOrEmpty(leftValue))
                     {
                         value = $"{leftValue} IS NULL";
-                    }else if (!Check.IsNullOrEmpty(rightValue))
+                    }
+                    else if (!Check.IsNullOrEmpty(rightValue))
                     {
                         value = $"{rightValue} IS NULL";
                     }
@@ -101,7 +102,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
         public static string AscendOrDescend(eOrderType OrderType)
         {
-            string value=string.Empty;
+            string value = string.Empty;
             switch (OrderType)
             {
                 case eOrderType.Ascending:
@@ -115,7 +116,5 @@ namespace NetCore.ORM.Simple.SqlBuilder
             }
             return value;
         }
-
-
     }
 }
