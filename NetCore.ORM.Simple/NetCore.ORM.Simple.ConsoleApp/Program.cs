@@ -14,8 +14,9 @@ public static class Program
     {
         SimpleMysqlTest MysqlTest=new SimpleMysqlTest();
         //MysqlTest.InsertTest();
-         MysqlTest.QueryTest();
-        //InsertSimpleInsert();
+        //MysqlTest.UpdateTest();
+        //MysqlTest.DeleteTest();
+        MysqlTest.QueryTest();
         return 0;
     }
 }

@@ -108,7 +108,7 @@ namespace NetCore.ORM.Simple.Client
             Type type = typeof(TEntity);
             var Visitor = new ConditionVisitor(new TableEntity(type),conditions,treeConditions);
             Visitor.Modify(expression);
-            var sql = builder.GetDelete<TEntity>(type, conditions, treeConditions);
+            var sql = builder.GetDelete(type,conditions, treeConditions);
             sqls.Add(sql);
             ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, configuration.CurrentConnectInfo.DBType, sql, sqls, dbDrive);
             return command;

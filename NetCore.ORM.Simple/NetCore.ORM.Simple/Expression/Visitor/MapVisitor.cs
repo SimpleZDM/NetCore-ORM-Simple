@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -55,6 +56,32 @@ namespace NetCore.ORM.Simple.Visitor
             Table = table;
             currentTables = new Dictionary<string, int>();
             mapInfos = MapInfos;
+            Type type = table.DicTable[table.TableNames[0]].ClassType;
+            PropertyInfo PropKey = type.GetKey();
+            mapInfos.Add(new MapEntity()
+            {
+                TableName = table.TableNames[0],
+                ColumnName=PropKey.GetColName(),
+                PropName= PropKey.GetColName(),
+                IsKey=true,
+                LastPropName=PropKey.GetColName(),
+                ClassName= type.GetClassName(),
+                EntityType = type,
+            });
+            foreach (var item in type.GetNotKeyAndIgnore())
+            {
+                mapInfos.Add(new MapEntity()
+                {
+                    TableName = table.TableNames[0],
+                    ColumnName = item.GetColName(),
+                    PropName=item.GetColName(),
+                    IsKey=false,
+                    LastPropName=item.GetColName(),
+                    ClassName = type.GetClassName(),
+                    EntityType = type,
+                });
+            }
+            IsAgain = true;
         }
 
         public List<MapEntity> GetMapInfos()
@@ -334,7 +361,6 @@ namespace NetCore.ORM.Simple.Visitor
         protected override Expression VisitMember(MemberExpression node)
         {
             base.VisitMember(node);
-            //Console.WriteLine(node.ToString());
             if (IsAgain)
             {
 
@@ -344,22 +370,24 @@ namespace NetCore.ORM.Simple.Visitor
                     currentmapInfo.MethodName = CurrentMethodName;
                     CurrentMethodName = string.Empty;
                 }
-                currentmapInfo.IsNeed = true;
-
-
+                if (!Check.IsNull(currentmapInfo))
+                {
+                    currentmapInfo.IsNeed = true;
+                    return node;
+                }
             }
-            else if (currentTables.ContainsKey(node.Expression.ToString()))
+            if (currentTables.ContainsKey(node.Expression.ToString()))
             {
                 currentmapInfo = new MapEntity();
                 mapInfos.Add(currentmapInfo);
                 currentmapInfo.ColumnName = node.Member.Name;
                 currentmapInfo.TableName = Table.TableNames[currentTables[node.Expression.ToString()]];
                 currentmapInfo.PropName=node.Member.Name;
-                currentmapInfo.LastPropName=node.Member.Name;
-
+                currentmapInfo.LastPropName=node.Member.Name; 
+                currentmapInfo.ClassName = Table.DicTable[currentmapInfo.TableName].ClassType.GetClassName();
+                currentmapInfo.EntityType = Table.DicTable[currentmapInfo.TableName].ClassType;
             }
-            currentmapInfo.ClassName = Table.DicTable[currentmapInfo.TableName].ClassType.GetClassName();
-            currentmapInfo.EntityType = Table.DicTable[currentmapInfo.TableName].ClassType;
+           
             return node;
         }
 

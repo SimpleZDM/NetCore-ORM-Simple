@@ -89,59 +89,157 @@ namespace NetCore.ORM.Simple
             return result;
         }
 
-        public Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand)
+        public async Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand)
         {
-            throw new NotImplementedException();
+            int result = 0;
+            int count = 0;
+            int current = 0;
+            if (sqlCommand.Length == 1)
+            {
+                await ExcuteAsync(sqlCommand[0], async (command) =>
+                {
+                    result = await command.ExecuteNonQueryAsync();
+                });
+            }
+            else
+            {
+                for (int i = 1; i < sqlCommand.Length; i++)
+                {
+                    if (count > SqliteConst.INSERTMAXCOUNT)
+                    {
+                        await ExcuteAsync(sqlCommand[current], async (command) =>
+                        {
+                            result += await command.ExecuteNonQueryAsync();
+                        });
+                        count = 0;
+                        current = i;
+                        i++;
+                    }
+                    sqlCommand[current].StrSqlValue.Append(sqlCommand[i].StrSqlValue.ToString());
+                    sqlCommand[current].DbParams.AddRange(sqlCommand[i].DbParams);
+                    count++;
+                }
+            }
+
+            return result;
         }
 
-        public Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
+        public async Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
         {
-            throw new NotImplementedException();
+            TEntity Entity = null;
+            await ExcuteAsync(entity, async (command) =>
+            {
+                int result = await command.ExecuteNonQueryAsync();
+                if (result == 0)
+                {
+                    return;
+                }
+                command.CommandText = query;
+                command.Parameters.Clear();
+                dataRead = await command.ExecuteReaderAsync();
+                Entity = MapData<TEntity>().FirstOrDefault();
+            });
+            return Entity;
         }
 
         public IEnumerable<TResult> Read<TResult>(QueryEntity entity)
         {
-            throw new NotImplementedException();
+            IEnumerable<TResult> data = null;
+            Excute(entity, (command) =>
+            {
+                dataRead = command.ExecuteReader();
+                data = MapData<TResult>(entity);
+            });
+            return data;
         }
 
         public bool ReadAny(QueryEntity entity)
         {
-            throw new NotImplementedException();
+            return ReadCount(entity) > CommonConst.ZeroOrNull;
         }
 
-        public Task<bool> ReadAnyAsync(QueryEntity entity)
+        public async Task<bool> ReadAnyAsync(QueryEntity entity)
         {
-            throw new NotImplementedException();
+            return await ReadCountAsync(entity) > CommonConst.ZeroOrNull;
         }
 
-        public Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params)
+        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params)
         {
-            throw new NotImplementedException();
+            var entity = new QueryEntity();
+            entity.StrSqlValue.Append(sql);
+            entity.DbParams.AddRange(Params);
+            IEnumerable<TResult> data = null;
+            await ExcuteAsync(entity, async (command) =>
+            {
+                dataRead = await command.ExecuteReaderAsync();
+                data = MapData<TResult>();
+            });
+            return data;
         }
 
-        public Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
+        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
         {
-            throw new NotImplementedException();
+            IEnumerable<TResult> data = null;
+            await ExcuteAsync(entity, async (command) =>
+            {
+                dataRead = await command.ExecuteReaderAsync();
+                data = MapData<TResult>(entity);
+            });
+            return data;
         }
+
 
         public int ReadCount(QueryEntity entity)
         {
-            throw new NotImplementedException();
+            int value = 0;
+            Excute(entity, (command) =>
+            {
+                dataRead = command.ExecuteReader();
+                while (dataRead.Read())
+                {
+                    string strValue = dataRead[CommonConst.StrDataCount].ToString();
+                    int.TryParse(strValue, out value);
+                }
+            });
+            return value;
         }
 
-        public Task<int> ReadCountAsync(QueryEntity entity)
+        public async Task<int> ReadCountAsync(QueryEntity entity)
         {
-            throw new NotImplementedException();
+            int value = 0;
+            await ExcuteAsync(entity, async (command) =>
+            {
+                dataRead = await command.ExecuteReaderAsync();
+                while (dataRead.Read())
+                {
+                    string strValue = dataRead[CommonConst.StrDataCount].ToString();
+                    int.TryParse(strValue, out value);
+                }
+            });
+            return value;
         }
 
         public TResult ReadFirstOrDefault<TResult>(QueryEntity entity)
         {
-            throw new NotImplementedException();
+
+            TResult data = default(TResult);
+            Excute(entity, (command) =>
+            {
+                dataRead = command.ExecuteReader();
+                data = MapDataFirstOrDefault<TResult>(entity);
+            });
+            return data;
         }
 
-        public Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity)
+        public async Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity)
         {
-            throw new NotImplementedException();
+            TResult data = default(TResult);
+            await ExcuteAsync(entity, async (command) =>
+            {
+                dataRead = await command.ExecuteReaderAsync();
+                data = MapDataFirstOrDefault<TResult>(entity);
+            });
+            return data;
         }
 
 

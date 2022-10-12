@@ -26,6 +26,7 @@ namespace NetCore.ORM.Simple
         /// </summary>
         IDBDrive mysqlDrive { get; set; }
         IDBDrive sqlServicelDrive { get; set; }
+        IDBDrive sqliteDrive { get; set; }
         /// <summary>
         /// 
         /// </summary>
@@ -53,8 +54,21 @@ namespace NetCore.ORM.Simple
         public DBDrive(DataBaseConfiguration cfg)
         {
             configuration = cfg;
-            mysqlDrive = new MysqlDrive(configuration);
-            sqlServicelDrive = new SqlServiceDrive(configuration);
+            switch (cfg.CurrentConnectInfo.DBType)
+            {
+                case eDBType.Mysql:
+                    mysqlDrive = new MysqlDrive(configuration);
+                    break;
+                case eDBType.SqlService:
+                    sqlServicelDrive = new SqlServiceDrive(configuration);
+                    break;
+                case eDBType.Sqlite:
+                    sqliteDrive = new SqliteDrive(configuration);
+                    break;
+                default:
+                    break;
+            }
+           
         }
         /// <summary>
         /// 
@@ -64,14 +78,16 @@ namespace NetCore.ORM.Simple
         {
             await MatchDBDrive(
                 () => mysqlDrive.CommitAsync(),
-                () => sqlServicelDrive.CommitAsync()
+                () => sqlServicelDrive.CommitAsync(),
+                () => sqliteDrive.CommitAsync()
                 );
         }
         public void Commit()
         {
              MatchDBDrive(
                 () => mysqlDrive.Commit(),
-                () => sqlServicelDrive.Commit()
+                () => sqlServicelDrive.Commit(),
+                () => sqliteDrive.Commit()
                 );
         }
         /// <summary>
@@ -82,14 +98,16 @@ namespace NetCore.ORM.Simple
         {
               await MatchDBDrive(
                      () =>mysqlDrive.RollBackAsync(),
-                    () => sqlServicelDrive.RollBackAsync()
+                    () => sqlServicelDrive.RollBackAsync(),
+                    () => sqliteDrive.RollBackAsync()
                   );
         }
         public void RollBack()
         {
                MatchDBDrive(
                 () => mysqlDrive.RollBack(),
-                () => sqlServicelDrive.RollBack()
+                () => sqlServicelDrive.RollBack(),
+                () => sqliteDrive.RollBack()
                );
         }
         /// <summary>
@@ -100,14 +118,16 @@ namespace NetCore.ORM.Simple
         {
             await MatchDBDrive(
                 () => mysqlDrive.BeginTransactionAsync(),
-                () => sqlServicelDrive.BeginTransactionAsync()
+                () => sqlServicelDrive.BeginTransactionAsync(),
+                () => sqliteDrive.BeginTransactionAsync()
                );
         }
         public void BeginTransaction()
         {
              MatchDBDrive(
                 () => mysqlDrive.BeginTransaction(),
-                () => sqlServicelDrive.BeginTransaction()
+                () => sqlServicelDrive.BeginTransaction(),
+                () => sqliteDrive.BeginTransaction()
                );
         }
         /// <summary>
@@ -119,28 +139,32 @@ namespace NetCore.ORM.Simple
         {
             return await MatchDBDrive(
                 () => mysqlDrive.ExcuteAsync(entity),
-                () => sqlServicelDrive.ExcuteAsync(entity)
+                () => sqlServicelDrive.ExcuteAsync(entity),
+                () => sqliteDrive.ExcuteAsync(entity)
                );;
         }
         public int Excute(SqlCommandEntity entity)
         {
             return MatchDBDrive(
                 () => mysqlDrive.Excute(entity),
-                () => sqlServicelDrive.Excute(entity)
+                () => sqlServicelDrive.Excute(entity),
+                () => sqliteDrive.Excute(entity)
                );
         }
         public async Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand)
         {
             return await MatchDBDrive(
                 () => mysqlDrive.ExcuteAsync(sqlCommand),
-                () => sqlServicelDrive.ExcuteAsync(sqlCommand)
+                () => sqlServicelDrive.ExcuteAsync(sqlCommand),
+                () => sqliteDrive.ExcuteAsync(sqlCommand)
                );
         }
         public int Excute(SqlCommandEntity[] sqlCommand)
         {
             return  MatchDBDrive(
                 () => mysqlDrive.Excute(sqlCommand),
-                () => sqlServicelDrive.Excute(sqlCommand)
+                () => sqlServicelDrive.Excute(sqlCommand),
+                () => sqliteDrive.Excute(sqlCommand)
                );
         }
         /// <summary>
@@ -160,7 +184,8 @@ namespace NetCore.ORM.Simple
         {
             return await MatchDBDrive(
                 () => mysqlDrive.ReadAsync<TResult>(entity),
-                () => sqlServicelDrive.ReadAsync<TResult>(entity)
+                () => sqlServicelDrive.ReadAsync<TResult>(entity),
+                () => sqliteDrive.ReadAsync<TResult>(entity)
                );
         }
         /// <summary>
@@ -174,14 +199,16 @@ namespace NetCore.ORM.Simple
         {
             return await MatchDBDrive(
                 () => mysqlDrive.ExcuteAsync<TEntity>(entity, query),
-                () => sqlServicelDrive.ExcuteAsync<TEntity>(entity, query)
+                () => sqlServicelDrive.ExcuteAsync<TEntity>(entity, query),
+                () => sqliteDrive.ExcuteAsync<TEntity>(entity, query)
                ) ;
         }
         public  TEntity Excute<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
         {
             return  MatchDBDrive(
                 () => mysqlDrive.Excute<TEntity>(entity, query),
-                () => sqlServicelDrive.Excute<TEntity>(entity, query)
+                () => sqlServicelDrive.Excute<TEntity>(entity, query),
+                () => sqliteDrive.Excute<TEntity>(entity, query)
                );
         }
         /// <summary>
@@ -195,7 +222,8 @@ namespace NetCore.ORM.Simple
         {
            return await MatchDBDrive(
                () => mysqlDrive.ReadAsync<TResult>(sql,Params),
-               () => mysqlDrive.ReadAsync<TResult>(sql,Params)
+               () => sqlServicelDrive.ReadAsync<TResult>(sql,Params),
+               () => sqliteDrive.ReadAsync<TResult>(sql,Params)
                );
         }
        
@@ -205,7 +233,8 @@ namespace NetCore.ORM.Simple
         {
             return  MatchDBDrive(
                        () => mysqlDrive.Read<TResult>(entity),
-                       () => sqlServicelDrive.Read<TResult>(entity)
+                       () => sqlServicelDrive.Read<TResult>(entity),
+                       () => sqliteDrive.Read<TResult>(entity)
                     );
         }
 
@@ -213,7 +242,8 @@ namespace NetCore.ORM.Simple
         {
             return MatchDBDrive(
                        () => mysqlDrive.ReadFirstOrDefault<TResult>(entity),
-                       () => sqlServicelDrive.ReadFirstOrDefault<TResult>(entity)
+                       () => sqlServicelDrive.ReadFirstOrDefault<TResult>(entity),
+                       () => sqliteDrive.ReadFirstOrDefault<TResult>(entity)
                     );
         }
 
@@ -221,7 +251,9 @@ namespace NetCore.ORM.Simple
         {
             return await MatchDBDrive(
                        () => mysqlDrive.ReadFirstOrDefaultAsync<TResult>(entity),
-                       () => sqlServicelDrive.ReadFirstOrDefaultAsync<TResult>(entity)
+                       () => sqlServicelDrive.ReadFirstOrDefaultAsync<TResult>(entity),
+                       () => sqliteDrive.ReadFirstOrDefaultAsync<TResult>(entity)
+                       
                     );
         }
 
@@ -229,7 +261,8 @@ namespace NetCore.ORM.Simple
         {
             return  MatchDBDrive(
                        () => mysqlDrive.ReadCount(entity),
-                       () => sqlServicelDrive.ReadCount(entity)
+                       () => sqlServicelDrive.ReadCount(entity),
+                       () => sqliteDrive.ReadCount(entity)
                     );
         }
 
@@ -237,7 +270,8 @@ namespace NetCore.ORM.Simple
         {
             return await MatchDBDriveAsync(
                       () => mysqlDrive.ReadCountAsync(entity),
-                      () => sqlServicelDrive.ReadCountAsync(entity)
+                      () => sqlServicelDrive.ReadCountAsync(entity),
+                      () => sqliteDrive.ReadCountAsync(entity)
                    ) ;
         }
 
@@ -245,7 +279,8 @@ namespace NetCore.ORM.Simple
         {
              return await MatchDBDriveAsync(
                       () => mysqlDrive.ReadAnyAsync(entity),
-                      () => sqlServicelDrive.ReadAnyAsync(entity)
+                      () => sqlServicelDrive.ReadAnyAsync(entity),
+                      () => sqliteDrive.ReadAnyAsync(entity)
                    );
         }
 
@@ -253,7 +288,8 @@ namespace NetCore.ORM.Simple
         {
             return  MatchDBDrive(
                       () => mysqlDrive.ReadAny(entity),
-                      () => sqlServicelDrive.ReadAny(entity)
+                      () => sqlServicelDrive.ReadAny(entity),
+                      () => sqliteDrive.ReadAny(entity)
                    );
         }
         /// <summary>

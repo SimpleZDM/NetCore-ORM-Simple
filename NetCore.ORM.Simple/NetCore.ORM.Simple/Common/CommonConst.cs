@@ -33,6 +33,7 @@ namespace NetCore.ORM.Simple.Common
             "删除数据,请指定删除的条件!",
             "sql 语句条件部分解析有误!",
             "链接字符串为空!",
+            "数据库参数不能为空!",
         }; 
 
         public static int ZeroOrNull=0;
@@ -77,6 +78,7 @@ namespace NetCore.ORM.Simple.Common
         NotKey,//没有主键
         DeleteNotMatch,//删除没有指定条件
         SqlAnalysis,//sql解析错误
-        ConnectionStrIsNull
+        ConnectionStrIsNull,
+        ParamsIsNull
     }
 }

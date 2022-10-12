@@ -1,6 +1,10 @@
-﻿using System;
+﻿using Microsoft.Data.Sqlite;
+using MySqlConnector;
+using NetCore.ORM.Simple.Common;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,14 +37,38 @@ namespace NetCore.ORM.Simple.Entity
         /// <summary>
         /// 参数化
         /// </summary>
-        public List<DbParameter> DbParams { get { return dbParams; } set { dbParams = value; } }
+        public List<DbParameter> DbParams { get { return dbParams; } private set {  dbParams = value; } }
 
         /// <summary>
         /// 语句的类型
         /// </summary>
         public eDbCommandType DbCommandType { get { return dbCommandType; } set { dbCommandType = value; } }
 
-     
+        public void AddParameter(eDBType DbType, string key, object value)
+        {
+            if (Check.IsNullOrEmpty(key))
+            {
+                throw new Exception(CommonConst.GetErrorInfo(ErrorType.ParamsIsNull));
+            }
+            DbParameter Parameter = null;
+            switch (DbType)
+            {
+                case eDBType.Mysql:
+                    Parameter = new MySqlParameter(key, value);
+                    break;
+                case eDBType.SqlService:
+                    Parameter= new SqlParameter(key,value);
+                    break;
+                case eDBType.Sqlite:
+                    Parameter = new SqliteParameter(key, value);
+                    break;
+                default:
+                    throw new Exception("不支持添加该类型的参数!");
+            }
+            DbParams.Add(Parameter);
+        }
+
+
         private List<DbParameter> dbParams;
         private StringBuilder strSqlValue;
         private eDbCommandType dbCommandType;

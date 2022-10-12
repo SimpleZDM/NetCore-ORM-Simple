@@ -1,8 +1,10 @@
-﻿using NetCore.ORM.Simple.Entity;
+﻿using NetCore.ORM.Simple.Common;
+using NetCore.ORM.Simple.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,61 +19,170 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.SqlBuilder
 {
-    public class SqlServiceBuilder : ISqlBuilder
+    public class SqlServiceBuilder :BaseBuilder,ISqlBuilder
     {
-        public void GetCount(SelectEntity select, QueryEntity entity)
+        public SqlServiceBuilder(eDBType dbType):base(dbType)
         {
-            throw new NotImplementedException();
+
+        }
+        public override SqlCommandEntity GetInsert<TData>(TData data, int random)
+        {
+            return base.GetInsert(data, random);
         }
 
-        public SqlCommandEntity GetDelete<TDate>(Type type, List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions)
+        public override SqlCommandEntity GetUpdate<TData>(TData data, int random)
         {
-            throw new NotImplementedException();
+            return base.GetUpdate(data, random);
+        }
+        public override SqlCommandEntity GetUpdate<TData>(List<TData> datas, int offset)
+        {
+            return base.GetUpdate(datas, offset);
         }
 
-        public SqlCommandEntity GetDelete<TData>(TData data, int random)
+        public override SqlCommandEntity GetInsert<TData>(List<TData> datas, int offset)
         {
-            throw new NotImplementedException();
+            return base.GetUpdate(datas, offset);
+        }
+        public override void GetSelect<TData>(QueryEntity sql)
+        {
+            base.GetSelect<TData>(sql);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="type"></param>
+        public override void GetSelect(QueryEntity sql, Type type)
+        {
+            base.GetSelect(sql, type);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TData"></typeparam>
+        /// <param name="sql"></param>
+        public override void GetLastInsert<TData>(QueryEntity sql)
+        {
+            if (Check.IsNull(sql))
+            {
+                sql = new QueryEntity();
+            }
+            Type type = typeof(TData);
+            GetSelect(sql, type);
+            var Key = type.GetKey();
+            sql.StrSqlValue.Append($" Where {Key.GetColName()}=Scope_identity();");
+            //SELECT scope_identity()
         }
 
-        public SqlCommandEntity GetInsert<TData>(TData data, int random = 0)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mapInfos">映射成需要返回的实体部分</param>
+        /// <param name="joinInfos">连接部分</param>
+        /// <param name="condition">条件部分</param>
+        /// <returns></returns>
+        public override void GetSelect<TData>(SelectEntity select, QueryEntity entity)
         {
-            throw new NotImplementedException();
+            base.GetSelect<TData>(select, entity);
+
+            GroupBy(select.OrderInfos, entity);
+
+            OrderBy(select.OrderInfos, entity);
+
+            SetPageList(entity);
         }
 
-        public SqlCommandEntity GetInsert<TData>(List<TData> datas, int offset)
+        public override void GetCount(SelectEntity select, QueryEntity entity)
         {
-            throw new NotImplementedException();
+            base.GetCount(select, entity);
+
+            GroupBy(select.OrderInfos, entity);
+
+            SetPageList(entity);
         }
 
-        public void GetLastInsert<TData>(QueryEntity sql)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TDate"></typeparam>
+        /// <param name="entity"></param>
+        public override SqlCommandEntity GetDelete(Type type, List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions)
         {
-            throw new NotImplementedException();
+
+            return base.GetDelete(type, conditions, treeConditions);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TData"></typeparam>
+        /// <param name="data"></param>
+        /// <exception cref="Exception"></exception>
+        public override SqlCommandEntity GetDelete<TData>(TData data, int random)
+        {
+            return base.GetDelete(data, random);
         }
 
-        public void GetSelect<TData>()
+
+
+        /// <summary>
+        /// 拼接分页
+        /// </summary>
+        /// <param name="sqlEntity"></param>
+        protected override void SetPageList(QueryEntity sqlEntity)
         {
-            throw new NotImplementedException();
+
+            if (sqlEntity.PageNumber < 0 || sqlEntity.PageSize <= 0)
+            {
+                return;
+            }
+            sqlEntity.StrSqlValue.Append(" Limit @SkipNumber,@TakeNumber");
+            sqlEntity.AddParameter(DbType, "@SkipNumber", (sqlEntity.PageNumber - 1) * sqlEntity.PageSize);
+            sqlEntity.AddParameter(DbType, "@TakeNumber", sqlEntity.PageSize);
+
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entity"></param>
+        protected override void OrderBy(List<OrderByEntity> OrderByInfos, QueryEntity entity)
+        {
+            if (!Check.IsNull(OrderByInfos) && OrderByInfos.Where(o => o.IsOrderBy).Any())
+            {
+                entity.StrSqlValue.Append(" Order By ");
+                entity.StrSqlValue.Append(string.Join(',', OrderByInfos.Where(o => o.IsOrderBy).OrderBy(o => o.OrderSoft).Select(o => $"{o.TableName}.{o.ColumnName} {MysqlConst.AscendOrDescend(o.OrderType)}")));
+                entity.StrSqlValue.Append(" ");
+            }
+
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entity"></param>
+        protected override void GroupBy(List<OrderByEntity> OrderByInfos, QueryEntity entity)
+        {
+            if (!Check.IsNull(OrderByInfos) && OrderByInfos.Where(g => g.IsGroupBy).Any())
+            {
+                entity.StrSqlValue.Append(" Group By ");
+                entity.StrSqlValue.Append(string.Join(',', OrderByInfos.Where(g => g.IsGroupBy).OrderBy(g => g.GroupSoft).Select(g => $"{g.TableName}.{g.ColumnName}")));
+                entity.StrSqlValue.Append(" ");
+            }
+
         }
 
-        public void GetSelect<TData>(SelectEntity select, QueryEntity entity)
+        protected override void Update<TEntity>(SqlCommandEntity sql, string keyName, string tableName, PropertyInfo pKey, TEntity data, IEnumerable<PropertyInfo> Props, int index)
         {
-            throw new NotImplementedException();
-        }
-
-        public SqlCommandEntity GetUpdate<TData>(TData data, int random = 0)
-        {
-            throw new NotImplementedException();
-        }
-
-        public SqlCommandEntity GetUpdate<TData>(List<TData> datas, int offset)
-        {
-            throw new NotImplementedException();
-        }
-
-        public SqlCommandEntity GetWhereSql<TData>(Expression<Func<TData, bool>> matchCondition)
-        {
-            throw new NotImplementedException();
+            sql.AddParameter(DbType, $"{keyName}{index}", pKey.GetValue(data));
+            sql.StrSqlValue.Append($"UPDATE `{tableName}` SET ");
+            sql.StrSqlValue.Append(string.Join(',',
+            Props.Select(p =>
+            {
+                string colName = $"{p.GetColName()}";
+                sql.AddParameter(DbType, $"@{colName}{index}", p.GetValue(data));
+                return $"`{colName}`=@{colName}{index}";
+            })));
+            sql.StrSqlValue.Append(" Where ");
+            sql.StrSqlValue.Append($"{pKey.GetColName()}={keyName}{index}");
+            sql.StrSqlValue.Append(";");
         }
     }
 }

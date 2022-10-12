@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetCore.ORM.Simple.Common;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
@@ -21,7 +22,6 @@ namespace NetCore.ORM.Simple.Entity
         public QueryEntity()
         {
             StrSqlValue = new StringBuilder();
-            DbParams = new List<DbParameter>(10);
             DyToMap = new List<dynamic>();
             PageSize = -1;
             PageNumber = -1;
@@ -103,6 +103,8 @@ namespace NetCore.ORM.Simple.Entity
             return null;
             
         }
+
+       
         
 
         private MapEntity[] mapInfos;

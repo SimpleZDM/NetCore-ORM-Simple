@@ -57,6 +57,7 @@ namespace NetCore.ORM.Simple.Entity
 
         public string ClassName { get { return className; } set { className = value; } }
         public Type EntityType { get { return entityType; } set { entityType = value; } }
+        public bool IsKey { get { return isKey; } set { isKey = value; } }
 
 
 
@@ -66,6 +67,7 @@ namespace NetCore.ORM.Simple.Entity
         private string columnName;
         private string asColumnName;
         private bool isNeed;
+        private bool isKey;
         private string methodName;
         private string lastPropName;
         private string className;

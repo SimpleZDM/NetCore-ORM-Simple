@@ -152,61 +152,65 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 Console.WriteLine("****************查询测试*****************");
                 Console.WriteLine("****************1.简单单表查询*****************");
                 ///返回所有
-              //  List<UserEntity> users = client.Queryable<UserEntity>().ToList();
-              //  UserEntity user = client.Queryable<UserEntity>().FirstOrDefault();
-              //  ///数据的条数
-              //  int count = client.Queryable<UserEntity>().Count();
-              //  //是否存在
-              //  bool any = client.Queryable<UserEntity>().Any();
+                List<UserEntity> users = client.Queryable<UserEntity>().ToList();
+                UserEntity user = client.Queryable<UserEntity>().FirstOrDefault();
+                ///数据的条数
+                int count = client.Queryable<UserEntity>().Count();
+                //是否存在
+                bool any = client.Queryable<UserEntity>().Any();
 
-              //  var first = client.Queryable<UserEntity>().First();
+                var first = client.Queryable<UserEntity>().First();
 
-              //  var firstordefault = client.Queryable<UserEntity>().FirstOrDefault();
+                var firstordefault = client.Queryable<UserEntity>().FirstOrDefault();
 
-              //  //返回匿名对象
-              //  var data0 = client.Queryable<UserEntity>().Select(u => new { Name = u.Name, Id = u.Id }).ToList();
-              //  var data = client.Queryable<UserEntity>().Select(u => new UserEntity{ Name = u.Name, Id = u.Id }).
-              //      Select(u=>new { Name = u.Name, Id = u.Id}).ToList();
-              //  //加条件
-              //  int min= 1746;
-              //  int max = 1756;
-              //  var data1 = client.Queryable<UserEntity>().Where(user=>user.Id> min && user.Id<= max).ToList();
-              //  //分组
-              //  var group = client.Queryable<UserEntity>().Where(user=>user.Id> min && user.Id<= max).GroupBy(u=>new { u.CompanyId}).ToList();
-              //  //排序
-              //  var order = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderBy(u=>new { u.Id }).ToList();
-              //  var orderDesce = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderByDescending(u=>new { u.Id }).ToList();
+                //返回匿名对象
+                var data0 = client.Queryable<UserEntity>().Select(u => new { Name = u.Name, Id = u.Id }).ToList();
+                var data = client.Queryable<UserEntity>().Select(u => new UserEntity { Name = u.Name, Id = u.Id }).
+                    Select(u => new { Name = u.Name, Id = u.Id }).ToList();
+                //加条件
+                int min = 1746;
+                int max = 1756;
+                var data1 = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).ToList();
+                //分组
+                var group = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).GroupBy(u => new { u.CompanyId }).ToList();
+                //排序
+                var order = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderBy(u => new { u.Id }).ToList();
+                var orderDesce = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderByDescending(u => new { u.Id }).ToList();
 
-              //  Console.WriteLine($"*****************是否有数据:{any}****************");
-              //  Console.WriteLine($"*****************总行数:{count}****************");
+                Console.WriteLine($"*****************是否有数据:{any}****************");
+                Console.WriteLine($"*****************总行数:{count}****************");
 
-              //  Console.WriteLine("****************2.多表连接查询*****************");
-              //  Console.WriteLine($"*****************连接查询****************");
+                Console.WriteLine("****************2.多表连接查询*****************");
+                Console.WriteLine($"*****************连接查询****************");
 
-              //  var JoinData = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u,r,c)=>new JoinInfoEntity(
-              //      new JoinMapEntity(eJoinType.Inner,u.RoleId.Equals(r.Id)),
-              //      new JoinMapEntity(eJoinType.Inner,u.CompanyId.Equals(c.Id))
-              //      )).ToList();
+                var JoinData = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) => new JoinInfoEntity(
+                    new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
+                    new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
+                    )).ToList();
 
-              //  var JoinData1 = client.Queryable<
-              //      UserEntity, RoleEntity, CompanyEntity>(
-              //      (u, r, c) => new JoinInfoEntity(
-              //     new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
-              //     new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
-              //     )).
-              //     Where((u, r, c) => u.Id > 10).OrderByDescending((u, r) =>u.Id).
-              //     Select((u, r, c) => new 
-              //     { UserName = u.Name, CompanyName = 
-              //     c.CompanyName, RoleName = r.DisplayName });
+                var JoinData1 = client.Queryable<
+                    UserEntity, RoleEntity, CompanyEntity>(
+                    (u, r, c) => new JoinInfoEntity(
+                   new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
+                   new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
+                   )).
+                   Where((u, r, c) => u.Id > 10).OrderByDescending((u, r) => u.Id).
+                   Select((u, r, c) => new
+                   {
+                       UserName = u.Name,
+                       CompanyName =c.CompanyName,
+                       RoleName = r.DisplayName,
+                       Id=u.Id
+                   });
 
-              //  JoinData1.Where(s=>true);
+                JoinData1.Where(s =>s.Id>10);
 
-              //  JoinData1.Where(s=>true);
+                JoinData1.Where(s => s.Id>100 && s.Id>1000);
 
-              //  JoinData1.Where(s=>true);
-              //  var data111 = JoinData1.ToList();
-              /////连接查询分组
-              var JoinData2 = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) => new JoinInfoEntity(
+                JoinData1.Where(s => true);
+                var data111 = JoinData1.ToList();
+                /////连接查询分组
+                var JoinData2 = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) => new JoinInfoEntity(
                   new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
                   new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
                   )).

@@ -1,10 +1,7 @@
-﻿using MySqlConnector;
-using NetCore.ORM.Simple.Common;
+﻿using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
-using NetCore.ORM.Simple.Visitor;
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -12,44 +9,43 @@ using System.Text;
 using System.Threading.Tasks;
 
 /*********************************************************
- * 命名空间 NetCore.ORM.Simple.SqlBuilder
- * 接口名称 MysqlBuilder
+ * 命名空间 NetCore.ORM.Simple.SqlBuilder.Sqlite
+ * 接口名称 SqliteBuilder
  * 开发人员：-nhy
- * 创建时间：2022/9/20 11:16:54
+ * 创建时间：2022/10/11 15:10:21
  * 描述说明：
  * 更改历史：
  * 
  * *******************************************************/
 namespace NetCore.ORM.Simple.SqlBuilder
 {
-    public class MysqlBuilder :BaseBuilder,ISqlBuilder
+    public class SqliteBuilder : BaseBuilder,ISqlBuilder
     {
-
-        
-        public MysqlBuilder(eDBType dbType):base(dbType)
+        public SqliteBuilder(eDBType dbtype):base(dbtype)
         {
+
         }
         public override SqlCommandEntity GetInsert<TData>(TData data, int random)
         {
-            return base.GetInsert(data,random);
+            return base.GetInsert(data, random);
         }
 
         public override SqlCommandEntity GetUpdate<TData>(TData data, int random)
         {
-            return base.GetUpdate(data,random);
+            return base.GetUpdate(data, random);
         }
-        public override SqlCommandEntity GetUpdate<TData>(List<TData> datas,int offset)
+        public override SqlCommandEntity GetUpdate<TData>(List<TData> datas, int offset)
         {
-            return base.GetUpdate(datas,offset);
+            return base.GetUpdate(datas, offset);
         }
-      
-        public override SqlCommandEntity GetInsert<TData>(List<TData> datas,int offset)
+
+        public override SqlCommandEntity GetInsert<TData>(List<TData> datas, int offset)
         {
-            return base.GetUpdate(datas,offset);
+            return base.GetUpdate(datas, offset);
         }
         public override void GetSelect<TData>(QueryEntity sql)
         {
-             base.GetSelect<TData>(sql);
+            base.GetSelect<TData>(sql);
         }
         /// <summary>
         /// 
@@ -58,7 +54,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="type"></param>
         public override void GetSelect(QueryEntity sql, Type type)
         {
-            base.GetSelect(sql,type);
+            base.GetSelect(sql, type);
         }
         /// <summary>
         /// 
@@ -67,7 +63,14 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="sql"></param>
         public override void GetLastInsert<TData>(QueryEntity sql)
         {
-            base.GetLastInsert<TData>(sql);
+            if (Check.IsNull(sql))
+            {
+                sql = new QueryEntity();
+            }
+            Type type = typeof(TData);
+            GetSelect(sql, type);
+            var Key = type.GetKey();
+            sql.StrSqlValue.Append($" Where {Key.GetColName()}=LAST_INSERT_ROWID();");
         }
 
         /// <summary>
@@ -79,7 +82,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <returns></returns>
         public override void GetSelect<TData>(SelectEntity select, QueryEntity entity)
         {
-            base.GetSelect<TData>(select,entity);
+            base.GetSelect<TData>(select, entity);
 
             GroupBy(select.OrderInfos, entity);
 
@@ -90,7 +93,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
         public override void GetCount(SelectEntity select, QueryEntity entity)
         {
-             base.GetCount(select,entity);
+            base.GetCount(select, entity);
 
             GroupBy(select.OrderInfos, entity);
 
@@ -104,8 +107,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="entity"></param>
         public override SqlCommandEntity GetDelete(Type type, List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions)
         {
-           
-           return base.GetDelete(type, conditions, treeConditions);
+
+            return base.GetDelete(type, conditions, treeConditions);
         }
         /// <summary>
         /// 
@@ -113,13 +116,13 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <typeparam name="TData"></typeparam>
         /// <param name="data"></param>
         /// <exception cref="Exception"></exception>
-        public override SqlCommandEntity GetDelete<TData>(TData data,int random)
+        public override SqlCommandEntity GetDelete<TData>(TData data, int random)
         {
-           return base.GetDelete(data,random);
+            return base.GetDelete(data, random);
         }
 
 
-       
+
         /// <summary>
         /// 拼接分页
         /// </summary>
@@ -127,13 +130,13 @@ namespace NetCore.ORM.Simple.SqlBuilder
         protected override void SetPageList(QueryEntity sqlEntity)
         {
 
-            if (sqlEntity.PageNumber <0||sqlEntity.PageSize <= 0)
+            if (sqlEntity.PageNumber < 0 || sqlEntity.PageSize <= 0)
             {
                 return;
             }
             sqlEntity.StrSqlValue.Append(" Limit @SkipNumber,@TakeNumber");
-            sqlEntity.AddParameter(DbType,"@SkipNumber", (sqlEntity.PageNumber - 1) * sqlEntity.PageSize);
-            sqlEntity.AddParameter(DbType,"@TakeNumber",sqlEntity.PageSize);
+            sqlEntity.AddParameter(DbType, "@SkipNumber", (sqlEntity.PageNumber - 1) * sqlEntity.PageSize);
+            sqlEntity.AddParameter(DbType, "@TakeNumber", sqlEntity.PageSize);
 
         }
         /// <summary>
@@ -165,20 +168,21 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
         }
 
-        protected override void Update<TEntity>(SqlCommandEntity sql,string keyName,string tableName,PropertyInfo pKey,TEntity data,IEnumerable<PropertyInfo> Props,int index)
+        protected override void Update<TEntity>(SqlCommandEntity sql, string keyName, string tableName, PropertyInfo pKey, TEntity data, IEnumerable<PropertyInfo> Props, int index)
         {
-            sql.AddParameter(DbType,$"{keyName}{index}", pKey.GetValue(data));
+            sql.AddParameter(DbType, $"{keyName}{index}", pKey.GetValue(data));
             sql.StrSqlValue.Append($"UPDATE `{tableName}` SET ");
             sql.StrSqlValue.Append(string.Join(',',
             Props.Select(p =>
             {
                 string colName = $"{p.GetColName()}";
-                sql.AddParameter(DbType,$"@{colName}{index}", p.GetValue(data));
+                sql.AddParameter(DbType, $"@{colName}{index}", p.GetValue(data));
                 return $"`{colName}`=@{colName}{index}";
             })));
             sql.StrSqlValue.Append(" Where ");
             sql.StrSqlValue.Append($"{pKey.GetColName()}={keyName}{index}");
             sql.StrSqlValue.Append(";");
         }
+
     }
 }

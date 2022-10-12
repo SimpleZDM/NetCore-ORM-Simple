@@ -378,7 +378,7 @@ namespace NetCore.ORM.Simple
             {
                 TResult tresult = Activator.CreateInstance<TResult>();
 
-                foreach (var item in entity.MapInfos)
+                foreach (var item in entity.MapInfos.Where(m=>m.IsNeed))
                 {
                     if (PropMapNames.ContainsKey(item.PropName))
                     {

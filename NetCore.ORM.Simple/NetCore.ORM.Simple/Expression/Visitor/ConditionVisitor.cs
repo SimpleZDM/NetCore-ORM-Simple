@@ -547,6 +547,10 @@ namespace NetCore.ORM.Simple.Visitor
                     {
                         condition.DisplayName = $"{mapInfo.TableName}.{mapInfo.ColumnName}";
                     }
+                    else
+                    {
+                        VisitMember(member);
+                    }
                 }
                 else
                 {

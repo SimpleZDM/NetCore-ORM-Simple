@@ -19,12 +19,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
 {
     public interface ISqlBuilder
     {
-        public SqlCommandEntity GetInsert<TData>(TData data, int random = 0);
-
-        public SqlCommandEntity GetUpdate<TData>(TData data,int random=0);
-        public SqlCommandEntity GetUpdate<TData>(List<TData> datas, int offset);
-
-
+        public SqlCommandEntity GetInsert<TData>(TData data, int random );
         /// <summary>
         /// 批量插入生成sql语句
         /// </summary>
@@ -32,20 +27,11 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="datas"></param>
         /// <returns></returns>
         public SqlCommandEntity GetInsert<TData>(List<TData> datas,int offset);
+        public SqlCommandEntity GetUpdate<TData>(TData data,int random);
+        public SqlCommandEntity GetUpdate<TData>(List<TData> datas, int offset);
 
-        /// <summary>
-        /// 拼装单挑查询语句
-        /// </summary>
-        /// <typeparam name="TData"></typeparam>
-        /// <returns></returns>
-        public void GetSelect<TData>();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TData"></typeparam>
-        /// <returns></returns>
-        public SqlCommandEntity GetWhereSql<TData>(Expression<Func<TData, bool>> matchCondition);
+        
 
 
         /// <summary>
@@ -57,11 +43,11 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <returns></returns>
         public void GetSelect<TData>(SelectEntity select,QueryEntity entity);
 
-        public SqlCommandEntity GetDelete<TDate>(Type type, List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions);
+        public SqlCommandEntity GetDelete(Type type, List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions);
 
         public SqlCommandEntity GetDelete<TData>(TData data,int random);
 
         public void GetLastInsert<TData>(QueryEntity sql);
-        public void GetCount(SelectEntity select, QueryEntity entity);
+        public  void GetCount(SelectEntity select, QueryEntity entity);
     }
 }

@@ -22,43 +22,63 @@ namespace NetCore.ORM.Simple.SqlBuilder
     {
         ISqlBuilder mysqlBuilder { get; set; }
         ISqlBuilder sqlServiceBuilder { get; set; }
+        ISqlBuilder sqliteBuilder { get; set; }
         private eDBType dbType;
         public Builder(eDBType DBType)
-        {
+        { 
             dbType = DBType;
-            mysqlBuilder = new MysqlBuilder();
-            sqlServiceBuilder = new SqlServiceBuilder();
+            switch (dbType)
+            {
+                case eDBType.Mysql:
+                    mysqlBuilder = new MysqlBuilder(dbType);
+                    break;
+                case eDBType.SqlService:
+                    sqlServiceBuilder = new SqlServiceBuilder(dbType);
+                    break;
+                case eDBType.Sqlite:
+                    sqliteBuilder = new SqliteBuilder(dbType);
+                    break;
+                default:
+                    break;
+            }
         }
 
         public SqlCommandEntity GetInsert<TData>(TData data, int random = 0)
         {
-            return MatchDBType(() => mysqlBuilder.GetInsert(data,random));
+            return MatchDBType(
+                () => mysqlBuilder.GetInsert(data,random),
+                () => sqlServiceBuilder.GetInsert(data,random),
+                () => sqliteBuilder.GetInsert(data,random)
+               );
         }
         
 
         public SqlCommandEntity GetUpdate<TData>(TData data,int random=0)
         {
-            return MatchDBType(() => mysqlBuilder.GetUpdate(data,random));
+            return MatchDBType(
+                () => mysqlBuilder.GetUpdate(data,random),
+                () => sqlServiceBuilder.GetUpdate(data,random),
+                () => sqliteBuilder.GetUpdate(data,random)
+               );
         }
         public SqlCommandEntity GetUpdate<TData>(List<TData> datas, int offset = 0)
         {
-            return MatchDBType(() => mysqlBuilder.GetUpdate(datas,offset));
+            return MatchDBType(
+                () => mysqlBuilder.GetUpdate(datas,offset),
+                () => sqlServiceBuilder.GetUpdate(datas,offset),
+                () => sqliteBuilder.GetUpdate(datas,offset)
+               );
         }
 
         public SqlCommandEntity GetInsert<TData>(List<TData> datas,int offset=0)
         {
-            return MatchDBType(() => mysqlBuilder.GetInsert(datas,offset));
+            return MatchDBType(
+                () => mysqlBuilder.GetInsert(datas,offset),
+                () => sqlServiceBuilder.GetInsert(datas,offset),
+                () => sqliteBuilder.GetInsert(datas,offset)
+                );
         }
 
-        //public SqlEntity GetSelect<TData>()
-        //{
-        //    return MatchDBType(() =>mysqlBuilder.GetSelect<TData>());
-        //}
-
-        public SqlCommandEntity GetWhereSql<TData>(Expression<Func<TData, bool>> matchCondition)
-        {
-            return MatchDBType(() => mysqlBuilder.GetWhereSql(matchCondition));
-        }
         /// <summary>
         /// 
         /// </summary>
@@ -70,7 +90,11 @@ namespace NetCore.ORM.Simple.SqlBuilder
              entity.LastAnonymity=select.LastAnonymity;
              entity.LastType=select.LastType;
              entity.DyToMap = select.DyToMap;
-             MatchDBType(() => mysqlBuilder.GetSelect<TData>(select,entity));
+             MatchDBType(
+                 () => mysqlBuilder.GetSelect<TData>(select,entity),
+                 () => sqlServiceBuilder.GetSelect<TData>(select,entity),
+                 () => sqliteBuilder.GetSelect<TData>(select,entity)
+                 );
         }
 
         public SqlCommandEntity MatchDBType(params Func<SqlCommandEntity>[] funcs)
@@ -85,21 +109,14 @@ namespace NetCore.ORM.Simple.SqlBuilder
             }
             return null;
         }
-      
-
-        public SqlCommandEntity GetSelect(List<MapEntity> mapInfos,string condition)
-        {
-            throw new NotImplementedException();
-        }
-
-        void ISqlBuilder.GetSelect<TData>()
-        {
-            throw new NotImplementedException();
-        }
 
         public void GetLastInsert<TData>(QueryEntity sql)
         {
-             MatchDBType(() => mysqlBuilder.GetLastInsert<TData>(sql));
+             MatchDBType(
+                 () => mysqlBuilder.GetLastInsert<TData>(sql),
+                 () => sqlServiceBuilder.GetLastInsert<TData>(sql),
+                 () => sqliteBuilder.GetLastInsert<TData>(sql)
+                 );
         }
         /// <summary>
         /// 
@@ -109,9 +126,13 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="conditions"></param>
         /// <param name="treeConditions"></param>
         /// <returns></returns>
-        public SqlCommandEntity GetDelete<TDate>(Type type, List<ConditionEntity> conditions,List<TreeConditionEntity> treeConditions)
+        public SqlCommandEntity GetDelete(Type type, List<ConditionEntity> conditions,List<TreeConditionEntity> treeConditions)
         {
-            return MatchDBType(() => mysqlBuilder.GetDelete<TDate>(type,conditions,treeConditions));
+            return MatchDBType(
+                () => mysqlBuilder.GetDelete(type,conditions,treeConditions),
+                () => sqlServiceBuilder.GetDelete(type,conditions,treeConditions),
+                () => sqliteBuilder.GetDelete(type,conditions,treeConditions)
+                );
         }
         /// <summary>
         /// 
@@ -121,18 +142,30 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <returns></returns>
         public SqlCommandEntity GetDelete<TData>(TData data,int random)
         {
-            return MatchDBType(() => mysqlBuilder.GetDelete(data,random));
+            return MatchDBType(
+                () => mysqlBuilder.GetDelete(data,random),
+                () => sqlServiceBuilder.GetDelete(data,random),
+                () => sqliteBuilder.GetDelete(data,random)
+                );
         }
 
         public void GetCount(SelectEntity select, QueryEntity entity)
         {
              
-             MatchDBType(() => mysqlBuilder.GetCount(select,entity));
+             MatchDBType(
+                 () => mysqlBuilder.GetCount(select,entity),
+                 () => sqlServiceBuilder.GetCount(select,entity),
+                 () => sqliteBuilder.GetCount(select,entity)
+             );
         }
 
         public void GetAync(SelectEntity select, QueryEntity entity)
         {
-            MatchDBType(() => mysqlBuilder.GetCount(select, entity));
+            MatchDBType(
+                () => mysqlBuilder.GetCount(select, entity),
+                () => sqlServiceBuilder.GetCount(select, entity),
+                () => sqliteBuilder.GetCount(select, entity)
+                );
         }
 
         public void MatchDBType(params Action[] actions)
