@@ -215,7 +215,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     throw new Exception("请配置主键!");
                 }
 
-                entity.StrSqlValue.Append($"{MainWordType.Select.GetMainWordStr()} {MainWordType.Top.GetMainWordStr()}({MainWordType.AT.GetMainWordStr()}{MainWordType.TakeNumber.GetMainWordStr()})* {MainWordType.From.GetMainWordStr()} ({MainWordType.Select.GetMainWordStr()} ROW_NUMBER() over(");
+                entity.StrSqlValue.Append($"{MainWordType.Select.GetMainWordStr()} * {MainWordType.From.GetMainWordStr()} ({MainWordType.Select.GetMainWordStr()} ROW_NUMBER() over(");
                 if (!IsGroup(select)&&IsOrder(select))
                 {
                     OrderBy(select.OrderInfos,entity,o=>o.IsOrderBy);
@@ -292,7 +292,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     throw new Exception("请配置主键!");
                 }
 
-                entity.StrSqlValue.Append($"{MainWordType.Select.GetMainWordStr()} {MainWordType.Top.GetMainWordStr()}({MainWordType.AT.GetMainWordStr()}{MainWordType.TakeNumber.GetMainWordStr()})* {MainWordType.From.GetMainWordStr()} ({MainWordType.Select.GetMainWordStr()} ROW_NUMBER() over(");
+                entity.StrSqlValue.Append($"{MainWordType.Select.GetMainWordStr()} {MainWordType.Count}(*) {MainWordType.As} {MainWordType.SimpleNumber} {MainWordType.From.GetMainWordStr()} ({MainWordType.Select.GetMainWordStr()} ROW_NUMBER() over(");
 
 
                 if (!IsGroup(select) && IsOrder(select))
@@ -317,6 +317,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 }
 
                 entity.StrSqlValue.Append($") {MainWordType.As.GetMainWordStr()} {MainWordType.NoIndex.GetMainWordStr()}");
+
+                //entity.StrSqlValue.Append($",{MainWordType.Count}(*) {MainWordType.As.GetMainWordStr()} {MainWordType.SimpleNumber.GetMainWordStr()}");
 
                 //entity.StrSqlValue.Append($" {map.TableName}.{map.ColumnName}");
                 //entity.MapInfos = select.MapInfos.ToArray();
@@ -404,9 +406,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="sqlEntity"></param>
         protected override void SetPageList(QueryEntity sqlEntity)
         {
-            sqlEntity.StrSqlValue.Append($" {MainWordType.Where.GetMainWordStr()} {MainWordType.NoIndex.GetMainWordStr()}>{MainWordType.AT.GetMainWordStr()}{MainWordType.SkipNumber.GetMainWordStr()}");
+            sqlEntity.StrSqlValue.Append($" {MainWordType.Where.GetMainWordStr()} {MainWordType.NoIndex.GetMainWordStr()}>{MainWordType.AT.GetMainWordStr()}{MainWordType.SkipNumber.GetMainWordStr()} and {MainWordType.NoIndex.GetMainWordStr()}<={MainWordType.AT.GetMainWordStr()}{MainWordType.TakeNumber.GetMainWordStr()}");
             sqlEntity.AddParameter(DbType, $"{MainWordType.AT.GetMainWordStr()}{MainWordType.SkipNumber.GetMainWordStr()}", (sqlEntity.PageNumber - 1) * sqlEntity.PageSize);
-            sqlEntity.AddParameter(DbType, $"{MainWordType.AT.GetMainWordStr()}{MainWordType.TakeNumber.GetMainWordStr()}", sqlEntity.PageSize);
+            sqlEntity.AddParameter(DbType, $"{MainWordType.AT.GetMainWordStr()}{MainWordType.TakeNumber.GetMainWordStr()}", sqlEntity.PageSize*sqlEntity.PageNumber);
 
         }
 
