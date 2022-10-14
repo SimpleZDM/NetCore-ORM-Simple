@@ -31,14 +31,14 @@ namespace NetCore.ORM.Simple.Visitor
         /// <summary>
         /// 
         /// </summary>
-        public SimpleVisitor(params Type[] types)
+        public SimpleVisitor(Type table,Type column,params Type[] types)
         {
             if (Check.IsNull(types))
             {
 
             }
             Select = new SelectEntity();
-            Table = new TableEntity(types);
+            Table = new TableEntity(table,column,types);
             mapVisitor = new MapVisitor(Table, Select.MapInfos);
             joinVisitor = new JoinVisitor(Table, Select.JoinInfos);
             OrderVistor = new OrderByVisitor(Table, Select.OrderInfos);

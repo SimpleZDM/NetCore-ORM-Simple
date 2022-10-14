@@ -29,8 +29,10 @@ namespace NetCore.ORM.Simple.Entity
         public Type TableAtrr { get { return tableAtrr; } private set { tableAtrr = value; } }
         public Type ColumnAttr { get { return columnAttr; } private set { columnAttr = value; } }
 
-        public TableEntity(params Type[] types)
+        public TableEntity(Type table,Type column,params Type[] types)
         {
+            TableAtrr = table;
+            ColumnAttr = column;
             if (Check.IsNull(types) ||types.Length<=CommonConst.ZeroOrNull)
             {
                 throw new ArgumentException(nameof(types));
@@ -41,6 +43,7 @@ namespace NetCore.ORM.Simple.Entity
             {
                 AddTableName(types[i],i);
             }
+           
         }
         private Dictionary<string, NameEntity> dicTable;
         private string[] tableNames;

@@ -77,6 +77,8 @@ namespace NetCore.ORM.Simple.Client
 
         public void SetAPOLog(Action<string,DbParameter[]> action);
 
+        public void SetAttr(Type Table = null, Type Column = null);
+
         public void BeginTransaction();
 
         public  Task BeginTransactionAsync();

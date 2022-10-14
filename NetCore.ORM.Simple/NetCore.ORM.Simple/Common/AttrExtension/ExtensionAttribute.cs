@@ -18,7 +18,7 @@ namespace NetCore.ORM.Simple.Common
             {
                 AttrTable = typeof(TableNameAttribute);
             }
-            if (type.IsDefined(typeof(TableNameAttribute), false))
+            if (type.IsDefined(AttrTable, false))
             {
                 IName classNameAttribute = (IName)type.GetCustomAttributes(AttrTable, false)[0];
                 string Name = classNameAttribute.GetName();

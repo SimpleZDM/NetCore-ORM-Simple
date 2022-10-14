@@ -271,7 +271,7 @@ namespace NetCore.ORM.Simple.Visitor
             {
                 currentTree = new TreeConditionEntity();
                 currentTree.LeftCondition = new ConditionEntity(eConditionType.Constant);
-                currentTree.LeftCondition.DisplayName =$"{node.Value}";
+                currentTree.LeftCondition.DisplayName = $"{node.Value}";
                 treeConditions.Add(currentTree);
                 return node;
             }
@@ -281,10 +281,10 @@ namespace NetCore.ORM.Simple.Visitor
             }
             else
             {
-                if (!currentTree.RightCondition.ConditionType.Equals(eConditionType.Constant)) 
+                if (!currentTree.RightCondition.ConditionType.Equals(eConditionType.Constant))
                 {
                     currentTree.RightCondition.ConditionType = eConditionType.Constant;
-                } 
+                }
             }
             if (!Check.IsNullOrEmpty(currentTree.RightCondition.DisplayName))
             {
@@ -316,7 +316,7 @@ namespace NetCore.ORM.Simple.Visitor
                 }
 
             }
-            else if (!Check.IsNull(currentTree.LeftCondition.ConstFieldType)&& currentTree.LeftCondition.ConstFieldType.Count>0)
+            else if (!Check.IsNull(currentTree.LeftCondition.ConstFieldType) && currentTree.LeftCondition.ConstFieldType.Count > 0)
             {
                 if (currentTree.LeftCondition.ConstFieldType.Count >= 2)
                 {
@@ -418,11 +418,27 @@ namespace NetCore.ORM.Simple.Visitor
         protected override Expression VisitMember(MemberExpression node)
         {
 
+            PropertyInfo Prop = null;
+            string PropName = node.Member.Name;
+            string TableName;
             if (currentTables.Count > CommonConst.ZeroOrNull)
             {
 
+                if (!Check.IsNull(mapInfos) && mapInfos.Count>0&&mapInfos.Where(m=>m.PropName.Equals(PropName)).Any())
+                {
+                    currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
+                    currentTree.LeftCondition.DisplayName = $"{tableNames.TableNames[currentTables[node.Expression.ToString()]]}.{node.Member.Name}";
+                    currentTree.LeftCondition.PropertyType = node.Type;
+                }
                 if (currentTables.ContainsKey(node.Expression.ToString()))
                 {
+                    Prop = tableNames.DicTable[tableNames.TableNames[currentTables[node.Expression.ToString()]]].ClassType.GetProperty(node.Member.Name);
+                    string tableName = tableNames.TableNames[currentTables[node.Expression.ToString()]];
+                    if (!Check.IsNull(Prop))
+                    {
+                        PropName = tableNames.GetColName(Prop);
+                        TableName = tableNames.TableNames[currentTables[node.Expression.ToString()]];
+                    }
                     currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
                     currentTree.LeftCondition.DisplayName = $"{tableNames.TableNames[currentTables[node.Expression.ToString()]]}.{node.Member.Name}";
                     currentTree.LeftCondition.PropertyType = node.Type;
@@ -562,9 +578,10 @@ namespace NetCore.ORM.Simple.Visitor
                             {
                                 mName = $"{tableNames.TableNames[currentTables[member.Expression.ToString()]]}.{member.Member.Name}";
                                 condition.DisplayName = mName;
-                            } else 
+                            }
+                            else
                             {
-                               VisitMember(member);
+                                VisitMember(member);
                             }
                         }
                         else
@@ -612,6 +629,17 @@ namespace NetCore.ORM.Simple.Visitor
                 }
             }
             return condition.DisplayName;
+        }
+
+        private void CreateCondition(string TableName, string ColumnName, Type type,eConditionType conditionType)
+        {
+            if (!Check.IsNull(currentTree))
+            {
+                currentTree.LeftCondition = new ConditionEntity(conditionType);
+                currentTree.LeftCondition.DisplayName = $"{tableNames}.{TableName}";
+                currentTree.LeftCondition.PropertyType = type;
+            }
+
         }
     }
 }

@@ -48,7 +48,7 @@ namespace NetCore.ORM.Simple.Visitor
         /// </summary>
         private bool isAnonymity;
 
-       
+
         public MapVisitor(TableEntity table, List<MapEntity> MapInfos)
         {
             if (Check.IsNull(table))
@@ -59,15 +59,15 @@ namespace NetCore.ORM.Simple.Visitor
             currentTables = new Dictionary<string, int>();
             mapInfos = MapInfos;
             Type type = table.DicTable[table.TableNames[0]].ClassType;
-            PropertyInfo PropKey =Table.GetKey(type);
+            PropertyInfo PropKey = Table.GetKey(type);
             mapInfos.Add(new MapEntity()
             {
                 TableName = table.TableNames[0],
-                ColumnName= Table.GetColName(PropKey),
-                PropName= Table.GetColName(PropKey),
-                IsKey=true,
-                LastPropName=Table.GetColName(PropKey),
-                ClassName= Table.GetTableName(type),
+                ColumnName = Table.GetColName(PropKey),
+                PropName = Table.GetColName(PropKey),
+                IsKey = true,
+                LastPropName = Table.GetColName(PropKey),
+                ClassName = Table.GetTableName(type),
                 EntityType = type,
             });
             foreach (var item in Table.GetNotKeyAndIgnore(type))
@@ -76,9 +76,9 @@ namespace NetCore.ORM.Simple.Visitor
                 {
                     TableName = table.TableNames[0],
                     ColumnName = Table.GetColName(item),
-                    PropName= Table.GetColName(item),
-                    IsKey=false,
-                    LastPropName= Table.GetColName(item),
+                    PropName = Table.GetColName(item),
+                    IsKey = false,
+                    LastPropName = Table.GetColName(item),
                     ClassName = Table.GetTableName(type),
                     EntityType = type,
                 });
@@ -101,7 +101,7 @@ namespace NetCore.ORM.Simple.Visitor
             isAnonymity = IsAnonymity;
             if (IsAgain)
             {
-                
+
                 for (int i = 0; i < mapInfos.Count; i++)
                 {
                     mapInfos[i].IsNeed = false;
@@ -112,7 +112,7 @@ namespace NetCore.ORM.Simple.Visitor
                 currentTables.Add(item.Name, currentTables.Count);
             }
             Visit(expression);
-            currentmapInfo= null;
+            currentmapInfo = null;
             IsAgain = true;
             return expression;
         }
@@ -279,7 +279,7 @@ namespace NetCore.ORM.Simple.Visitor
             }
             else
             {
-               currentmapInfo.MethodName=node.Method.Name;
+                currentmapInfo.MethodName = node.Method.Name;
             }
             return node;
         }
@@ -353,9 +353,19 @@ namespace NetCore.ORM.Simple.Visitor
             {
                 return node;
             }
+            string PropName=node.Member.Name;
+            PropertyInfo prop=null;
+            if (currentTables.ContainsKey(node.Expression.ToString()))
+            {
+                prop = Table.DicTable[Table.TableNames[currentTables[node.Expression.ToString()]]].ClassType.GetProperty(node.Member.Name);
+                if (!Check.IsNull(prop))
+                {
+                    PropName = Table.GetColName(prop);
+                }
+            }
             if (IsAgain)
             {
-                currentmapInfo = mapInfos.FirstOrDefault(m => m.PropName.Equals(node.Member.Name));
+                currentmapInfo = mapInfos.FirstOrDefault(m => m.PropName.Equals(PropName));
                 if (!Check.IsNullOrEmpty(CurrentMethodName))
                 {
                     currentmapInfo.MethodName = CurrentMethodName;
@@ -366,20 +376,22 @@ namespace NetCore.ORM.Simple.Visitor
                     currentmapInfo.IsNeed = true;
                     return node;
                 }
+                else
+                {
+                    if (!Check.IsNull(prop))
+                    {
+                        CreateMap(Table.TableNames[currentTables[node.Expression.ToString()]], prop);
+                    }
+                }
             }
-            if (currentTables.ContainsKey(node.Expression.ToString()))
-            {
-                
-                currentmapInfo = new MapEntity();
-                mapInfos.Add(currentmapInfo);
-                currentmapInfo.ColumnName = node.Member.Name;
-                currentmapInfo.TableName = Table.TableNames[currentTables[node.Expression.ToString()]];
-                currentmapInfo.PropName=node.Member.Name;
-                currentmapInfo.LastPropName=node.Member.Name; 
-                currentmapInfo.ClassName = Table.GetTableName(Table.DicTable[currentmapInfo.TableName].ClassType);
-                currentmapInfo.EntityType = Table.DicTable[currentmapInfo.TableName].ClassType;
+          else{
+                if (!Check.IsNull(prop))
+                {
+                    CreateMap(Table.TableNames[currentTables[node.Expression.ToString()]],prop);
+                }
+
             }
-           
+
             return node;
         }
 
@@ -444,6 +456,18 @@ namespace NetCore.ORM.Simple.Visitor
                 action.Invoke(null);
             }
             base.Visit(node.Right);
+        }
+
+        public void CreateMap(string TableName,PropertyInfo Prop)
+        {
+            currentmapInfo = new MapEntity();
+            mapInfos.Add(currentmapInfo);
+            currentmapInfo.TableName = TableName;
+            currentmapInfo.ColumnName = Table.GetColName(Prop);
+            currentmapInfo.PropName = Table.GetColName(Prop);
+            currentmapInfo.LastPropName = Table.GetColName(Prop);
+            currentmapInfo.ClassName = Table.GetTableName(Table.DicTable[currentmapInfo.TableName].ClassType);
+            currentmapInfo.EntityType = Table.DicTable[currentmapInfo.TableName].ClassType;
         }
     }
 }

@@ -16,11 +16,11 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.ConsoleApp
 {
-    [TableName("usertable")]
+    [MyTableAttrbute("usertable")]
     public class UserEntity
     {
-        [ColName(key:true,autoIncrease:true)]
-        public int Id { get; set; }
+        [MyColumnAttrbute(name:"Id",key:true,autoIncrease:true)]
+        public int Idddd { get; set; }
         public int CompanyId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -29,19 +29,19 @@ namespace NetCore.ORM.Simple.ConsoleApp
         public int Age { get; set; }
         public int IDDD;
     }
-    [TableName("RoleTable")]
+    [MyTableAttrbute("RoleTable")]
     public class RoleEntity
     {
-        [ColName(key: true, autoIncrease: true)]
+        [MyColumnAttrbute(key: true, autoIncrease: true)]
         public int Id { get; set; }
         public string DisplayName { get; set; }
     }
-    [TableName("CompanyTable")]
+    [MyTableAttrbute("CompanyTable")]
     public class CompanyEntity
     {
-        [ColName(key:true,autoIncrease: true)]
+        [MyColumnAttrbute(key:true,autoIncrease: true)]
         public int Id { get; set; }
-        [ColName("CompanyName")]
+        [MyColumnAttrbute("CompanyName")]
         public string CompanyName { get; set; }
     }
 

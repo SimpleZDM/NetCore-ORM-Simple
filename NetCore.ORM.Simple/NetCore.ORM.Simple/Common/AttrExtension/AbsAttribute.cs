@@ -14,7 +14,7 @@ namespace NetCore.ORM.Simple.Common
         {
             this._name = name;
         }
-        public string GetName()
+        public virtual string GetName()
         {
             return _name;
         }
