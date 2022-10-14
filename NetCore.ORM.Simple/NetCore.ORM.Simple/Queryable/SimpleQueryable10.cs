@@ -21,7 +21,7 @@ namespace NetCore.ORM.Simple.Queryable
 {
     public class SimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : QueryResult<T1>, ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> where T1 : class
     {
-        public SimpleQueryable(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8,T9,T10,JoinInfoEntity>> expression, ISqlBuilder builder, IDBDrive dBDrive)
+        public SimpleQueryable(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8,T9,T10,JoinInfoEntity>> expression, ISqlBuilder builder, IDBDrive dBDrive,Type Table, Type Column)
         {
             Type[] types = ReflectExtension.GetType<T1, T2, T3, T4, T5, T6, T7, T8,T9,T10>();
             Init(builder, dBDrive, types);

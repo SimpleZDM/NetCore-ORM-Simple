@@ -9,9 +9,9 @@ namespace NetCore.ORM.Simple.Common
     /// 
 
     [AttributeUsage(AttributeTargets.Class)]
-    public class ClassNameAttribute:AbsAttribute
+    public class TableNameAttribute:AbsAttribute,IName
     {
-        public ClassNameAttribute(string name):base(name)
+        public TableNameAttribute(string name):base(name)
         {
 
         }

@@ -41,22 +41,30 @@ namespace NetCore.ORM.Simple
             int result = 0;
             int count = 0;
             int current = 0;
-            for (int i = 1; i < sqlCommand.Length; i++)
+            if (sqlCommand.Length == 1)
             {
-                if (count > SqliteConst.INSERTMAXCOUNT)
-                {
-                    Excute(sqlCommand[current], (command) =>
-                    {
-                        result += command.ExecuteNonQuery();
-                    });
-                    count = 0;
-                    current = i;
-                    i++;
-                }
-                sqlCommand[current].StrSqlValue.Append(sqlCommand[i].StrSqlValue.ToString());
-                sqlCommand[current].DbParams.AddRange(sqlCommand[i].DbParams);
-                count++;
+                result=Excute(sqlCommand[0]);
             }
+            else
+            {
+                for (int i = 1; i < sqlCommand.Length; i++)
+                {
+                    if (count > SqliteConst.INSERTMAXCOUNT)
+                    {
+                        Excute(sqlCommand[current], (command) =>
+                        {
+                            result += command.ExecuteNonQuery();
+                        });
+                        count = 0;
+                        current = i;
+                        i++;
+                    }
+                    sqlCommand[current].StrSqlValue.Append(sqlCommand[i].StrSqlValue.ToString());
+                    sqlCommand[current].DbParams.AddRange(sqlCommand[i].DbParams);
+                    count++;
+                }
+            }
+
             return result;
         }
 
@@ -96,10 +104,7 @@ namespace NetCore.ORM.Simple
             int current = 0;
             if (sqlCommand.Length == 1)
             {
-                await ExcuteAsync(sqlCommand[0], async (command) =>
-                {
-                    result = await command.ExecuteNonQueryAsync();
-                });
+                result=await ExcuteAsync(sqlCommand[0]);
             }
             else
             {
@@ -331,6 +336,11 @@ namespace NetCore.ORM.Simple
                 Excute(entity, action);
             });
 
+        }
+
+        public override void SetAttr(Type Table = null, Type Column = null)
+        {
+            base.SetAttr(Table, Column);
         }
     }
 }

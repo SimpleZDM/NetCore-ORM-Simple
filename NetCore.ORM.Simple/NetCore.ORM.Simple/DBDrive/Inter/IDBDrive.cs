@@ -79,6 +79,7 @@ namespace NetCore.ORM.Simple
         /// <returns></returns>
         public  Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class;
         public TEntity Excute<TEntity>(SqlCommandEntity entity, string query) where TEntity : class;
+        public void SetAttr(Type Table = null, Type Column = null);
 
     }
 }

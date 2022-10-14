@@ -126,15 +126,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="sqlEntity"></param>
         protected override void SetPageList(QueryEntity sqlEntity)
         {
-
-            if (sqlEntity.PageNumber <0||sqlEntity.PageSize <= 0)
-            {
-                return;
-            }
-            sqlEntity.StrSqlValue.Append(" Limit @SkipNumber,@TakeNumber");
-            sqlEntity.AddParameter(DbType,"@SkipNumber", (sqlEntity.PageNumber - 1) * sqlEntity.PageSize);
-            sqlEntity.AddParameter(DbType,"@TakeNumber",sqlEntity.PageSize);
-
+            base.SetPageList(sqlEntity);
         }
         /// <summary>
         /// 
@@ -172,13 +164,18 @@ namespace NetCore.ORM.Simple.SqlBuilder
             sql.StrSqlValue.Append(string.Join(',',
             Props.Select(p =>
             {
-                string colName = $"{p.GetColName()}";
+                string colName = $"{GetColName(p)}";
                 sql.AddParameter(DbType,$"@{colName}{index}", p.GetValue(data));
                 return $"`{colName}`=@{colName}{index}";
             })));
             sql.StrSqlValue.Append(" Where ");
-            sql.StrSqlValue.Append($"{pKey.GetColName()}={keyName}{index}");
+            sql.StrSqlValue.Append($"{GetColName(pKey)}={keyName}{index}");
             sql.StrSqlValue.Append(";");
+        }
+
+        public override void SetAttr(Type Table = null, Type Column = null)
+        {
+            base.SetAttr(Table,Column);
         }
     }
 }

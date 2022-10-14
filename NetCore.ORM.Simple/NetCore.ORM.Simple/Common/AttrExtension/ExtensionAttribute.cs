@@ -8,85 +8,47 @@ namespace NetCore.ORM.Simple.Common
 {
     public static class ExtensionAttribute
     {
-        /// <summary>
-        /// 校准接口参数
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="t"></param>
-        /// <returns></returns>
-        //public static bool Verify<T>(this T t, out string messgae) where T : IModeVerify
-        //{
-        //    bool IsResualt = true;
-        //    Type type = typeof(T);
-        //    messgae = "";
-        //    foreach (var prop in type.GetProperties().Where(prop => prop.IsDefined(typeof(ParaVerifyAttribute), false)))
-        //    {
-        //        ParaVerifyAttribute VerifyAttr = (ParaVerifyAttribute)prop.GetCustomAttributes(typeof(ParaVerifyAttribute),false).ToArray()[0];
-        //        if (prop.PropertyType == typeof(string)||prop.PropertyType==typeof(Guid))
-        //        {
-        //            string val = prop.GetValue(t)==null ? string.Empty : prop.GetValue(t).ToString();
-        //            if (VerifyAttr.GetIsEmpty()== false && 
-        //                (string.IsNullOrEmpty(val)|| 
-        //                val.Length < VerifyAttr.GetLength()||
-        //                val==Guid.Empty.ToString()))
-        //            {  //string 类型验证失败
-        //                messgae = VerifyAttr.GetDesc();
-        //                IsResualt = false;
-        //                break;
-        //            }
-        //        }
-        //        else if (prop.PropertyType == typeof(Int16) || prop.PropertyType == typeof(Int32) || prop.PropertyType == typeof(Int64))
-        //        {
-                    
-        //            int val;
-        //            int.TryParse(prop.GetValue(t).ToString(), out val);
-        //            if (val > VerifyAttr.GetMax() || val < VerifyAttr.GetMin())
-        //            {
-        //                IsResualt = false;
-        //                messgae = VerifyAttr.GetDesc();
-        //                break;
-        //            }
-        //        }else if (typeof(IFormFile)==prop.PropertyType)
-        //        {
-        //            if (prop.GetValue(t) == null)
-        //            {
-        //                messgae = VerifyAttr.GetDesc();
-        //                IsResualt = false;
-        //                break;
-        //            }
-        //        }
-        //    }
-        //    return IsResualt;
-        //}
-
-        public static string GetClassName(this Type type)
+        public static string GetTableName(this Type type,Type AttrTable)
         {
-            if (type.IsDefined(typeof(ClassNameAttribute), false))
+            if (Check.IsNull(type))
             {
-                ClassNameAttribute classNameAttribute = (ClassNameAttribute)type.GetCustomAttributes(typeof(ClassNameAttribute),false)[0];
-                return classNameAttribute.GetName();
+                return null;
             }
-            else
+            if (Check.IsNull(AttrTable))
             {
-                return type.Name;
+                AttrTable = typeof(TableNameAttribute);
             }
+            if (type.IsDefined(typeof(TableNameAttribute), false))
+            {
+                IName classNameAttribute = (IName)type.GetCustomAttributes(AttrTable, false)[0];
+                string Name = classNameAttribute.GetName();
+                if (!Check.IsNullOrEmpty(Name))
+                {
+                    return Name;
+                }
+            }
+            return type.Name;
         }
-
-        public static string GetColName(this PropertyInfo prop)
+        public static string GetColName(this PropertyInfo prop, Type type)
         {
             if (Check.IsNull(prop))
             {
                 return null;
             }
-            if (prop.IsDefined(typeof(ColNameAttribute), false))
+            if (Check.IsNull(type))
             {
-                ColNameAttribute classNameAttribute = (ColNameAttribute)prop.GetCustomAttributes(typeof(ColNameAttribute),false)[0];
-                return classNameAttribute.GetName();
+                type = typeof(ColNameAttribute);
             }
-            else
+            if (prop.IsDefined(type, false))
             {
-                return prop.Name;
+                IName classNameAttribute = (IName)prop.GetCustomAttributes(type, false)[0];
+                string Name = classNameAttribute.GetName();
+                if (!Check.IsNullOrEmpty(Name))
+                {
+                    return Name;
+                }
             }
+            return prop.Name;
         }
 
         /// <summary>
@@ -95,54 +57,28 @@ namespace NetCore.ORM.Simple.Common
         /// <param name="type"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public static IEnumerable<PropertyInfo> GetNotKeyAndIgnore(this Type type)
+        public static IEnumerable<PropertyInfo> GetNotKeyAndIgnore(this Type type, Type ColumnType)
         {
-            if (Check.IsNull(type))
-            {
-                throw new ArgumentNullException();
-            }
-            IEnumerable<PropertyInfo> props = type.GetProperties().
-                Where(p =>
-                {
-                    var value =!p.IsDefined(typeof(IgnoreAttribute), false);
-                    if (p.IsDefined(typeof(KeyAttribute),false))
-                    {
-                        KeyAttribute keyAttr=(KeyAttribute)p.GetCustomAttribute(typeof(KeyAttribute),false);
-                        if (Check.IsNull(keyAttr))
-                        {
-                            throw new Exception("请为实体配置一个主键!");
-                        }
-                        value = !keyAttr.AutoIncrease;
-                    }
-                    return value;
-                });
-            return props;
+            return GetPropertyInfos(type, column =>!column.AutoIncrease && !column.Ignore, ColumnType);
         }
 
 
-        public static IEnumerable<PropertyInfo> GetNoIgnore(this Type type)
+        public static IEnumerable<PropertyInfo> GetNoIgnore(this Type type, Type ColumnType)
         {
-            if (Check.IsNull(type))
-            {
-                throw new ArgumentNullException();
-            }
-            IEnumerable<PropertyInfo> props=type.GetProperties().
-                Where(t=>t.IsDefined(typeof(IgnoreAttribute),false)==false);
-            return props;
+            return GetPropertyInfos(type,column=> !column.Ignore, ColumnType);
         }
-        public static PropertyInfo GetKey(this Type type)
+        public static PropertyInfo GetKey(this Type type,Type ColumnType)
         {
-            if (Check.IsNull(type))
-            {
-                throw new ArgumentNullException("type");
-            }
-            var keyProp = type.GetProperties().FirstOrDefault(t => t.IsDefined(typeof(KeyAttribute), false));
-            return keyProp;
+            return GetPropertyInfos(type, column =>column.Key,ColumnType).FirstOrDefault();
         }
-        public static IEnumerable<PropertyInfo> GetNoIgnore(this Type type,Func<PropertyInfo,bool> func)
+        public static PropertyInfo GetAutoKey(this Type type, Type ColumnType)
+        {
+            return GetPropertyInfos(type, column => column.Key&&column.AutoIncrease, ColumnType).FirstOrDefault();
+        }
+        public static IEnumerable<PropertyInfo> GetNoIgnore(this Type type, Func<PropertyInfo, bool> func)
         {
             IEnumerable<PropertyInfo> props = type.GetProperties().
-                Where(t=>func.Invoke(t));
+                Where(t => func.Invoke(t));
             if (props == null)
             {
                 return null;
@@ -150,47 +86,18 @@ namespace NetCore.ORM.Simple.Common
             return props;
         }
 
-        public static T DicMapEntity<T>(this Dictionary<string,int> dic)
+     
+
+        public static void SetPropValue(this PropertyInfo Prop, object data, object vData)
         {
-            Type type = typeof(T);
-            object obj = Activator.CreateInstance(type);
-
-            foreach (var prop in type.GetProperties())
-            {
-                if (dic.ContainsKey(prop.GetColName()))
-                {
-                    prop.SetValue(obj,dic[prop.GetColName()]);
-                }
-            }
-
-            return (T)obj;
-        }
-        public static T DicMapEntity<T,TValue>(this Dictionary<string,TValue> dic)
-        {
-            Type type = typeof(T);
-            object obj = Activator.CreateInstance(type);
-
-            foreach (var prop in type.GetProperties())
-            {
-                if (dic.ContainsKey(prop.GetColName()))
-                {
-                    prop.SetValue(obj, dic[prop.GetColName()]);
-                }
-            }
-
-            return (T)obj;
-        }
-
-        public static void SetPropValue(this PropertyInfo Prop,object data,object vData)
-        {
-            if (Check.IsNull(Prop)||Check.IsNull(data))
+            if (Check.IsNull(Prop) || Check.IsNull(data))
             {
                 return;
             }
-            if (Prop.PropertyType==typeof(int))
+            if (Prop.PropertyType == typeof(int))
             {
-                int.TryParse(vData.ToString(),out int value);
-                Prop.SetValue(data,value);
+                int.TryParse(vData.ToString(), out int value);
+                Prop.SetValue(data, value);
             }
             else if (Prop.PropertyType == typeof(float))
             {
@@ -209,7 +116,7 @@ namespace NetCore.ORM.Simple.Common
             else if (Prop.PropertyType == typeof(DateTime))
             {
                 DateTime.TryParse(vData.ToString(), out DateTime value);
-                Prop.SetValue(data,value);
+                Prop.SetValue(data, value);
             }
             else if (Prop.PropertyType == typeof(TimeSpan))
             {
@@ -221,6 +128,39 @@ namespace NetCore.ORM.Simple.Common
                 Guid.TryParse(vData.ToString(), out Guid value);
                 Prop.SetValue(data, value);
             }
+        }
+
+        private static IEnumerable<PropertyInfo> GetPropertyInfos(Type type,Func<IColumn,bool> func,Type ColumnType)
+        {
+            if (Check.IsNull(type))
+            {
+                throw new ArgumentNullException();
+            }
+            if (Check.IsNull(ColumnType))
+            {
+                ColumnType = typeof(ColNameAttribute);
+            }
+            IEnumerable<PropertyInfo> props = type.GetProperties().
+                Where(p => {
+                    bool value = false;
+                    if (p.IsDefined(ColumnType, false) == false)
+                    {
+                        return true;
+                    }
+                    if (p.GetCustomAttribute(ColumnType, false) is IColumn column)
+                    {
+                        if (Check.IsNull(column))
+                        {
+                            throw new Exception("使用自定义特性请继承IColumn!");
+                        }
+                        if (!Check.IsNull(func))
+                        {
+                            value = func.Invoke(column);
+                        }
+                    }
+                    return value;
+                });
+            return props;
         }
 
     }

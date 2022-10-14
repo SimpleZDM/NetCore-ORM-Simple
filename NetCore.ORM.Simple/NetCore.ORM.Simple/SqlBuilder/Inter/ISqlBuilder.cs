@@ -49,5 +49,6 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
         public void GetLastInsert<TData>(QueryEntity sql);
         public  void GetCount(SelectEntity select, QueryEntity entity);
+        public  void SetAttr(Type Table = null, Type Column = null);
     }
 }

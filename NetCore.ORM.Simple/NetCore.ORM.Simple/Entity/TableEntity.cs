@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using NetCore.ORM.Simple.Common;
@@ -24,6 +25,9 @@ namespace NetCore.ORM.Simple.Entity
         /// </summary>
         public Dictionary<string,NameEntity> DicTable { get { return dicTable; } private set { dicTable = value; } }
         public string[] TableNames { get { return tableNames; } private set { tableNames = value; } }
+
+        public Type TableAtrr { get { return tableAtrr; } private set { tableAtrr = value; } }
+        public Type ColumnAttr { get { return columnAttr; } private set { columnAttr = value; } }
 
         public TableEntity(params Type[] types)
         {
@@ -54,7 +58,7 @@ namespace NetCore.ORM.Simple.Entity
             } 
             var newEity = new NameEntity()
                 {
-                    DisplayNmae=type.GetClassName(),
+                    DisplayNmae=GetTableName(type),
                     ClassType=type,
                 };
             if (DicTable.ContainsKey(newEity.DisplayNmae))
@@ -70,5 +74,34 @@ namespace NetCore.ORM.Simple.Entity
             }
             DicTable.Add(TableNames[index],newEity);
         }
+
+        public string GetTableName(Type type)
+        {
+            return type.GetTableName(tableAtrr);
+        }
+        public string GetColName(PropertyInfo Prop)
+        {
+            return Prop.GetColName(columnAttr);
+        }
+
+        public IEnumerable<PropertyInfo> GetNotKeyAndIgnore(Type type)
+        {
+            return type.GetNotKeyAndIgnore(columnAttr);
+        }
+        public IEnumerable<PropertyInfo> GetNoIgnore(Type type)
+        {
+            return type.GetNoIgnore(columnAttr);
+        }
+        public PropertyInfo GetKey(Type type)
+        {
+            return type.GetKey(columnAttr);
+        }
+        public PropertyInfo GetAutoKey(Type type)
+        {
+            return type.GetAutoKey(columnAttr);
+        }
+
+        private Type tableAtrr;
+        private Type columnAttr;
     }
 }

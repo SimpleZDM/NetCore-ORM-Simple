@@ -17,33 +17,141 @@ namespace NetCore.ORM.Simple.Common
 {
     public static class ReflectExtension
     {
-        public static string GetTypeName<T>()
+        public static string GetTypeName<T>(Type t)
         {
             Type type = typeof(T);
-            return type.GetClassName();
+            return type.GetTableName(t);
         }
-        public static string[] GetTypeName<T,T2>() 
+        public static string[] GetTypeName<T,T2>(Type type) 
         {
             string[] names = new string[2];
-            names[0] = GetTypeName<T>();
-            names[2] = GetTypeName<T2>();
+            names[0] = GetTypeName<T>(type);
+            names[2] = GetTypeName<T2>(type);
             return names;
         }
-        public static string[] GetTypeName<T,T2,T3>()
+        public static string[] GetTypeName<T,T2,T3>(Type type)
         {
             string[] names=new string[3];
-            names[0]=GetTypeName<T>();
-            names[1]=GetTypeName<T2>();
-            names[2]=GetTypeName<T3>();
+            names[0]=GetTypeName<T>(type);
+            names[1]=GetTypeName<T2>(type);
+            names[2]=GetTypeName<T3>(type);
             return names;
         }
-        public static string[] GetTypeName<T, T2, T3,T4>()
+        public static string[] GetTypeName<T, T2, T3,T4>(Type type)
         {
             string[] names = new string[4];
-            names[0] = GetTypeName<T>();
-            names[1] = GetTypeName<T2>();
-            names[2] = GetTypeName<T3>();
-            names[3] = GetTypeName<T4>();
+            names[0] = GetTypeName<T>(type);
+            names[1] = GetTypeName<T2>(type);
+            names[2] = GetTypeName<T3>(type);
+            names[3] = GetTypeName<T4>(type);
+            return names;
+        }
+        public static string[] GetTypeName<T, T2, T3, T4,T5>(Type type)
+        {
+            string[] names = new string[5];
+            names[0] = GetTypeName<T>(type);
+            names[1] = GetTypeName<T2>(type);
+            names[2] = GetTypeName<T3>(type);
+            names[3] = GetTypeName<T4>(type);
+            names[4] = GetTypeName<T5>(type);
+            return names;
+        }
+        public static string[] GetTypeName<T, T2, T3, T4, T5,T6>(Type type)
+        {
+            string[] names = new string[6];
+            names[0] = GetTypeName<T>(type);
+            names[1] = GetTypeName<T2>(type);
+            names[2] = GetTypeName<T3>(type);
+            names[3] = GetTypeName<T4>(type);
+            names[4] = GetTypeName<T5>(type);
+            names[5] = GetTypeName<T6>(type);
+            return names;
+        }
+        public static string[] GetTypeName<T, T2, T3, T4, T5, T6,T7>(Type type)
+        {
+            string[] names = new string[7];
+            names[0] = GetTypeName<T>(type);
+            names[1] = GetTypeName<T2>(type);
+            names[2] = GetTypeName<T3>(type);
+            names[3] = GetTypeName<T4>(type);
+            names[4] = GetTypeName<T5>(type);
+            names[5] = GetTypeName<T6>(type);
+            names[6] = GetTypeName<T7>(type);
+            return names;
+        }
+        public static string[] GetTypeName<T, T2, T3, T4, T5, T6, T7,T8>(Type type)
+        {
+            string[] names = new string[8];
+            names[0] = GetTypeName<T>(type);
+            names[1] = GetTypeName<T2>(type);
+            names[2] = GetTypeName<T3>(type);
+            names[3] = GetTypeName<T4>(type);
+            names[4] = GetTypeName<T5>(type);
+            names[5] = GetTypeName<T6>(type);
+            names[6] = GetTypeName<T7>(type);
+            names[7] = GetTypeName<T8>(type);
+            return names;
+        }
+        public static string[] GetTypeName<T, T2, T3, T4, T5, T6, T7, T8,T9>(Type type)
+        {
+            string[] names = new string[9];
+            names[0] = GetTypeName<T>(type);
+            names[1] = GetTypeName<T2>(type);
+            names[2] = GetTypeName<T3>(type);
+            names[3] = GetTypeName<T4>(type);
+            names[4] = GetTypeName<T5>(type);
+            names[5] = GetTypeName<T6>(type);
+            names[6] = GetTypeName<T7>(type);
+            names[7] = GetTypeName<T8>(type);
+            names[8] = GetTypeName<T9>(type);
+            return names;
+        }
+        public static string[] GetTypeName<T, T2, T3, T4, T5, T6, T7, T8, T9,T10>(Type type)
+        {
+            string[] names = new string[10];
+            names[0] = GetTypeName<T>(type);
+            names[1] = GetTypeName<T2>(type);
+            names[2] = GetTypeName<T3>(type);
+            names[3] = GetTypeName<T4>(type);
+            names[4] = GetTypeName<T5>(type);
+            names[5] = GetTypeName<T6>(type);
+            names[6] = GetTypeName<T7>(type);
+            names[7] = GetTypeName<T8>(type);
+            names[8] = GetTypeName<T9>(type);
+            names[9] = GetTypeName<T10>(type);
+            return names;
+        }
+        public static string[] GetTypeName<T, T2, T3, T4, T5, T6, T7, T8, T9,T10,T11>(Type type)
+        {
+            string[] names = new string[11];
+            names[0] = GetTypeName<T>(type);
+            names[1] = GetTypeName<T2>(type);
+            names[2] = GetTypeName<T3>(type);
+            names[3] = GetTypeName<T4>(type);
+            names[4] = GetTypeName<T5>(type);
+            names[5] = GetTypeName<T6>(type);
+            names[6] = GetTypeName<T7>(type);
+            names[7] = GetTypeName<T8>(type);
+            names[8] = GetTypeName<T9>(type);
+            names[9] = GetTypeName<T10>(type);
+            names[10] = GetTypeName<T11>(type);
+            return names;
+        }
+        public static string[] GetTypeName<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11,T12>(Type type)
+        {
+            string[] names = new string[11];
+            names[0] = GetTypeName<T>(type);
+            names[1] = GetTypeName<T2>(type);
+            names[2] = GetTypeName<T3>(type);
+            names[3] = GetTypeName<T4>(type);
+            names[4] = GetTypeName<T5>(type);
+            names[5] = GetTypeName<T6>(type);
+            names[6] = GetTypeName<T7>(type);
+            names[7] = GetTypeName<T8>(type);
+            names[8] = GetTypeName<T9>(type);
+            names[9] = GetTypeName<T10>(type);
+            names[10] = GetTypeName<T11>(type);
+            names[11] = GetTypeName<T12>(type);
             return names;
         }
 

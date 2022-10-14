@@ -71,15 +71,26 @@ namespace NetCore.ORM.Simple.Client
         
         public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Queryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, JoinInfoEntity>> expression) where T1 : class;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public Task<int> SaveChangeAsync();
+
+        public int SaveChange();
 
         public void SetAPOLog(Action<string,DbParameter[]> action);
 
-        public List<T1> GetEntity<T, T1>(T t, Expression<Func<T, T1>> expression);
+        public void BeginTransaction();
+
+        public  Task BeginTransactionAsync();
+
+        public void Commit();
+
+        public  Task CommitAsync();
+
+
+        public void RollBack();
+
+        public  Task RollBackAsync();
+
+        //public List<T1> GetEntity<T, T1>(T t, Expression<Func<T, T1>> expression);
 
         //public List<T2> GetEntity<T, T1, T2>(T t, Expression<Func<T, T1>> expression, Expression<Func<T1, T2>> expression1);
 

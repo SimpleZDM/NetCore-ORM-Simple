@@ -7,27 +7,27 @@ using System.Text;
 using System.Threading.Tasks;
 
 /*********************************************************
- * 命名空间 NetCore.ORM.Simple.ConsoleApp.Test
- * 接口名称 SimpleTest
+ * 命名空间 NetCore.ORM.Simple.ConsoleApp
+ * 接口名称 SimpleSqlServiceTest
  * 开发人员：-nhy
- * 创建时间：2022/10/8 16:38:58
+ * 创建时间：2022/10/13 11:07:55
  * 描述说明：
  * 更改历史：
  * 
  * *******************************************************/
 namespace NetCore.ORM.Simple.ConsoleApp
 {
-    public class SimpleMysqlTest
+    public class SimpleSqlServiceTest
     {
         ISimpleClient client;
-        public SimpleMysqlTest()
+        public SimpleSqlServiceTest()
         {
             client = new SimpleClient(
           new DataBaseConfiguration(false,
-          new ConnectionEntity("server=localhost;database=testdb;user=root;pwd=123456;Allow Zero Datetime=true;Convert Zero Datetime=True;")
+          new ConnectionEntity("Data Source = localhost;Initial Catalog = testdb;User Id = sa;Password = 123456;")
           {
               IsAutoClose = true,
-              DBType = eDBType.Mysql,
+              DBType = eDBType.SqlService,
               Name = "test1",
               ReadWeight = 5,
               WriteReadType = eWriteOrReadType.ReadOrWrite
@@ -38,7 +38,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 Console.WriteLine(sql);
             });
 
-           // var data=client.Queryable<MatchLog>().Take(10).ToList();
+            // var data=client.Queryable<MatchLog>().Take(10).ToList();
         }
         /// <summary>
         /// 添加测试
@@ -51,7 +51,9 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 Console.WriteLine("****************1.单条插入*****************");
                 UserEntity user = new UserEntity();
                 user.Name = "test1-小明";
-                var result = client.Insert(user);
+                user.Description = "sdf";
+                user.gIdColumn = Guid.NewGuid();
+                var result = client.Insert(user).SaveChange();
                 Console.WriteLine($"*****************受影响行数:{result}****************");
 
                 Console.WriteLine("****************2.多条插入*****************");
@@ -60,9 +62,9 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 const int Lenght = 100;
                 for (int i = 0; i < Lenght; i++)
                 {
-                    users.Add(new UserEntity() { Name=$"测试添加{i}",Age=100,RoleId=1,CompanyId=1,Description="测试"});
+                    users.Add(new UserEntity() { Name = $"测试添加{i}", Age = 100, RoleId = 1, CompanyId = 1, Description = "测试" });
                 }
-                var result1 = client.Insert(users);
+                var result1 = client.Insert(users).SaveChange();
                 client.SaveChange();
                 Console.WriteLine($"*****************受影响行数:{result1}****************");
                 Console.WriteLine("****************测试结束*****************");
@@ -114,32 +116,32 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 Console.WriteLine("****************删除测试*****************");
                 Console.WriteLine("****************1.单条删除*****************");
                 var users = client.Queryable<UserEntity>().Take(100).ToList().ToArray();
-                 var result = client.Delete(users[0]).SaveChange();
+                var result = client.Delete(users[0]).SaveChange();
                 int id = 1503;
-                UserEntity user=users[3];
+                UserEntity user = users[3];
                 user.IDDD = user.Id;
-                Dictionary<string,UserEntity> duser=new Dictionary<string, UserEntity>();
-                duser.Add("1",users[4]);
+                Dictionary<string, UserEntity> duser = new Dictionary<string, UserEntity>();
+                duser.Add("1", users[4]);
                 //var result0 = client.Delete<UserEntity>(d => d.Id.Equals(1503)).SaveChange();
                 // var result1 = client.Delete<UserEntity>(d => d.Id.Equals(id)).SaveChange();
                 //var result2 = client.Delete<UserEntity>(d => d.Id.Equals(user.Id)).SaveChange();
-                var result14= client.Delete<UserEntity>(d => d.Id.Equals(duser["1"].Id)).SaveChange();
-                var result13= client.Delete<UserEntity>(d => d.Id.Equals(users[3].IDDD)).SaveChange();
+                var result14 = client.Delete<UserEntity>(d => d.Id.Equals(duser["1"].Id)).SaveChange();
+                var result13 = client.Delete<UserEntity>(d => d.Id.Equals(users[3].IDDD)).SaveChange();
                 var result15 = client.Delete<UserEntity>(d => d.Id.Equals(user.IDDD)).SaveChange();
 
                 client.SaveChange();
-                
+
                 Console.WriteLine($"*****************受影响行数:{result}****************");
-               // Console.WriteLine($"*****************受影响行数:{result1}****************");
+                // Console.WriteLine($"*****************受影响行数:{result1}****************");
 
                 Console.WriteLine("****************2.多条删除*****************");
                 Console.WriteLine($"*****************删除100条****************");
-                
+
                 //删除多个数据
                 //var result2 = client.Delete(users[0]).SaveChange();
-               // var result3 = client.Delete<UserEntity>(d=>d.Id.Equals(10)).SaveChange();
+                // var result3 = client.Delete<UserEntity>(d=>d.Id.Equals(10)).SaveChange();
                 //Console.WriteLine($"*****************受影响行数:{result1}****************");
-               // Console.WriteLine($"*****************受影响行数:{result2}****************");
+                // Console.WriteLine($"*****************受影响行数:{result2}****************");
                 Console.WriteLine("****************测试结束*****************");
             }
             catch (Exception ex)
@@ -154,10 +156,10 @@ namespace NetCore.ORM.Simple.ConsoleApp
             {
                 Console.WriteLine("****************查询测试*****************");
                 Console.WriteLine("****************1.简单单表查询*****************");
-                ///返回所有
+                /// 返回所有
                 List<UserEntity> users = client.Queryable<UserEntity>().ToList();
                 UserEntity user = client.Queryable<UserEntity>().FirstOrDefault();
-                ///数据的条数
+                // 数据的条数
                 int count = client.Queryable<UserEntity>().Count();
                 //是否存在
                 bool any = client.Queryable<UserEntity>().Any();
@@ -172,12 +174,13 @@ namespace NetCore.ORM.Simple.ConsoleApp
                     Select(u => new { Name = u.Name, Id = u.Id }).ToList();
                 //加条件
                 int min = 1746;
-                int max = 19999;
+                int max = 1756;
                 var data1 = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).ToList();
                 //分组
                 var group = client.Queryable<UserEntity>().
                     Where(user => user.Id > min && user.Id <= max).
-                    GroupBy(u => new { u.CompanyId }).Where(u=>u.Id>100).ToList();
+                    GroupBy(u => new { u.Name }).
+                    Select(u => new { Name=u.Key.Name }).ToList();
                 //排序
                 var order = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderBy(u => new { u.Id }).ToList();
                 var orderDesce = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderByDescending(u => new { u.Id }).ToList();
@@ -204,16 +207,16 @@ namespace NetCore.ORM.Simple.ConsoleApp
                    Select((u, r, c) => new
                    {
                        UserName = u.Name,
-                       CompanyName =c.CompanyName,
+                       CompanyName = c.CompanyName,
                        RoleName = r.DisplayName,
-                       Id=u.Id
+                       Id = u.Id
                    });
 
-                JoinData1.Where(s =>s.Id>10);
+                JoinData1.Where(s => s.Id > 10);
 
-                JoinData1.Where(s => s.Id>100 && s.Id>1000);
+                JoinData1.Where(s => s.Id > 100 && s.Id > 1000);
 
-                JoinData1.Where(s => true);
+                JoinData1.Where(s => 1==1);
 
                 var data111 = JoinData1.ToList();
                 /////连接查询分组
@@ -221,28 +224,29 @@ namespace NetCore.ORM.Simple.ConsoleApp
                   new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
                   new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
                   )).
-                  Where((u, r, c) => u.Id > 10).Select((u,r,c)=>
-                  new ViewEntity {
-                      UserName=u.Name,
-                      CompanyId=c.Id,
-                      CompanyName=c.CompanyName,
-                      RoleId=r.Id
+                  Where((u, r, c) => u.Id > 10).Select((u, r, c) =>
+                  new ViewEntity
+                  {
+                      UserName = u.Name,
+                      CompanyId = c.Id,
+                      CompanyName = c.CompanyName,
+                      RoleId = r.Id
                   }
                   ).
-                  GroupBy(v=>v.RoleId).
-                  Select((v) =>new GroupEntity()
+                  GroupBy(v =>new{ v.RoleId,v.UserName}).
+                  Select((v) => new GroupEntity()
                   {
-                      Count=v.Count(),
-                      FirstOrDefaultName=v.FirstOrDefault(s=>s.UserName),
-                      Max=v.Max(s=>s.RoleId)
+                      Count = v.Count(),
+                      FirstOrDefaultName = v.FirstOrDefault(s => s.UserName),
+                      Max = v.Max(s => s.RoleId)
                   }).ToList();
 
-                var orderBy= client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) => new JoinInfoEntity(
+                var orderBy = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) => new JoinInfoEntity(
                    new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
                    new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
                    )).
                    Where((u, r, c) => u.Id > 10).
-                   Select((u, r, c) => new { UserName = u.Name, CompanyName = c.CompanyName, RoleName = r.DisplayName,Id=u.Id }).OrderBy(u=>u.Id).ToList();
+                   Select((u, r, c) => new { UserName = u.Name, CompanyName = c.CompanyName, RoleName = r.DisplayName, Id = u.Id }).OrderBy(u => u.Id).ToList();
                 //Console.WriteLine($"*****************受影响行数:{result1}****************");
                 // Console.WriteLine($"*****************受影响行数:{result2}****************");
                 Console.WriteLine("****************测试结束*****************");

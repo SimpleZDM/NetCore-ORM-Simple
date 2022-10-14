@@ -23,18 +23,29 @@ namespace NetCore.ORM.Simple.Entity
         {
             StrSqlValue = new StringBuilder();
             DyToMap = new List<dynamic>();
-            PageSize = -1;
-            PageNumber = -1;
+            PageSize =0;
+            PageNumber =1;
         }
      
         /// <summary>
         /// 取出的数据
         /// </summary>
-        public int PageNumber { get { return pageNumber; } set { pageNumber = value; } }
+        public int PageNumber { get { return pageNumber; } set {
+                if (value< 1)
+                {
+                    throw new ArgumentException("页码不能小于一!");
+                }
+                pageNumber = value; } }
         /// <summary>
         /// 跳过的数据
         /// </summary>
-        public int PageSize { get { return pageSize; } set { pageSize = value; } }
+        public int PageSize { get { return pageSize; } set 
+            {
+                if (pageSize<0)
+                {
+                    throw new ArgumentException("每页大小不能小于!");
+                }
+                pageSize = value; } }
 
 
         /// <summary>

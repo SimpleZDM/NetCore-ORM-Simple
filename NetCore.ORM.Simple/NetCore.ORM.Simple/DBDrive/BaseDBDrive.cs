@@ -28,6 +28,8 @@ namespace NetCore.ORM.Simple
         protected DataBaseConfiguration configuration;
         protected DbTransaction transaction;
         protected DbCommand command;
+        protected Type tableAtrr;
+        protected Type columnAttr;
 
         public string ConnectStr
         {
@@ -155,7 +157,7 @@ namespace NetCore.ORM.Simple
             Dictionary<string, PropertyInfo> PropsMapNames = new Dictionary<string, PropertyInfo>();
             foreach (var item in Props)
             {
-                PropsMapNames.Add(item.GetColName(), item);
+                PropsMapNames.Add(GetColName(item), item);
             }
             return PropsMapNames;
         }
@@ -173,9 +175,9 @@ namespace NetCore.ORM.Simple
             }
             Type type = typeof(TResult);
             Dictionary<string, PropertyInfo> MapProps = new Dictionary<string, PropertyInfo>();
-            foreach (var item in type.GetNoIgnore())
+            foreach (var item in GetNoIgnore(type))
             {
-                string name = item.GetColName();
+                string name = GetColName(item);
                 if (!MapProps.ContainsKey(name))
                 {
                     MapProps.Add(name, item);
@@ -420,5 +422,37 @@ namespace NetCore.ORM.Simple
                 connection.Close();
             }
         }
+
+        protected string GetTableName(Type type)
+        {
+            return type.GetTableName(tableAtrr);
+        }
+        protected string GetColName(PropertyInfo Prop)
+        {
+            return Prop.GetColName(columnAttr);
+        }
+
+        protected IEnumerable<PropertyInfo> GetNotKeyAndIgnore(Type type)
+        {
+            return type.GetNotKeyAndIgnore(columnAttr);
+        }
+        protected IEnumerable<PropertyInfo> GetNoIgnore(Type type)
+        {
+            return type.GetNoIgnore(columnAttr);
+        }
+        protected PropertyInfo GetKey(Type type)
+        {
+            return type.GetKey(columnAttr);
+        }
+        protected PropertyInfo GetAutoKey(Type type)
+        {
+            return type.GetAutoKey(columnAttr);
+        }
+        public virtual void SetAttr(Type Table = null, Type Column = null)
+        {
+            tableAtrr = Table;
+            columnAttr = Column;
+        }
+
     }
 }

@@ -43,6 +43,14 @@ namespace NetCore.ORM.Simple.SqlBuilder
             }
         }
 
+        public void SetAttr(Type Table = null, Type Column = null)
+        {
+            MatchDBType(
+                () => { mysqlBuilder.SetAttr(Table, Column); }, 
+                () => { sqlServiceBuilder.SetAttr(Table, Column); }, 
+                () => { sqliteBuilder.SetAttr(Table, Column); }
+                 );
+        }
         public SqlCommandEntity GetInsert<TData>(TData data, int random = 0)
         {
             return MatchDBType(

@@ -22,7 +22,7 @@ namespace NetCore.ORM.Simple.Queryable
     public class SimpleQueryable<T>
         :QueryResult<T>,ISimpleQueryable<T> where T : class
     {
-        public SimpleQueryable(ISqlBuilder builder,IDBDrive dbDrive)
+        public SimpleQueryable(ISqlBuilder builder,IDBDrive dbDrive,Type Table, Type Column)
         {
             Type tableName=ReflectExtension.GetType<T>();
             Init(builder,dbDrive,tableName);

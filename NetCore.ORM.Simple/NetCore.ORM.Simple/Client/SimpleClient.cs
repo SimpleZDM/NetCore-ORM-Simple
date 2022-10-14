@@ -46,6 +46,8 @@ namespace NetCore.ORM.Simple.Client
         /// </summary>
        
         private IDBDrive dbDrive;
+        private Type TableAttr;
+        private Type ColumnAttr;
         /// <summary>
         /// 更新或者插入数据的量
         /// </summary>
@@ -67,6 +69,15 @@ namespace NetCore.ORM.Simple.Client
         public void SetAPOLog(Action<string,DbParameter[]> action)
         {
             dbDrive.AOPSqlLog = action;
+        }
+
+        public void SetAttr(Type Table=null,Type Column=null)
+        {
+            builder.SetAttr(Table, Column);
+            dbDrive.SetAttr(Table, Column);
+            TableAttr = Table;
+            ColumnAttr= Column;
+
         }
 
         #region 执行部分
@@ -126,51 +137,51 @@ namespace NetCore.ORM.Simple.Client
         #region 查询部分
         public ISimpleQueryable<T1> Queryable<T1>()where T1:class,new()
         {
-            return new SimpleQueryable<T1>(builder,dbDrive);
+            return new SimpleQueryable<T1>(builder,dbDrive,TableAttr,ColumnAttr);
         }
         public ISimpleQueryable<T1,T2> Queryable<T1,T2>(Expression<Func<T1,T2,JoinInfoEntity>> expression) where T1 : class
         {
-            return new SimpleQueryable<T1,T2>(expression,builder,dbDrive);
+            return new SimpleQueryable<T1,T2>(expression,builder,dbDrive,TableAttr, ColumnAttr);
         }
         public ISimpleQueryable<T1, T2,T3> Queryable<T1,T2,T3>(Expression<Func<T1,T2,T3,JoinInfoEntity>> expression) where T1 : class
         {
-            return new SimpleQueryable<T1, T2,T3>(expression,builder,dbDrive);
+            return new SimpleQueryable<T1, T2,T3>(expression,builder,dbDrive,TableAttr, ColumnAttr);
         }
         public ISimpleQueryable<T1,T2,T3,T4> Queryable<T1,T2,T3,T4>(Expression<Func<T1,T2,T3,T4,JoinInfoEntity>> expression) where T1 : class
         {
-            return new SimpleQueryable<T1,T2,T3,T4>(expression,builder,dbDrive);
+            return new SimpleQueryable<T1,T2,T3,T4>(expression,builder,dbDrive,TableAttr, ColumnAttr);
         }
         public ISimpleQueryable<T1, T2, T3, T4,T5> Queryable<T1, T2, T3, T4,T5>(Expression<Func<T1, T2, T3, T4,T5, JoinInfoEntity>> expression) where T1 : class
         {
-            return new SimpleQueryable<T1, T2, T3, T4,T5>(expression, builder, dbDrive);
+            return new SimpleQueryable<T1, T2, T3, T4,T5>(expression, builder, dbDrive,TableAttr, ColumnAttr);
         }
         public ISimpleQueryable<T1, T2, T3, T4, T5,T6> Queryable<T1, T2, T3, T4, T5,T6>(Expression<Func<T1, T2, T3, T4, T5,T6, JoinInfoEntity>> expression) where T1 : class
         {
-            return new SimpleQueryable<T1, T2, T3, T4, T5,T6>(expression, builder, dbDrive);
+            return new SimpleQueryable<T1, T2, T3, T4, T5,T6>(expression, builder, dbDrive, TableAttr, ColumnAttr);
         }
         public ISimpleQueryable<T1, T2, T3, T4, T5, T6,T7> Queryable<T1, T2, T3, T4, T5, T6,T7>(Expression<Func<T1, T2, T3, T4, T5,T6,T7, JoinInfoEntity>> expression) where T1 : class
         {
-            return new SimpleQueryable<T1, T2, T3, T4, T5, T6,T7>(expression, builder, dbDrive);
+            return new SimpleQueryable<T1, T2, T3, T4, T5, T6,T7>(expression, builder, dbDrive, TableAttr, ColumnAttr);
         }
         public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7,T8> Queryable<T1, T2, T3, T4, T5, T6, T7,T8>(Expression<Func<T1, T2, T3, T4, T5, T6, T7,T8, JoinInfoEntity>> expression) where T1 : class
         {
-            return new SimpleQueryable<T1, T2, T3, T4, T5, T6, T7,T8>(expression, builder, dbDrive);
+            return new SimpleQueryable<T1, T2, T3, T4, T5, T6, T7,T8>(expression, builder, dbDrive,TableAttr, ColumnAttr);
         }
         public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8,T9> Queryable<T1, T2, T3, T4, T5, T6, T7, T8,T9>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8,T9, JoinInfoEntity>> expression) where T1 : class
         {
-            return new SimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8,T9>(expression, builder, dbDrive);
+            return new SimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8,T9>(expression, builder, dbDrive, TableAttr, ColumnAttr);
         }
         public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9,T10> Queryable<T1, T2, T3, T4, T5, T6, T7, T8, T9,T10>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9,T10, JoinInfoEntity>> expression) where T1 : class
         {
-            return new SimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9,T10>(expression, builder, dbDrive);
+            return new SimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9,T10>(expression, builder, dbDrive, TableAttr, ColumnAttr);
         }
         public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11> Queryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11, JoinInfoEntity>> expression) where T1 : class
         {
-            return new SimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11>(expression, builder, dbDrive);
+            return new SimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11>(expression, builder, dbDrive, TableAttr, ColumnAttr);
         }
         public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11,T12> Queryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11,T12>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11,T12, JoinInfoEntity>> expression) where T1 : class
         {
-            return new SimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11,T12>(expression, builder, dbDrive);
+            return new SimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11,T12>(expression, builder, dbDrive, TableAttr, ColumnAttr);
         }
 
         #endregion
@@ -194,6 +205,31 @@ namespace NetCore.ORM.Simple.Client
             changeOffset = 0;
             return result;
         }
+        public void BeginTransaction()
+        {
+            dbDrive.BeginTransaction();
+        }
+        public async Task BeginTransactionAsync()
+        {
+            await dbDrive.BeginTransactionAsync();
+        }
+        public void Commit()
+        {
+           dbDrive.Commit();
+        }
+        public async Task CommitAsync()
+        {
+            await dbDrive.CommitAsync();
+        }
+
+        public void RollBack()
+        {
+            dbDrive.RollBack();
+        }
+        public async Task RollBackAsync()
+        {
+           await dbDrive.RollBackAsync();
+        }
 
         //public List<T2> GetEntity<T, T1, T2>(T t, Expression<Func<T, T1>> expression, Expression<Func<T1, T2>> expression1)
         //{
@@ -211,19 +247,19 @@ namespace NetCore.ORM.Simple.Client
 
         //    return result;
         //}
-        public List<T1> GetEntity<T,T1>(T t, Expression<Func<T, T1>> expression)
-        {
-            var result = new List<T1>();
-            T1 t1 = (T1)expression.Compile().Invoke(t);
-            dynamic[] dys = new dynamic[] { expression.Compile()};
-            for (int i = 0; i < 100000; i++)
-            {
-                var t11 = dys[0].Invoke(t);
-            }
-            result.Add(t1);
+        //public List<T1> GetEntity<T,T1>(T t, Expression<Func<T, T1>> expression)
+        //{
+        //    var result = new List<T1>();
+        //    T1 t1 = (T1)expression.Compile().Invoke(t);
+        //    dynamic[] dys = new dynamic[] { expression.Compile()};
+        //    for (int i = 0; i < 100000; i++)
+        //    {
+        //        var t11 = dys[0].Invoke(t);
+        //    }
+        //    result.Add(t1);
 
-            return result;
-        }
+        //    return result;
+        //}
 
         //public List<T> GetEntity<T>(Dictionary<string,object>data)
         //{

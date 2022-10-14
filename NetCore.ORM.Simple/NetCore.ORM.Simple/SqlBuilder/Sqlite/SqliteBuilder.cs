@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 /*********************************************************
- * 命名空间 NetCore.ORM.Simple.SqlBuilder.Sqlite
+ * 命名空间 NetCore.ORM.Simple.SqlBuilder
  * 接口名称 SqliteBuilder
  * 开发人员：-nhy
  * 创建时间：2022/10/11 15:10:21
@@ -27,7 +27,28 @@ namespace NetCore.ORM.Simple.SqlBuilder
         }
         public override SqlCommandEntity GetInsert<TData>(TData data, int random)
         {
-            return base.GetInsert(data, random);
+            SqlCommandEntity sql = new SqlCommandEntity();
+            Type type = typeof(TData);
+            var Props = GetNotKeyAndIgnore(type).ToArray();
+
+            sql.StrSqlValue.Append($"{MainWordType.Insert.GetMainWordStr()} {MainWordType.Into.GetMainWordStr()} `{GetTableName(type)}` ");
+            sql.StrSqlValue.Append("(");
+            sql.StrSqlValue.Append(string.Join(',', Props.Select(p => $"`{GetColName(p)}`")));
+            sql.StrSqlValue.Append(") ");
+            sql.StrSqlValue.Append($" {MainWordType.Values.GetMainWordStr()}(");
+            sql.StrSqlValue.Append(string.Join(',',
+                Props.Select(p =>
+                {
+                    string key = $"{MainWordType.AT.GetMainWordStr()}{random}{GetColName(p)}";
+
+                    sql.AddParameter(DbType, key, p.GetValue(data));
+                    return key;
+                })));
+            sql.StrSqlValue.Append(");");
+
+            sql.DbCommandType = eDbCommandType.Insert;
+
+            return sql;
         }
 
         public override SqlCommandEntity GetUpdate<TData>(TData data, int random)
@@ -41,7 +62,50 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
         public override SqlCommandEntity GetInsert<TData>(List<TData> datas, int offset)
         {
-            return base.GetUpdate(datas, offset);
+            SqlCommandEntity sql = new SqlCommandEntity();
+            Type type = typeof(TData);
+            var Props = GetNotKeyAndIgnore(type);
+            int count = 0;
+            int Index = 0;
+            foreach (var data in datas)
+            {
+                if (count == 0)
+                {
+                    sql.StrSqlValue.Append($"{MainWordType.Insert.GetMainWordStr()} {MainWordType.Into.GetMainWordStr()} `{GetTableName(type)}` ");
+                    sql.StrSqlValue.Append("(");
+                    sql.StrSqlValue.Append(string.Join(',', Props.Select(p => $"`{GetColName(p)}`")));
+                    sql.StrSqlValue.Append(") ");
+                    sql.StrSqlValue.Append($" {MainWordType.Values.GetMainWordStr()}");
+                }
+                Index++;
+                count++;
+                sql.StrSqlValue.Append(" (");
+                sql.StrSqlValue.Append(string.Join(',',
+                  Props.Select(p =>
+                  {
+                      string key = $"{MainWordType.AT.GetMainWordStr()}{Index + offset}{charConnectSign}{GetColName(p)}";
+                      sql.AddParameter(DbType, key, p.GetValue(data));
+                      return key;
+                  })));
+                sql.StrSqlValue.Append(" )");
+                if (count == MysqlConst.INSERTMAX)
+                {
+                    sql.StrSqlValue.Append(";");
+                    count = 0;
+                }
+                else
+                {
+                    if (Index == datas.Count())
+                    {
+                        sql.StrSqlValue.Append(";");
+                    }
+                    else
+                    {
+                        sql.StrSqlValue.Append(",");
+                    }
+                }
+            }
+            return sql;
         }
         public override void GetSelect<TData>(QueryEntity sql)
         {
@@ -69,8 +133,13 @@ namespace NetCore.ORM.Simple.SqlBuilder
             }
             Type type = typeof(TData);
             GetSelect(sql, type);
-            var Key = type.GetKey();
-            sql.StrSqlValue.Append($" Where {Key.GetColName()}=LAST_INSERT_ROWID();");
+            var Key =GetAutoKey(type);
+            if (Check.IsNull(Key))
+            {
+                throw new Exception("");
+            }
+            string TableName = GetTableName(type);
+            sql.StrSqlValue.Append($" {MainWordType.Where.GetMainWordStr()} {GetColName(Key)}=({MainWordType.Select.GetMainWordStr()} Id {MainWordType.From.GetMainWordStr()} sqlite_sequence {MainWordType.Where.GetMainWordStr()} name='{TableName}');");
         }
 
         /// <summary>
@@ -89,6 +158,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
             OrderBy(select.OrderInfos, entity);
 
             SetPageList(entity);
+
+            entity.StrSqlValue.Append(" ;");
         }
 
         public override void GetCount(SelectEntity select, QueryEntity entity)
@@ -98,6 +169,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
             GroupBy(select.OrderInfos, entity);
 
             SetPageList(entity);
+
+            entity.StrSqlValue.Append(" ;");
         }
 
         /// <summary>
@@ -134,9 +207,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 return;
             }
-            sqlEntity.StrSqlValue.Append(" Limit @SkipNumber,@TakeNumber");
-            sqlEntity.AddParameter(DbType, "@SkipNumber", (sqlEntity.PageNumber - 1) * sqlEntity.PageSize);
-            sqlEntity.AddParameter(DbType, "@TakeNumber", sqlEntity.PageSize);
+            sqlEntity.StrSqlValue.Append($" {MainWordType.Limit.GetMainWordStr()} {MainWordType.AT.GetMainWordStr()}{MainWordType.TakeNumber.GetMainWordStr()} {MainWordType.Offset.GetMainWordStr()} {MainWordType.AT.GetMainWordStr()}{MainWordType.SkipNumber.GetMainWordStr()}");
+            sqlEntity.AddParameter(DbType, $"{MainWordType.AT.GetMainWordStr()}{MainWordType.SkipNumber.GetMainWordStr()}", (sqlEntity.PageNumber - 1) * sqlEntity.PageSize);
+            sqlEntity.AddParameter(DbType, $"{MainWordType.AT.GetMainWordStr()}{MainWordType.TakeNumber.GetMainWordStr()}", sqlEntity.PageSize);
 
         }
         /// <summary>
@@ -147,7 +220,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         {
             if (!Check.IsNull(OrderByInfos) && OrderByInfos.Where(o => o.IsOrderBy).Any())
             {
-                entity.StrSqlValue.Append(" Order By ");
+                entity.StrSqlValue.Append($" {MainWordType.Order.GetMainWordStr()} {MainWordType.By.GetMainWordStr()} ");
                 entity.StrSqlValue.Append(string.Join(',', OrderByInfos.Where(o => o.IsOrderBy).OrderBy(o => o.OrderSoft).Select(o => $"{o.TableName}.{o.ColumnName} {MysqlConst.AscendOrDescend(o.OrderType)}")));
                 entity.StrSqlValue.Append(" ");
             }
@@ -161,7 +234,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         {
             if (!Check.IsNull(OrderByInfos) && OrderByInfos.Where(g => g.IsGroupBy).Any())
             {
-                entity.StrSqlValue.Append(" Group By ");
+                entity.StrSqlValue.Append($" {MainWordType.Group.GetMainWordStr()} {MainWordType.By.GetMainWordStr()} ");
                 entity.StrSqlValue.Append(string.Join(',', OrderByInfos.Where(g => g.IsGroupBy).OrderBy(g => g.GroupSoft).Select(g => $"{g.TableName}.{g.ColumnName}")));
                 entity.StrSqlValue.Append(" ");
             }
@@ -171,18 +244,22 @@ namespace NetCore.ORM.Simple.SqlBuilder
         protected override void Update<TEntity>(SqlCommandEntity sql, string keyName, string tableName, PropertyInfo pKey, TEntity data, IEnumerable<PropertyInfo> Props, int index)
         {
             sql.AddParameter(DbType, $"{keyName}{index}", pKey.GetValue(data));
-            sql.StrSqlValue.Append($"UPDATE `{tableName}` SET ");
+            sql.StrSqlValue.Append($"{MainWordType.Update.GetMainWordStr()} `{tableName}` {MainWordType.Set.GetMainWordStr()} ");
             sql.StrSqlValue.Append(string.Join(',',
             Props.Select(p =>
             {
-                string colName = $"{p.GetColName()}";
-                sql.AddParameter(DbType, $"@{colName}{index}", p.GetValue(data));
-                return $"`{colName}`=@{colName}{index}";
+                string colName = $"{GetColName(p)}";
+                sql.AddParameter(DbType, $"{MainWordType.AT.GetMainWordStr()}{colName}{index}", p.GetValue(data));
+                return $"`{colName}`={MainWordType.AT.GetMainWordStr()}{colName}{index}";
             })));
-            sql.StrSqlValue.Append(" Where ");
-            sql.StrSqlValue.Append($"{pKey.GetColName()}={keyName}{index}");
+            sql.StrSqlValue.Append($" {MainWordType.Where.GetMainWordStr()} ");
+            sql.StrSqlValue.Append($"{GetColName(pKey)}={keyName}{index}");
             sql.StrSqlValue.Append(";");
         }
 
+        public override void SetAttr(Type Table = null, Type Column = null)
+        {
+            base.SetAttr(Table, Column);
+        }
     }
 }

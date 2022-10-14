@@ -47,6 +47,8 @@ namespace NetCore.ORM.Simple.Visitor
         /// 匿名类标记
         /// </summary>
         private bool isAnonymity;
+
+       
         public MapVisitor(TableEntity table, List<MapEntity> MapInfos)
         {
             if (Check.IsNull(table))
@@ -57,27 +59,27 @@ namespace NetCore.ORM.Simple.Visitor
             currentTables = new Dictionary<string, int>();
             mapInfos = MapInfos;
             Type type = table.DicTable[table.TableNames[0]].ClassType;
-            PropertyInfo PropKey = type.GetKey();
+            PropertyInfo PropKey =Table.GetKey(type);
             mapInfos.Add(new MapEntity()
             {
                 TableName = table.TableNames[0],
-                ColumnName=PropKey.GetColName(),
-                PropName= PropKey.GetColName(),
+                ColumnName= Table.GetColName(PropKey),
+                PropName= Table.GetColName(PropKey),
                 IsKey=true,
-                LastPropName=PropKey.GetColName(),
-                ClassName= type.GetClassName(),
+                LastPropName=Table.GetColName(PropKey),
+                ClassName= Table.GetTableName(type),
                 EntityType = type,
             });
-            foreach (var item in type.GetNotKeyAndIgnore())
+            foreach (var item in Table.GetNotKeyAndIgnore(type))
             {
                 mapInfos.Add(new MapEntity()
                 {
                     TableName = table.TableNames[0],
-                    ColumnName = item.GetColName(),
-                    PropName=item.GetColName(),
+                    ColumnName = Table.GetColName(item),
+                    PropName= Table.GetColName(item),
                     IsKey=false,
-                    LastPropName=item.GetColName(),
-                    ClassName = type.GetClassName(),
+                    LastPropName= Table.GetColName(item),
+                    ClassName = Table.GetTableName(type),
                     EntityType = type,
                 });
             }
@@ -87,17 +89,6 @@ namespace NetCore.ORM.Simple.Visitor
         public List<MapEntity> GetMapInfos()
         {
             return mapInfos;
-        }
-        public string GetValue()
-        {
-            StringBuilder value = new StringBuilder();
-            //int length = qValue.Count();
-            //for (int i = 0; i < length; i++)
-            //{
-            //    value.Append($" `{qValue.Dequeue()}` ");
-            //}
-            //Console.WriteLine(value.ToString());
-            return value.ToString();
         }
         /// <summary>
         /// 修改表达式树的形式
@@ -274,7 +265,6 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            //qValue.Enqueue(node.Value.ToString());
             return base.VisitConstant(node);
         }
 
@@ -344,13 +334,11 @@ namespace NetCore.ORM.Simple.Visitor
 
         protected override Expression VisitListInit(ListInitExpression node)
         {
-            Console.WriteLine(node.ToString());
             return base.VisitListInit(node);
         }
 
         protected override Expression VisitLoop(LoopExpression node)
         {
-            Console.WriteLine(node.ToString());
             return base.VisitLoop(node);
         }
         /// <summary>
@@ -361,9 +349,12 @@ namespace NetCore.ORM.Simple.Visitor
         protected override Expression VisitMember(MemberExpression node)
         {
             base.VisitMember(node);
+            if (node.Member.Name.Equals("Key"))
+            {
+                return node;
+            }
             if (IsAgain)
             {
-
                 currentmapInfo = mapInfos.FirstOrDefault(m => m.PropName.Equals(node.Member.Name));
                 if (!Check.IsNullOrEmpty(CurrentMethodName))
                 {
@@ -378,13 +369,14 @@ namespace NetCore.ORM.Simple.Visitor
             }
             if (currentTables.ContainsKey(node.Expression.ToString()))
             {
+                
                 currentmapInfo = new MapEntity();
                 mapInfos.Add(currentmapInfo);
                 currentmapInfo.ColumnName = node.Member.Name;
                 currentmapInfo.TableName = Table.TableNames[currentTables[node.Expression.ToString()]];
                 currentmapInfo.PropName=node.Member.Name;
                 currentmapInfo.LastPropName=node.Member.Name; 
-                currentmapInfo.ClassName = Table.DicTable[currentmapInfo.TableName].ClassType.GetClassName();
+                currentmapInfo.ClassName = Table.GetTableName(Table.DicTable[currentmapInfo.TableName].ClassType);
                 currentmapInfo.EntityType = Table.DicTable[currentmapInfo.TableName].ClassType;
             }
            
@@ -403,38 +395,7 @@ namespace NetCore.ORM.Simple.Visitor
 
         protected override Expression VisitNewArray(NewArrayExpression node)
         {
-            Console.WriteLine(node.ToString());
             return base.VisitNewArray(node);
-        }
-
-        protected override Expression VisitSwitch(SwitchExpression node)
-        {
-            Console.WriteLine(node.ToString());
-            return base.VisitSwitch(node);
-        }
-
-        protected override Expression VisitTry(TryExpression node)
-        {
-            Console.WriteLine(node.ToString());
-            return base.VisitTry(node);
-        }
-
-        protected override Expression VisitTypeBinary(TypeBinaryExpression node)
-        {
-            Console.WriteLine(node.ToString());
-            return base.VisitTypeBinary(node);
-        }
-
-        protected override CatchBlock VisitCatchBlock(CatchBlock node)
-        {
-            Console.WriteLine(node.ToString());
-            return base.VisitCatchBlock(node);
-        }
-
-        protected override ElementInit VisitElementInit(ElementInit node)
-        {
-            Console.WriteLine(node.ToString());
-            return base.VisitElementInit(node);
         }
 
         /// <summary>
@@ -454,7 +415,6 @@ namespace NetCore.ORM.Simple.Visitor
 
                         mName = $"{Table.TableNames[currentTables[member.Expression.ToString()]]}.{member.Member.Name}";
                     }
-
                 }
                 else
                 {
@@ -468,7 +428,6 @@ namespace NetCore.ORM.Simple.Visitor
             }
             if (node.Right is ConstantExpression constant)
             {
-                // qValue.Enqueue(constant.Value.ToString());
             }
         }
 
@@ -479,16 +438,12 @@ namespace NetCore.ORM.Simple.Visitor
         /// <param name="action"></param>
         private void SingleLogicBinary(BinaryExpression node, Action<Queue<string>> action)
         {
-            //qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.LeftBracket]);
             base.Visit(node.Left);
-            // qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.RightBracket]);
             if (!Check.IsNull(action))
             {
                 action.Invoke(null);
             }
-            // qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.LeftBracket]);
             base.Visit(node.Right);
-            // qValue.Enqueue(SimpleConst.cStrSign[(int)eSignType.RightBracket]);
         }
     }
 }

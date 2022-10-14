@@ -21,14 +21,14 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple
 {
-    public class MysqlDrive : BaseDBDrive,IDBDrive
+    public class MysqlDrive : BaseDBDrive, IDBDrive
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connect"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public MysqlDrive(DataBaseConfiguration cfg):base(cfg)
+        public MysqlDrive(DataBaseConfiguration cfg) : base(cfg)
         {
             connection = new MySqlConnection(configuration.CurrentConnectInfo.ConnectStr);
         }
@@ -162,10 +162,7 @@ namespace NetCore.ORM.Simple
             int current = 0;
             if (sqlCommand.Length == 1)
             {
-                await ExcuteAsync(sqlCommand[0], async (command) =>
-                {
-                    result = await command.ExecuteNonQueryAsync();
-                });
+                result=await ExcuteAsync(sqlCommand[0]);
             }
             else
             {
@@ -194,22 +191,30 @@ namespace NetCore.ORM.Simple
             int result = 0;
             int count = 0;
             int current = 0;
-            for (int i = 1; i < sqlCommand.Length; i++)
+            if (sqlCommand.Length == 1)
             {
-                if (count > MysqlConst.INSERTMAXCOUNT)
-                {
-                    Excute(sqlCommand[current], (command) =>
-                    {
-                        result += command.ExecuteNonQuery();
-                    });
-                    count = 0;
-                    current = i;
-                    i++;
-                }
-                sqlCommand[current].StrSqlValue.Append(sqlCommand[i].StrSqlValue.ToString());
-                sqlCommand[current].DbParams.AddRange(sqlCommand[i].DbParams);
-                count++;
+                result = Excute(sqlCommand[0]);
             }
+            else
+            {
+                for (int i = 1; i < sqlCommand.Length; i++)
+                {
+                    if (count > MysqlConst.INSERTMAXCOUNT)
+                    {
+                        Excute(sqlCommand[current], (command) =>
+                        {
+                            result += command.ExecuteNonQuery();
+                        });
+                        count = 0;
+                        current = i;
+                        i++;
+                    }
+                    sqlCommand[current].StrSqlValue.Append(sqlCommand[i].StrSqlValue.ToString());
+                    sqlCommand[current].DbParams.AddRange(sqlCommand[i].DbParams);
+                    count++;
+                }
+            }
+
             return result;
         }
 
@@ -260,14 +265,14 @@ namespace NetCore.ORM.Simple
             {
                 Open();
             }
-            command = new MySqlCommand(entity.StrSqlValue.ToString(),(MySqlConnection)connection);
+            command = new MySqlCommand(entity.StrSqlValue.ToString(), (MySqlConnection)connection);
             if (!Check.IsNull(entity.DbParams) && entity.DbParams.Count > 0)
             {
                 command.Parameters.AddRange(entity.DbParams.ToArray());
             }
             if (!Check.IsNull(AOPSqlLog))
             {
-                AOPSqlLog.Invoke(entity.StrSqlValue.ToString(),entity.DbParams.ToArray());
+                AOPSqlLog.Invoke(entity.StrSqlValue.ToString(), entity.DbParams.ToArray());
             }
             action((MySqlCommand)command);
             if (configuration.CurrentConnectInfo.IsAutoClose)
@@ -281,7 +286,7 @@ namespace NetCore.ORM.Simple
         {
             await Task.Run(() =>
             {
-                Excute(entity,action);
+                Excute(entity, action);
             });
         }
 
@@ -295,7 +300,7 @@ namespace NetCore.ORM.Simple
             {
                 Open();
             }
-            command = new MySqlCommand(entity.StrSqlValue.ToString(),(MySqlConnection)connection);
+            command = new MySqlCommand(entity.StrSqlValue.ToString(), (MySqlConnection)connection);
             if (!Check.IsNull(entity.DbParams) && entity.DbParams.Count > 0)
             {
                 command.Parameters.AddRange(entity.DbParams.ToArray());
@@ -317,7 +322,7 @@ namespace NetCore.ORM.Simple
         {
             await Task.Run(() =>
             {
-                Excute(entity,action);
+                Excute(entity, action);
             });
 
         }
@@ -336,7 +341,12 @@ namespace NetCore.ORM.Simple
             }
             base.Open();
         }
-        
+
+        public override void SetAttr(Type Table = null, Type Column = null)
+        {
+            base.SetAttr(Table, Column);
+        }
+
         #endregion
     }
 }

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 /*********************************************************
- * 命名空间 NetCore.ORM.Simple.ConsoleApp.Entity
+ * 命名空间 NetCore.ORM.Simple.ConsoleApp
  * 接口名称 UserEntity
  * 开发人员：-nhy
  * 创建时间：2022/10/8 16:34:32
@@ -16,10 +16,10 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.ConsoleApp
 {
-    [ClassName("usertable")]
+    [TableName("usertable")]
     public class UserEntity
     {
-        [Key(true)]
+        [ColName(key:true,autoIncrease:true)]
         public int Id { get; set; }
         public int CompanyId { get; set; }
         public string Name { get; set; }
@@ -29,16 +29,17 @@ namespace NetCore.ORM.Simple.ConsoleApp
         public int Age { get; set; }
         public int IDDD;
     }
-    [ClassName("RoleTable")]
+    [TableName("RoleTable")]
     public class RoleEntity
     {
+        [ColName(key: true, autoIncrease: true)]
         public int Id { get; set; }
         public string DisplayName { get; set; }
     }
-    [ClassName("CompanyTable")]
+    [TableName("CompanyTable")]
     public class CompanyEntity
     {
-        [Key(true)]
+        [ColName(key:true,autoIncrease: true)]
         public int Id { get; set; }
         [ColName("CompanyName")]
         public string CompanyName { get; set; }
@@ -58,7 +59,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
         public string FirstOrDefaultName { get; set; }
         public int Max { get; set; }
     }
-    [ClassName("missiondetailtable")]
+    [TableName("missiondetailtable")]
     public class MissionDetailEntity
     {
         public MissionDetailEntity()

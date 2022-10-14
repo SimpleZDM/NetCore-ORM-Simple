@@ -12,11 +12,23 @@ public static class Program
 {
     public static int Main(string []args)
     {
-        SimpleMysqlTest MysqlTest=new SimpleMysqlTest();
+        //SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
         //MysqlTest.InsertTest();
         //MysqlTest.UpdateTest();
         //MysqlTest.DeleteTest();
-        MysqlTest.QueryTest();
+        //MysqlTest.QueryTest();
+
+        //SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
+        //sqliteTest.InsertTest();
+        //sqliteTest.UpdateTest();
+        //sqliteTest.DeleteTest();
+        //sqliteTest.QueryTest();
+
+        SimpleSqlServiceTest sqlServcie = new SimpleSqlServiceTest();
+        sqlServcie.InsertTest();
+        sqlServcie.UpdateTest();
+        sqlServcie.DeleteTest();
+        sqlServcie.QueryTest();
         return 0;
     }
 }

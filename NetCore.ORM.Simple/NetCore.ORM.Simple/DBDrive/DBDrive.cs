@@ -39,6 +39,10 @@ namespace NetCore.ORM.Simple
                         mysqlDrive.AOPSqlLog= value;
                         break;
                     case eDBType.SqlService:
+                        sqlServicelDrive.AOPSqlLog = value;
+                        break;
+                    case eDBType.Sqlite:
+                        sqliteDrive.AOPSqlLog = value;
                         break;
                     default:
                         break;
@@ -69,6 +73,15 @@ namespace NetCore.ORM.Simple
                     break;
             }
            
+        }
+
+        public void SetAttr(Type Table = null, Type Column = null)
+        {
+            MatchDBDrive(
+                () => { mysqlDrive.SetAttr(Table,Column);},
+                () => { sqlServicelDrive.SetAttr(Table,Column);},
+                () => { sqliteDrive.SetAttr(Table,Column);}
+                );
         }
         /// <summary>
         /// 
