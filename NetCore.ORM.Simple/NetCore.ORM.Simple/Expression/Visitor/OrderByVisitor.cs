@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -110,6 +111,8 @@ namespace NetCore.ORM.Simple.Visitor
             else
             {
                 OrderByEntity order = new OrderByEntity();
+                PropertyInfo Prop=null;
+                string PropName=node.Member.Name;
                 switch (OrderOrGroup)
                 {
                     case eOrderOrGroupType.OrderBy:
@@ -135,9 +138,18 @@ namespace NetCore.ORM.Simple.Visitor
                 }
                 else
                 {
-                    var map = mapInfos.Where(m => m.PropName.Equals(node.Member.Name)).FirstOrDefault();
-                    order.TableName = map.TableName;
-                    order.ColumnName = map.ColumnName;
+                    if (!Check.IsNull(Params))
+                    {
+                        if (currentTables.ContainsKey(Params.Name))
+                        {
+                            Prop=Table.DicTable[Table.TableNames[currentTables[node.Expression.ToString()]]].ClassType.GetProperty(node.Member.Name);
+                            PropName = Table.GetColName(Prop);
+                        }
+                        var map = mapInfos.Where(m => m.PropName.Equals(node.Member.Name)).FirstOrDefault();
+                        order.TableName = map.TableName;
+                        order.ColumnName = map.ColumnName;
+                    }
+
                 }
                 order.PropName = node.Member.ToString();
                 OrderInfos.Add(order);

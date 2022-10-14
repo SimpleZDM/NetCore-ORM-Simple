@@ -426,9 +426,8 @@ namespace NetCore.ORM.Simple.Visitor
 
                 if (!Check.IsNull(mapInfos) && mapInfos.Count>0&&mapInfos.Where(m=>m.PropName.Equals(PropName)).Any())
                 {
-                    currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
-                    currentTree.LeftCondition.DisplayName = $"{tableNames.TableNames[currentTables[node.Expression.ToString()]]}.{node.Member.Name}";
-                    currentTree.LeftCondition.PropertyType = node.Type;
+                    var Map = mapInfos.Where(m => m.PropName.Equals(PropName)).FirstOrDefault();
+                    CreateCondition(Map, node.Type, eConditionType.ColumnName);
                 }
                 if (currentTables.ContainsKey(node.Expression.ToString()))
                 {
@@ -438,10 +437,8 @@ namespace NetCore.ORM.Simple.Visitor
                     {
                         PropName = tableNames.GetColName(Prop);
                         TableName = tableNames.TableNames[currentTables[node.Expression.ToString()]];
+                        CreateCondition(TableName,PropName,node.Type,eConditionType.ColumnName);
                     }
-                    currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
-                    currentTree.LeftCondition.DisplayName = $"{tableNames.TableNames[currentTables[node.Expression.ToString()]]}.{node.Member.Name}";
-                    currentTree.LeftCondition.PropertyType = node.Type;
                 }
                 else
                 {
@@ -636,10 +633,18 @@ namespace NetCore.ORM.Simple.Visitor
             if (!Check.IsNull(currentTree))
             {
                 currentTree.LeftCondition = new ConditionEntity(conditionType);
-                currentTree.LeftCondition.DisplayName = $"{tableNames}.{TableName}";
+                currentTree.LeftCondition.DisplayName = $"{TableName}.{ColumnName}";
                 currentTree.LeftCondition.PropertyType = type;
             }
-
+        }
+        private void CreateCondition(MapEntity Map, Type type, eConditionType conditionType)
+        {
+            if (!Check.IsNull(currentTree))
+            {
+                currentTree.LeftCondition = new ConditionEntity(conditionType);
+                currentTree.LeftCondition.DisplayName = $"{Map.TableName}.{Map.ColumnName}";
+                currentTree.LeftCondition.PropertyType = type;
+            }
         }
     }
 }
