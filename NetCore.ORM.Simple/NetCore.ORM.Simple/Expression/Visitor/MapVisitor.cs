@@ -2,6 +2,7 @@
 using NetCore.ORM.Simple.Entity;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -26,7 +27,7 @@ namespace NetCore.ORM.Simple.Visitor
         /// 所有的表
         /// </summary>
 
-        private TableEntity Table;
+        private SelectEntity select;
         /// <summary>
         /// 当前传入的参数表
         /// </summary>
@@ -36,8 +37,9 @@ namespace NetCore.ORM.Simple.Visitor
         /// <summary>
         /// 映射的信息
         /// </summary>
+        private MemberInfo[] Members { get; set; }
 
-        private List<MapEntity> mapInfos;
+        private int MemberCurrent;
 
         private MapEntity currentmapInfo;
         private bool IsAgain;
@@ -49,46 +51,13 @@ namespace NetCore.ORM.Simple.Visitor
         private bool isAnonymity;
 
 
-        public MapVisitor(TableEntity table, List<MapEntity> MapInfos)
+        public MapVisitor(SelectEntity Select)
         {
-            if (Check.IsNull(table))
-            {
-                throw new ArgumentException("not table names!");
-            }
-            Table = table;
-            currentTables = new Dictionary<string, int>();
-            mapInfos = MapInfos;
-            Type type = table.DicTable[table.TableNames[0]].ClassType;
-            PropertyInfo PropKey = Table.GetKey(type);
-            mapInfos.Add(new MapEntity()
-            {
-                TableName = table.TableNames[0],
-                ColumnName = Table.GetColName(PropKey),
-                PropName = Table.GetColName(PropKey),
-                IsKey = true,
-                LastPropName = Table.GetColName(PropKey),
-                ClassName = Table.GetTableName(type),
-                EntityType = type,
-            });
-            foreach (var item in Table.GetNotKeyAndIgnore(type))
-            {
-                mapInfos.Add(new MapEntity()
-                {
-                    TableName = table.TableNames[0],
-                    ColumnName = Table.GetColName(item),
-                    PropName = Table.GetColName(item),
-                    IsKey = false,
-                    LastPropName = Table.GetColName(item),
-                    ClassName = Table.GetTableName(type),
-                    EntityType = type,
-                });
-            }
-            IsAgain = true;
-        }
 
-        public List<MapEntity> GetMapInfos()
-        {
-            return mapInfos;
+            select = Select;
+            currentTables = new Dictionary<string, int>();
+            select.InitMap();
+            IsAgain = true;
         }
         /// <summary>
         /// 修改表达式树的形式
@@ -102,10 +71,7 @@ namespace NetCore.ORM.Simple.Visitor
             if (IsAgain)
             {
 
-                for (int i = 0; i < mapInfos.Count; i++)
-                {
-                    mapInfos[i].IsNeed = false;
-                }
+                select.AllMapNotNeed();
             }
             foreach (ParameterExpression item in ((dynamic)expression).Parameters)
             {
@@ -275,7 +241,7 @@ namespace NetCore.ORM.Simple.Visitor
             {
                 currentmapInfo = new MapEntity();
                 currentmapInfo.MethodName = node.Method.Name;
-                mapInfos.Add(currentmapInfo);
+                select.AddMapInfo(currentmapInfo);
             }
             else
             {
@@ -315,7 +281,7 @@ namespace NetCore.ORM.Simple.Visitor
                 if (Check.IsNull(currentmapInfo))
                 {
                     currentmapInfo = new MapEntity();
-                    mapInfos.Add(currentmapInfo);
+                    select.AddMapInfo(currentmapInfo);
                 }
                 currentmapInfo.LastPropName = node.Member.Name;
             }
@@ -353,19 +319,20 @@ namespace NetCore.ORM.Simple.Visitor
             {
                 return node;
             }
-            string PropName=node.Member.Name;
-            PropertyInfo prop=null;
+            string PropName = node.Member.Name;
+            PropertyInfo prop = null;
             if (currentTables.ContainsKey(node.Expression.ToString()))
             {
-                prop = Table.DicTable[Table.TableNames[currentTables[node.Expression.ToString()]]].ClassType.GetProperty(node.Member.Name);
+                prop = select.GetPropertyType(currentTables[node.Expression.ToString()], PropName);
                 if (!Check.IsNull(prop))
                 {
-                    PropName = Table.GetColName(prop);
+                    PropName = prop.Name;
                 }
             }
+
             if (IsAgain)
             {
-                currentmapInfo = mapInfos.FirstOrDefault(m => m.PropName.Equals(PropName));
+                currentmapInfo = select.MapFirstOrDefault(m => m.PropName.Equals(PropName));
                 if (!Check.IsNullOrEmpty(CurrentMethodName))
                 {
                     currentmapInfo.MethodName = CurrentMethodName;
@@ -374,20 +341,22 @@ namespace NetCore.ORM.Simple.Visitor
                 if (!Check.IsNull(currentmapInfo))
                 {
                     currentmapInfo.IsNeed = true;
+                    SetPropName();
                     return node;
                 }
                 else
                 {
                     if (!Check.IsNull(prop))
                     {
-                        CreateMap(Table.TableNames[currentTables[node.Expression.ToString()]], prop);
+                        CreateMap(node.Expression.ToString(), PropName);
                     }
                 }
             }
-          else{
+            else
+            {
                 if (!Check.IsNull(prop))
                 {
-                    CreateMap(Table.TableNames[currentTables[node.Expression.ToString()]],prop);
+                    CreateMap(node.Expression.ToString(), PropName);
                 }
 
             }
@@ -402,6 +371,11 @@ namespace NetCore.ORM.Simple.Visitor
 
         protected override Expression VisitNew(NewExpression node)
         {
+            if (isAnonymity)
+            {
+                Members = node.Members.ToArray();
+                MemberCurrent = 0;
+            }
             return base.VisitNew(node);
         }
 
@@ -420,13 +394,11 @@ namespace NetCore.ORM.Simple.Visitor
             if (node.Left is MemberExpression member)
             {
                 string mName = string.Empty;
-                if (Table.TableNames.Length > SimpleConst.minTableCount)
-                {
-                    if (currentTables.ContainsKey(member.Expression.ToString()))
-                    {
 
-                        mName = $"{Table.TableNames[currentTables[member.Expression.ToString()]]}.{member.Member.Name}";
-                    }
+                if (currentTables.ContainsKey(member.Expression.ToString()))
+                {
+
+                    mName = $"{select.GetTableName(currentTables[member.Expression.ToString()])}.{member.Member.Name}";
                 }
                 else
                 {
@@ -458,16 +430,25 @@ namespace NetCore.ORM.Simple.Visitor
             base.Visit(node.Right);
         }
 
-        public void CreateMap(string TableName,PropertyInfo Prop)
+        public void CreateMap(string Params, string PropName)
         {
-            currentmapInfo = new MapEntity();
-            mapInfos.Add(currentmapInfo);
-            currentmapInfo.TableName = TableName;
-            currentmapInfo.ColumnName = Table.GetColName(Prop);
-            currentmapInfo.PropName = Table.GetColName(Prop);
-            currentmapInfo.LastPropName = Table.GetColName(Prop);
-            currentmapInfo.ClassName = Table.GetTableName(Table.DicTable[currentmapInfo.TableName].ClassType);
-            currentmapInfo.EntityType = Table.DicTable[currentmapInfo.TableName].ClassType;
+            var index = currentTables[Params];
+            currentmapInfo = select.CreateMapInfo(index, PropName, isAnonymity);
+            select.AddMapInfo(currentmapInfo);
+            SetPropName();
+
+        }
+
+        public void SetPropName()
+        {
+            if (isAnonymity)
+            {
+                if (Members.Count() > MemberCurrent)
+                {
+                    currentmapInfo.PropName = Members[MemberCurrent].Name;
+                    MemberCurrent++;
+                }
+            }
         }
     }
 }

@@ -230,10 +230,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 throw new ArgumentNullException(nameof(select));
             }
-            if (Check.IsNull(select.MapInfos))
-            {
-                select.MapInfos = new List<MapEntity>();
-            }
+           
             if (select.MapInfos.Count.Equals(CommonConst.ZeroOrNull))
             {
                 Type type = typeof(TData);

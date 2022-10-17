@@ -22,14 +22,8 @@ namespace NetCore.ORM.Simple.Visitor
 {
     public class ConditionVisitor : ExpressionVisitor, IExpressionVisitor
     {
-        /// <summary>
-        /// 逻辑条件关联符号
-        /// </summary>
-        private List<ConditionEntity> conditions;
-        /// <summary>
-        /// 单个表达式集合
-        /// </summary>
-        private List<TreeConditionEntity> treeConditions;
+     
+       
         /// <summary>
         /// 当前等式
         /// </summary>
@@ -39,8 +33,6 @@ namespace NetCore.ORM.Simple.Visitor
         /// </summary>
         private bool IsComplete;
 
-        /// </summary>
-        private List<MapEntity> mapInfos;
         /// <summary>
         /// 是否经过多次映射- 根据最后一次映射数据
         /// </summary>
@@ -60,18 +52,14 @@ namespace NetCore.ORM.Simple.Visitor
         /// </summary>
         /// 
         private int firstConditionIndex;
-        public ConditionVisitor(TableEntity table, List<ConditionEntity> Conditions, List<TreeConditionEntity> TreeConditions)
+
+        private SelectEntity select;
+        public ConditionVisitor(SelectEntity select)
         {
-            if (Check.IsNull(table))
-            {
-                throw new ArgumentException("not table names!");
-            }
-            tableNames = table;
+            this.select=select;
             currentTables = new Dictionary<string, int>();
-            conditions = Conditions;
-            treeConditions = TreeConditions;
             IsComplete = true;
-            IsMultipleMap = false;
+            IsMultipleMap = true;
             firstConditionIndex = 0;
         }
 
@@ -81,66 +69,22 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         public string GetValue()
         {
-            StringBuilder values = new StringBuilder();
-            for (int i = 0; i < treeConditions.Count; i++)
-            {
-                foreach (var item in treeConditions[i].LeftBracket)
-                {
-                    values.Append(SimpleConst.cStrSign[(int)item]);
-                }
-
-                values.Append(treeConditions[i].LeftCondition.DisplayName);
-
-                values.Append(SimpleConst.cStrSign[(int)treeConditions[i].RelationCondition.SignType]);
-
-                values.Append(treeConditions[i].RightCondition.DisplayName);
-
-                foreach (var item in treeConditions[i].RightBracket)
-                {
-                    values.Append(SimpleConst.cStrSign[(int)item]);
-                }
-                if (conditions.Count > i)
-                {
-                    values.Append(SimpleConst.cStrSign[(int)conditions[i].SignType]);
-                }
-            }
-            return values.ToString();
+           return String.Empty;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public Tuple<List<ConditionEntity>, List<TreeConditionEntity>> GetCondition()
-        {
-            return Tuple.Create(conditions, treeConditions);
-        }
+      
+       
         /// <summary>
         /// 修改表达式树的形式
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public Expression Modify(Expression expression, List<MapEntity> mapInfos = null)
+        public Expression Modify(Expression expression)
         {
             currentTables.Clear();
             currentTree = null;
+            select.TreeConditionInit(ref firstConditionIndex);
+            IsMultipleMap = true;
 
-
-            if (treeConditions.Count > 0)
-            {
-                treeConditions[firstConditionIndex].LeftBracket.Add(eSignType.LeftBracket);
-                firstConditionIndex = treeConditions.Count - 1;
-                treeConditions[firstConditionIndex].RightBracket.Add(eSignType.RightBracket);
-                conditions.Add(new ConditionEntity(eConditionType.Sign)
-                {
-                    SignType = eSignType.And
-
-                });
-            }
-            if (!Check.IsNull(mapInfos) && mapInfos.Count > 0)
-            {
-                this.mapInfos = mapInfos;
-                IsMultipleMap = true;
-            }
             foreach (ParameterExpression item in ((dynamic)expression).Parameters)
             {
                 currentTables.Add(item.Name, currentTables.Count);
@@ -165,7 +109,8 @@ namespace NetCore.ORM.Simple.Visitor
                     case ExpressionType.AndAlso:
                         SingleLogicBinary(node, (queue) =>
                         {
-                            conditions.Add(new ConditionEntity(eConditionType.Sign)
+                            select.CreateCondition(new 
+                            ConditionEntity(eConditionType.Sign)
                             {
                                 SignType = eSignType.And
                             });
@@ -237,14 +182,15 @@ namespace NetCore.ORM.Simple.Visitor
                     case ExpressionType.OrElse:
                         SingleLogicBinary(node, (queue) =>
                         {
-                            conditions.Add(new ConditionEntity(eConditionType.Sign)
+                            select.CreateCondition(
+                            new ConditionEntity(eConditionType.Sign)
                             {
                                 SignType = eSignType.Or
                             });
+                           
                         });
                         break;
                     case ExpressionType.ArrayIndex:
-                        //currentTree.RightCondition = new ConditionEntity(eConditionType.Constant);  
                         int index = 0;
                         int.TryParse(node.Right.ToString(), out index);
                         if (!Check.IsNull(currentTree.LeftCondition))
@@ -272,7 +218,7 @@ namespace NetCore.ORM.Simple.Visitor
                 currentTree = new TreeConditionEntity();
                 currentTree.LeftCondition = new ConditionEntity(eConditionType.Constant);
                 currentTree.LeftCondition.DisplayName = $"{node.Value}";
-                treeConditions.Add(currentTree);
+                select.CreateTreeConditon(currentTree);
                 return node;
             }
             if (Check.IsNull(currentTree.RightCondition))
@@ -318,7 +264,26 @@ namespace NetCore.ORM.Simple.Visitor
             }
             else if (!Check.IsNull(currentTree.LeftCondition.ConstFieldType) && currentTree.LeftCondition.ConstFieldType.Count > 0)
             {
-                if (currentTree.LeftCondition.ConstFieldType.Count >= 2)
+                if (currentTree.RelationCondition.DisplayName.Equals("Contains"))
+                {
+                    
+                    var obj = currentTree.LeftCondition.ConstFieldType[0].GetValue(node.Value);
+                    StringBuilder sb = new StringBuilder();
+                    foreach (var item in (dynamic)obj)
+                    {
+                        if (item.GetType()==typeof(int)|| item.GetType()== typeof(float)|| item.GetType() == typeof(double) || item.GetType() == typeof(decimal))
+                        {
+                            sb.Append($"{item},");
+                        }
+                        else
+                        {
+                            sb.Append($"'{item}',");
+                        }
+                    }
+                    currentTree.RightCondition.DisplayName =sb.Remove(sb.Length-1,1).ToString();
+                    
+                }
+                else if (currentTree.LeftCondition.ConstFieldType.Count >= 2)
                 {
                     var obj = currentTree.LeftCondition.ConstFieldType[1].GetValue(node.Value);
                     if (currentTree.LeftCondition.Index >= 0)
@@ -390,7 +355,7 @@ namespace NetCore.ORM.Simple.Visitor
                 {
                     currentTree.RelationCondition = new ConditionEntity(eConditionType.Method);
                     currentTree.RelationCondition.DisplayName = node.Method.Name;
-                    treeConditions.Add(currentTree);
+                    select.CreateTreeConditon(currentTree);
                 }
 
             }
@@ -424,19 +389,19 @@ namespace NetCore.ORM.Simple.Visitor
             if (currentTables.Count > CommonConst.ZeroOrNull)
             {
 
-                if (!Check.IsNull(mapInfos) && mapInfos.Count>0&&mapInfos.Where(m=>m.PropName.Equals(PropName)).Any())
+                if (select.MapInfos.Where(m => m.PropName.Equals(PropName)).Any() &&select.MapInfos.Where(m=>m.PropName.Equals(PropName)).Count()==1)
                 {
-                    var Map = mapInfos.Where(m => m.PropName.Equals(PropName)).FirstOrDefault();
+                    var Map = select.MapFirstOrDefault(m => m.PropName.Equals(PropName));
                     CreateCondition(Map, node.Type, eConditionType.ColumnName);
                 }
-                if (currentTables.ContainsKey(node.Expression.ToString()))
+                else if (currentTables.ContainsKey(node.Expression.ToString()))
                 {
-                    Prop = tableNames.DicTable[tableNames.TableNames[currentTables[node.Expression.ToString()]]].ClassType.GetProperty(node.Member.Name);
-                    string tableName = tableNames.TableNames[currentTables[node.Expression.ToString()]];
+                    int index=currentTables[node.Expression.ToString()];
+                    Prop = select.GetPropertyType(index,node.Member.Name);
+                    TableName = select.GetTableName(index);
                     if (!Check.IsNull(Prop))
                     {
-                        PropName = tableNames.GetColName(Prop);
-                        TableName = tableNames.TableNames[currentTables[node.Expression.ToString()]];
+                        PropName = select.GetColumnName(index,node.Member.Name);
                         CreateCondition(TableName,PropName,node.Type,eConditionType.ColumnName);
                     }
                 }
@@ -444,10 +409,18 @@ namespace NetCore.ORM.Simple.Visitor
                 {
                     if (node.Member is FieldInfo field)
                     {
+                        if (Check.IsNull(currentTree.LeftCondition))
+                        {
+                            currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
+                        }
                         currentTree.LeftCondition.ConstFieldType.Add(field);
                     }
                     else if (node.Member is PropertyInfo prop)
                     {
+                        if (Check.IsNull(currentTree.LeftCondition))
+                        {
+                            currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
+                        }
                         currentTree.LeftCondition.ConstPropType = prop;
                     }
                 }
@@ -508,7 +481,7 @@ namespace NetCore.ORM.Simple.Visitor
                 currentTree.RightCondition = new ConditionEntity(eConditionType.ColumnName);
                 GetMemberValue(rightMember, currentTree.RightCondition);
             }
-            treeConditions.Add(currentTree);
+            select.CreateTreeConditon(currentTree);
             IsComplete = true;
         }
 
@@ -555,7 +528,7 @@ namespace NetCore.ORM.Simple.Visitor
 
                 if (IsMultipleMap)
                 {
-                    var mapInfo = mapInfos.Where(map => map.PropName.Equals(member.Member.Name)).FirstOrDefault();
+                    var mapInfo = select.MapFirstOrDefault(map => map.PropName.Equals(member.Member.Name));
                     if (!Check.IsNull(mapInfo))
                     {
                         condition.DisplayName = $"{mapInfo.TableName}.{mapInfo.ColumnName}";

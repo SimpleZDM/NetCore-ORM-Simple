@@ -20,7 +20,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
     public class UserEntity
     {
         [MyColumnAttrbute(name:"Id",key:true,autoIncrease:true)]
-        public int Idddd { get; set; }
+        public int Id { get; set; }
         public int CompanyId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }

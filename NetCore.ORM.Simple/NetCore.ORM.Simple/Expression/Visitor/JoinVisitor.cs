@@ -26,7 +26,6 @@ namespace NetCore.ORM.Simple.Visitor
         /// all tables
         /// </summary>
 
-        private TableEntity Table;
 
         private Dictionary<string, int> currentTables;
         /// <summary>
@@ -34,7 +33,6 @@ namespace NetCore.ORM.Simple.Visitor
         /// for table join info
         /// </summary>
 
-        private Dictionary<string, JoinTableEntity> JoinTables;
         /// <summary>
         /// 正在解析连接条件
         /// </summary>
@@ -50,52 +48,19 @@ namespace NetCore.ORM.Simple.Visitor
         /// </summary>
         private bool IsComplete;
 
-        public JoinVisitor(TableEntity table, Dictionary<string, JoinTableEntity> joinInfos)
+        private SelectEntity select;
+
+        public JoinVisitor(SelectEntity Select)
         {
-            if (Check.IsNull(table))
-            {
-                throw new ArgumentException("not table names!");
-            }
-            Table = table;
+            select = Select;
             currentTables = new Dictionary<string, int>();
-            JoinTables = joinInfos;
-            JoinTables.Add(Table.TableNames[0], new JoinTableEntity() { DisplayName = Table.TableNames[0], TableType = eTableType.Master });
+            select.InitJoin();
             IsComplete = true;
         }
 
 
-        public string GetValue()
-        {
-            StringBuilder value = new StringBuilder();
-            //foreach (var jTable in JoinTables)
-            //{
-            //    if (jTable.Value.TableType.Equals(eTableType.Master))
-            //    {
-            //        continue;
-            //    }
-            //    int length = jTable.Value.QValue.Count;
-            //    value.Append(jTable.Value.JoinType);
-            //    value.Append($" {jTable.Key} ON ");
-            //    for (int i = 0; i < length; i++)
-            //    {
-            //        value.Append($"{jTable.Value.QValue.Dequeue()}");
-            //    }
-            //}
-            //Console.WriteLine(value);
-            return value.ToString();
-        }
-        /// <summary>
-        /// 返回解析信息-不生成sql语句
-        /// </summary>
-        /// <returns></returns>
-        public List<JoinTableEntity> GetJoinInfos()
-        {
-            if (Check.IsNull(JoinTables))
-            {
-                return null;
-            }
-            return JoinTables.Values.ToList();
-        }
+
+
         /// <summary>
         /// 修改表达式树的形式
         /// </summary>
@@ -408,7 +373,8 @@ namespace NetCore.ORM.Simple.Visitor
                     currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
                     GetMemberValue(node, currentTree.LeftCondition);
                     currentTree.LeftCondition.PropertyType = node.Type;
-                }else if(Check.IsNull(currentTree.RightCondition))
+                }
+                else if (Check.IsNull(currentTree.RightCondition))
                 {
                     currentTree.RightCondition = new ConditionEntity(eConditionType.ColumnName);
                     GetMemberValue(node, currentTree.RightCondition);
@@ -531,24 +497,19 @@ namespace NetCore.ORM.Simple.Visitor
             if (!Check.IsNull(member))
             {
 
-                if (Table.TableNames.Length > SimpleConst.minTableCount)
+
+                if (currentTables.ContainsKey(member.Expression.ToString()))
                 {
-                    if (currentTables.ContainsKey(member.Expression.ToString()))
-                    {
-                        if (!JoinTables.ContainsKey(Table.TableNames[currentTables[member.Expression.ToString()]]))
-                        {
-                            CreateJoinTable(member);
-                        }
-
-                        condition.DisplayName = $"{Table.TableNames[currentTables[member.Expression.ToString()]]}.{member.Member.Name}";
-                        mName = condition.DisplayName;
-                    }
-                    else
-                    {
-                        VisitMember(member);
-                    }
-
+                    
+                    CreateJoinTable(member);
+                    condition.DisplayName = $"{select.GetTableName(currentTables[member.Expression.ToString()])}.{member.Member.Name}";
+                    mName = condition.DisplayName;
                 }
+                else
+                {
+                    VisitMember(member);
+                }
+
             }
             //return mName;
         }
@@ -576,28 +537,17 @@ namespace NetCore.ORM.Simple.Visitor
         {
             if (!Check.IsNull(member))
             {
-                string mName = string.Empty;
-                if (Table.TableNames.Length > SimpleConst.minTableCount)
+
+                if (currentTables.ContainsKey(member.Expression.ToString()))
                 {
-                    if (currentTables.ContainsKey(member.Expression.ToString()))
-                    {
-                        if (!JoinTables.ContainsKey(Table.TableNames[currentTables[member.Expression.ToString()]]))
-                        {
-                            if (Check.IsNull(CurrentJoinTable))
-                            {
-                                CurrentJoinTable = new JoinTableEntity();
-
-                            }
-                            Dictionary<string, string> dic = new Dictionary<string, string>();
-
-                            CurrentJoinTable.AsName = Table.TableNames[currentTables[member.Expression.ToString()]];
-                            CurrentJoinTable.DisplayName = Table.DicTable[CurrentJoinTable.AsName].DisplayNmae;
-                            JoinTables.Add(CurrentJoinTable.DisplayName, CurrentJoinTable);
-                        }
-                    }
-
+                    select.CreateJoin(currentTables[member.Expression.ToString()],CurrentJoinTable);
                 }
             }
+        }
+
+        public string GetValue()
+        {
+            throw new NotImplementedException();
         }
     }
 }

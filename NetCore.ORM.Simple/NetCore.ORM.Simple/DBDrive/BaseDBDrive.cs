@@ -292,7 +292,7 @@ namespace NetCore.ORM.Simple
 
                 foreach (var item in entity.MapInfos.Where(m => m.IsNeed))
                 {
-                    var Prop = type.GetProperty(item.LastPropName);
+                    var Prop = type.GetProperty(item.PropName);
                     Prop.SetPropValue(obj, dataRead[item.AsColumnName]);
                 }
                 data.Add(entity.GetResult<TResult>(obj));
@@ -328,7 +328,7 @@ namespace NetCore.ORM.Simple
                 }
                 foreach (var item in entity.MapInfos.Where(m => m.IsNeed))
                 {
-                    var Prop = entity.LastType[item.ClassName].GetProperty(item.LastPropName);
+                    var Prop = entity.LastType[item.ClassName].GetProperty(item.PropName);
                     Prop.SetPropValue(dicobjs[item.ClassName], dataRead[item.AsColumnName]);
                 }
                 data.Add(entity.GetResult<TResult>(dicobjs.Values.ToArray()));

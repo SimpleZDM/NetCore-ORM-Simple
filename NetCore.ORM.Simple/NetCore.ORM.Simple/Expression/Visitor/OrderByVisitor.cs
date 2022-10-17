@@ -21,30 +21,22 @@ namespace NetCore.ORM.Simple.Visitor
 {
     public class OrderByVisitor : ExpressionVisitor
     {
-        private List<OrderByEntity> OrderInfos;
-        private TableEntity Table;
         private OrderByEntity currentOrder;
         private Dictionary<string, int> currentTables;
         private eOrderOrGroupType OrderOrGroup;
         private eOrderType OrderType;
-        private List<MapEntity> mapInfos;
-        public OrderByVisitor(TableEntity table, List<OrderByEntity> orderInfos)
+        private SelectEntity select;
+        public OrderByVisitor(SelectEntity select)
         {
-            if (Check.IsNull(table))
-            {
-                throw new ArgumentException("not table names!");
-            }
-            Table = table;
-            OrderInfos = orderInfos;
+            this.select = select;
             currentTables = new Dictionary<string, int>();
 
         }
-        public Expression Modify(Expression expression, List<MapEntity> MapInfos, eOrderOrGroupType orderOrGroup, eOrderType orderType)
+        public Expression Modify(Expression expression,eOrderOrGroupType orderOrGroup, eOrderType orderType)
         {
             currentTables.Clear();
             OrderOrGroup = orderOrGroup;
             OrderType = orderType;
-            mapInfos = MapInfos;
             foreach (ParameterExpression item in ((dynamic)expression).Parameters)
             {
                 currentTables.Add(item.Name, currentTables.Count);
@@ -82,78 +74,13 @@ namespace NetCore.ORM.Simple.Visitor
         }
         protected override Expression VisitMember(MemberExpression node)
         {
-            var Params = node.Expression as ParameterExpression;
-            //base.VisitMember(node);
-            if (OrderInfos.Any(info =>
-            info.PropName.Equals(node.Member.Name) ||
-            (node.Member.Name.Contains("key") && node.Member.Name.Replace("key", "").Equals(info.PropName))
-            ))
+            int Index = -1;
+            if (currentTables.ContainsKey(node.Expression.ToString()))
             {
-                var order = OrderInfos.Where(info => info.PropName.Equals(node.Member.Name) ||
-             (node.Member.Name.Contains("key") && node.Member.Name.Replace("key", "")
-             .Equals(info.PropName))).FirstOrDefault();
-                order.PropName = node.Member.ToString();
-                switch (OrderOrGroup)
-                {
-                    case eOrderOrGroupType.OrderBy:
-                        order.IsOrderBy = true;
-                        order.OrderType = OrderType;
-                        // order.OrderSoft = OrderInfos.Where(o=>o.IsOrderBy).Max(o=>o.OrderSoft)+1;
-                        break;
-                    case eOrderOrGroupType.GroupBy:
-                        order.IsGroupBy = true;
-                        //order.GroupSoft = OrderInfos.Where(o => o.IsGroupBy).Max(o => o.GroupSoft)+1;
-                        break;
-                    default:
-                        break;
-                }
+                Index = currentTables[node.Expression.ToString()];
             }
-            else
-            {
-                OrderByEntity order = new OrderByEntity();
-                PropertyInfo Prop=null;
-                string PropName=node.Member.Name;
-                switch (OrderOrGroup)
-                {
-                    case eOrderOrGroupType.OrderBy:
-                        order.IsOrderBy = true;
-                        order.OrderType = OrderType;
-                        order.OrderSoft = OrderInfos.Where(o => o.IsOrderBy).Count() > 0 ? OrderInfos.Where(o => o.IsOrderBy).Max(o => o.OrderSoft) + 1 : 0;
-                        break;
-                    case eOrderOrGroupType.GroupBy:
-                        order.IsGroupBy = true;
-                        order.GroupSoft = OrderInfos.Where(g => g.IsGroupBy).Count() > 0 ? OrderInfos.Where(o => o.IsGroupBy).Max(o => o.GroupSoft) + 1 : 0;
-                        break;
-                    default:
-                        break;
-                }
-                if (Check.IsNull(mapInfos) || mapInfos.Count <= 0)
-                {
-                    if (!Check.IsNull(Params))
-                    {
-                        order.TableName = Table.TableNames[currentTables[Params.Name]];
-                        order.ColumnName = node.Member.Name;
-                    }
-
-                }
-                else
-                {
-                    if (!Check.IsNull(Params))
-                    {
-                        if (currentTables.ContainsKey(Params.Name))
-                        {
-                            Prop=Table.DicTable[Table.TableNames[currentTables[node.Expression.ToString()]]].ClassType.GetProperty(node.Member.Name);
-                            PropName = Table.GetColName(Prop);
-                        }
-                        var map = mapInfos.Where(m => m.PropName.Equals(node.Member.Name)).FirstOrDefault();
-                        order.TableName = map.TableName;
-                        order.ColumnName = map.ColumnName;
-                    }
-
-                }
-                order.PropName = node.Member.ToString();
-                OrderInfos.Add(order);
-            }
+            string PropName = node.Member.Name;
+            select.CreateOrder(PropName,Index,OrderOrGroup,OrderType);
             return node;
         }
 

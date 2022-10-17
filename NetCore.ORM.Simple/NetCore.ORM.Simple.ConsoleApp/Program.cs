@@ -12,6 +12,9 @@ public static class Program
 {
     public static int Main(string []args)
     {
+        //SimpleExpressionTest test = new SimpleExpressionTest();
+        // test.Select();
+        //test.Where();
         SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
         //MysqlTest.InsertTest();
         //MysqlTest.UpdateTest();

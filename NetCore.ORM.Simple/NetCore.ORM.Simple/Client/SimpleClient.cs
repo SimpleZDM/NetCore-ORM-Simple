@@ -114,12 +114,11 @@ namespace NetCore.ORM.Simple.Client
 
         public ISimpleCommand<TEntity> Delete<TEntity>(Expression<Func<TEntity,bool>>expression) where TEntity : class, new()
         {
-            List<ConditionEntity> conditions = new List<ConditionEntity>();
-            List<TreeConditionEntity> treeConditions = new List<TreeConditionEntity>();
             Type type = typeof(TEntity);
-            var Visitor = new ConditionVisitor(new TableEntity(TableAttr,ColumnAttr,type),conditions,treeConditions);
+            SelectEntity select = new SelectEntity(TableAttr, ColumnAttr, type);
+            var Visitor = new ConditionVisitor(select);
             Visitor.Modify(expression);
-            var sql = builder.GetDelete(type,conditions, treeConditions);
+            var sql = builder.GetDelete(type, select.Conditions, select.TreeConditions);
             sqls.Add(sql);
             ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, configuration.CurrentConnectInfo.DBType, sql, sqls, dbDrive);
             return command;
