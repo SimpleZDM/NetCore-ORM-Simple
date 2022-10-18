@@ -193,9 +193,11 @@ namespace NetCore.ORM.Simple.Entity
         {
             Conditions.Add(condition);
         }
-        public void CreateTreeConditon(TreeConditionEntity treeCondition)
+        public TreeConditionEntity CreateTreeConditon()
         {
+            TreeConditionEntity treeCondition = new TreeConditionEntity();
             TreeConditions.Add(treeCondition);
+            return treeCondition;
         }
 
         public void CreateOrder(string PropName, int Index, eOrderOrGroupType OrderOrGroup, eOrderType OrderType)

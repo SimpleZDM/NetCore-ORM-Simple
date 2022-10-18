@@ -43,7 +43,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// </summary>
         /// <param name="methodName"></param>
         /// <returns></returns>
-        public static string MapMethod(string methodName,string leftValue,string rightValue)
+        public static string MapMethod(string methodName,string leftValue,string rightValue,ConditionEntity condition)
         {
             string value = EqualSign.ToString();
             if (Check.IsNullOrEmpty(methodName))
@@ -86,6 +86,60 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 case "FirstOrDefault":
                     value = $" {leftValue}";
                     break;
+                case "Contains":
+                    
+                default:
+                    break;
+            }
+            return value;
+        }
+
+        public static string MapMethod(string methodName, string leftValue, string rightValue)
+        {
+            string value = EqualSign.ToString();
+            if (Check.IsNullOrEmpty(methodName))
+            {
+                return value;
+            }
+            switch (methodName)
+            {
+                case "ToString":
+                    break;
+                case "Equals":
+                    value = $"{leftValue}={rightValue}";
+                    break;
+                case "IsNullOrEmpty":
+                    if (!Check.IsNullOrEmpty(leftValue))
+                    {
+                        value = $"{leftValue} IS NULL";
+                    }
+                    else if (!Check.IsNullOrEmpty(rightValue))
+                    {
+                        value = $"{rightValue} IS NULL";
+                    }
+                    break;
+                case "Sum":
+                    value = $" SUM({leftValue}) ";
+                    break;
+                case "Min":
+                    value = $" Min({leftValue}) ";
+                    break;
+                case "Max":
+                    value = $" Max({leftValue}) ";
+                    break;
+                case "Count":
+                    var star = "*";
+                    leftValue = Check.IsNullOrEmpty(leftValue) ? star : leftValue;
+                    value = $" COUNT({leftValue}) ";
+                    break;
+                case "Average":
+                    value = $" AVG({leftValue}) ";
+                    break;
+                case "FirstOrDefault":
+                    value = $" {leftValue}";
+                    break;
+                case "Contains":
+
                 default:
                     break;
             }

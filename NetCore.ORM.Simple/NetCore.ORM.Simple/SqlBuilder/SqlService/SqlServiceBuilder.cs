@@ -435,7 +435,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
                 string leftValue = string.Empty;
                 string rightValue = string.Empty;
-
+                ConditionEntity currentConditon = null ;
                 switch (treeConditions[i].LeftCondition.ConditionType)
                 {
                     case eConditionType.ColumnName:
@@ -443,7 +443,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
                         {
                             rightValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
-                            sqlEntity.AddParameter(DbType, rightValue, treeConditions[i].RightCondition.DisplayName);
+                            base.GetConditionValue(treeConditions[i].RightCondition,sqlEntity,rightValue);
+                            currentConditon = treeConditions[i].RightCondition;
+                            //sqlEntity.AddParameter(DbType, rightValue, treeConditions[i].RightCondition.DisplayName);
                         }
                         else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
                         {
@@ -469,7 +471,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         {
                             leftValue = $" {treeConditions[i].RightCondition.DisplayName} ";
                             rightValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
-                            sqlEntity.AddParameter(DbType, rightValue, treeConditions[i].LeftCondition.DisplayName);
+                            base.GetConditionValue(treeConditions[i].LeftCondition, sqlEntity, rightValue);
+                            currentConditon = treeConditions[i].LeftCondition;
+                            ///sqlEntity.AddParameter(DbType, rightValue, treeConditions[i].LeftCondition.DisplayName);
                         }
                         break;
                     default:
@@ -489,7 +493,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 }
                 else if (treeConditions[i].RelationCondition.ConditionType.Equals(eConditionType.Method))
                 {
-                    StrValue.Append(MysqlConst.MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue));
+                    StrValue.Append(MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue,rightValue,currentConditon));
                 }
                 else
                 {

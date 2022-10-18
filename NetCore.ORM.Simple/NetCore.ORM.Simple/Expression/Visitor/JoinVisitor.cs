@@ -353,7 +353,6 @@ namespace NetCore.ORM.Simple.Visitor
         }
         protected override Expression VisitUnary(UnaryExpression node)
         {
-            Console.WriteLine(node.ToString());
             return base.VisitUnary(node);
         }
         protected override Expression VisitListInit(ListInitExpression node)
@@ -403,10 +402,8 @@ namespace NetCore.ORM.Simple.Visitor
         protected override Expression VisitNew(NewExpression node)
         {
 
-            if (currentTables.Count > SimpleConst.minTableCount)
-            {
-                base.VisitNew(node);
-            }
+            
+            base.VisitNew(node);
             return node;
         }
 

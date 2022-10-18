@@ -1,5 +1,7 @@
-﻿using System;
+﻿using NetCore.ORM.Simple.Entity;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -73,6 +75,8 @@ namespace NetCore.ORM.Simple.Common
 
         public static string StrDataCount;
 
+        public static string[] StrDataType;
+
 
 
         public static bool IsAnonymityObject<T>(Type AttrType)
@@ -105,6 +109,75 @@ namespace NetCore.ORM.Simple.Common
                 return SqlMainWord[(int)type];
             }
             return SqlMainWord[0];
+        }
+        public static eDataType GetType(Type type)
+        {
+            eDataType dataType = eDataType.SimpleString;
+            if (type.Equals(typeof(int)))
+            {
+                dataType = eDataType.SimpleInt;
+            }
+            else if (type.Equals(typeof(float)))
+            {
+                dataType = eDataType.SimpleFloat;
+            }
+            else if (type.Equals(typeof(double)))
+            {
+                dataType = eDataType.SimpleDouble;
+            }
+            else if (type.Equals(typeof(decimal)))
+            {
+                dataType = eDataType.SimpleDecimal;
+            }
+            else if (type.Equals(typeof(List<int>)))
+            {
+                dataType = eDataType.SimpleListInt;
+            }
+            else if (type.Equals(typeof(List<string>)))
+            {
+                dataType = eDataType.SimpleListString;
+            }
+            else if (type.Equals(typeof(List<Guid>)))
+            {
+                dataType = eDataType.SimpleListGuid;
+            }
+            else if (type.Equals(typeof(List<float>)))
+            {
+                dataType = eDataType.SimpleListFloat;
+            }
+            else if (type.Equals(typeof(List<double>)))
+            {
+                dataType = eDataType.SimpleListDouble;
+            }
+            else if (type.Equals(typeof(List<decimal>)))
+            {
+                dataType = eDataType.SimpleListDecimal;
+            }
+            else if (type.Equals(typeof(int[])))
+            {
+                dataType = eDataType.SimpleArrayInt;
+            }
+            else if (type.Equals(typeof(Guid[])))
+            {
+                dataType = eDataType.SimpleArrayGuid;
+            }
+            else if (type.Equals(typeof(float[])))
+            {
+                dataType = eDataType.SimpleArrayFloat;
+            }
+            else if (type.Equals(typeof(double[])))
+            {
+                dataType = eDataType.SimpleArrayDouble;
+            }
+            else if (type.Equals(typeof(decimal[])))
+            {
+                dataType = eDataType.SimpleArrayDecimal;
+            }
+            else if (type.Equals(typeof(string[])))
+            {
+                dataType = eDataType.SimpleArrayString;
+            }
+            return dataType;
         }
     }
     public enum ErrorType
@@ -144,4 +217,8 @@ namespace NetCore.ORM.Simple.Common
         AT,
         SimpleNumber//作为count的映射值
     }
+
+
+
+    
 }

@@ -33,9 +33,21 @@ namespace NetCore.ORM.Simple.ConsoleApp
         }
         public void Where()
         {
+            
+                Console.WriteLine(typeof(Guid).Name);
+                Console.WriteLine(typeof(float).Name);
+                Console.WriteLine(typeof(Double).Name);
+                Console.WriteLine(typeof(decimal).Name);
             ExpressionTest<UserEntity> u = new ExpressionTest<UserEntity>();
             int[] ids=new int[3] {1,2,3};
-            u.Where(u =>ids.Contains(u.Id));
+            string str = "";
+            List<int> lids = new List<int>();
+            IEnumerable<int> ints = new List<int>();
+            
+            lids.Add(1);
+            lids.Add(2);
+            lids.Add(3);
+            u.Where(u =>u.Name.Contains(str)&&ids.Contains(u.Id)&&lids.Contains(u.Id));
         }
 
     }

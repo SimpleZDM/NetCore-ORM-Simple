@@ -442,7 +442,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
                 string leftValue = string.Empty;
                 string rightValue = string.Empty;
-
+                ConditionEntity currentConditon=null;
                 switch (treeConditions[i].LeftCondition.ConditionType)
                 {
                     case eConditionType.ColumnName:
@@ -450,7 +450,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
                         {
                             rightValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
-                            sqlEntity.AddParameter(DbType, rightValue, treeConditions[i].RightCondition.DisplayName);
+                            GetConditionValue(treeConditions[i].RightCondition,sqlEntity,rightValue);
+                            currentConditon = treeConditions[i].RightCondition;
                         }
                         else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
                         {
@@ -474,9 +475,10 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         }
                         else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
                         {
-                            leftValue = $" {treeConditions[i].RightCondition.DisplayName} ";
                             rightValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
-                            sqlEntity.AddParameter(DbType, rightValue, treeConditions[i].LeftCondition.DisplayName);
+                            GetConditionValue(treeConditions[i].LeftCondition,sqlEntity, rightValue);
+                            currentConditon = treeConditions[i].LeftCondition;
+                            leftValue = $" {treeConditions[i].RightCondition.DisplayName} ";
                         }
                         break;
                     default:
@@ -488,7 +490,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 }
                 else if (treeConditions[i].RelationCondition.ConditionType.Equals(eConditionType.Method))
                 {
-                    StrValue.Append(MysqlConst.MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue));
+                    StrValue.Append(MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue, currentConditon));
                 }
                 else
                 {
@@ -536,14 +538,16 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
                 string leftValue = string.Empty;
                 string rightValue = string.Empty;
+                ConditionEntity currentConditon=null;
                 switch (treeConditions[i].LeftCondition.ConditionType)
                 {
                     case eConditionType.ColumnName:
                         leftValue = $" {treeConditions[i].LeftCondition.DisplayName} ";
                         if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
-                        {
+                        { 
+                            GetConditionValue(treeConditions[i].RightCondition,sqlEntity,rightValue);
                             rightValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
-                            sqlEntity.AddParameter(DbType, rightValue, treeConditions[i].RightCondition.DisplayName);
+                            currentConditon = treeConditions[i].RightCondition;
                         }
                         else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
                         {
@@ -561,10 +565,11 @@ namespace NetCore.ORM.Simple.SqlBuilder
                             sqlEntity.AddParameter(DbType, rightValue, treeConditions[i].RightCondition.DisplayName);
                         }
                         else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
-                        {
-                            leftValue = $" {treeConditions[i].RightCondition.DisplayName}";
+                        { 
                             rightValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
-                            sqlEntity.AddParameter(DbType, rightValue, treeConditions[i].LeftCondition.DisplayName);
+                            leftValue = $" {treeConditions[i].RightCondition.DisplayName}";
+                            GetConditionValue(treeConditions[i].LeftCondition,sqlEntity, rightValue);
+                            currentConditon = treeConditions[i].LeftCondition;
                         }
                         break;
                     default:
@@ -572,7 +577,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 }
                 if (treeConditions[i].RelationCondition.ConditionType.Equals(eConditionType.Method))
                 {
-                    sqlEntity.StrSqlValue.Append(MysqlConst.MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue));
+                    sqlEntity.StrSqlValue.Append(MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue,currentConditon));
                 }
                 else
                 {
@@ -720,6 +725,127 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 return true;
             }
             return false;
+        }
+
+
+        protected virtual  void GetConditionValue(ConditionEntity condition,SqlBase entity,string key)
+        {
+            StringBuilder sValue = new StringBuilder();
+            if (Check.IsNull(condition))
+            {
+                throw new ArgumentNullException(nameof(condition));
+            }
+            if (!Check.IsNullOrEmpty(condition.DisplayName))
+            {
+                entity.AddParameter(DbType,key,condition.DisplayName);
+                return;
+            }
+            if (Check.IsNull(condition.Value))
+            {
+                return;
+            }
+           condition.DataType = CommonConst.GetType(condition.PropertyType);
+            switch (condition.DataType)
+            {
+                case eDataType.SimpleString:
+                case eDataType.SimpleInt:
+                case eDataType.SimpleGuid:
+                case eDataType.SimpleTime:
+                case eDataType.SimpleFloat:
+                case eDataType.SimpleDouble:
+                case eDataType.SimpleDecimal:
+                    sValue.Append(condition.Value);
+
+                    break;
+                case eDataType.SimpleArrayString:
+                case eDataType.SimpleListString:
+                case eDataType.SimpleArrayGuid:
+                case eDataType.SimpleListGuid:
+                    foreach (var item in (dynamic)condition.Value)
+                    {
+                        sValue.Append($"'{item}',");
+                    }
+                    sValue.Remove(sValue.Length - 1, 1);
+                    break;
+                case eDataType.SimpleArrayInt:
+                case eDataType.SimpleArrayDouble:
+                case eDataType.SimpleArrayFloat:
+                case eDataType.SimpleArrayDecimal:
+                case eDataType.SimpleListInt:
+               
+                case eDataType.SimpleListFloat:
+                case eDataType.SimpleListDouble:
+                case eDataType.SimpleListDecimal:
+                    foreach (var item in (dynamic)condition.Value)
+                    {
+                        sValue.Append($"{item},");
+                    }
+                    sValue.Remove(sValue.Length-1,1);
+                    break;
+                default:
+                    break;
+            }
+            condition.DisplayName=sValue.ToString();
+        }
+
+        protected virtual string MapMethod(string methodName, string leftValue, string rightValue, ConditionEntity condition)
+        {
+            string value = MysqlConst.EqualSign.ToString();
+            if (Check.IsNullOrEmpty(methodName))
+            {
+                return value;
+            }
+            switch (methodName)
+            {
+                case "ToString":
+                    break;
+                case "Equals":
+                    value = $"{leftValue}={rightValue}";
+                    break;
+                case "IsNullOrEmpty":
+                    if (!Check.IsNullOrEmpty(leftValue))
+                    {
+                        value = $"{leftValue} IS NULL";
+                    }
+                    else if (!Check.IsNullOrEmpty(rightValue))
+                    {
+                        value = $"{rightValue} IS NULL";
+                    }
+                    break;
+                case "Sum":
+                    value = $" SUM({leftValue}) ";
+                    break;
+                case "Min":
+                    value = $" Min({leftValue}) ";
+                    break;
+                case "Max":
+                    value = $" Max({leftValue}) ";
+                    break;
+                case "Count":
+                    var star = "*";
+                    leftValue = Check.IsNullOrEmpty(leftValue) ? star : leftValue;
+                    value = $" COUNT({leftValue}) ";
+                    break;
+                case "Average":
+                    value = $" AVG({leftValue}) ";
+                    break;
+                case "FirstOrDefault":
+                    value = $" {leftValue}";
+                    break;
+                case "Contains":
+                    if (eDataType.SimpleString==condition.DataType)
+                    {
+                        value= $"{leftValue} Like '%{rightValue}%' ";
+                    }else if ((int)eDataType.SimpleArrayInt <= (int)condition.DataType
+                        && (int)eDataType.SimpleListDecimal >= (int)condition.DataType)
+                    {
+                         value=$"{leftValue} in ({condition.DisplayName}) ";
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return value;
         }
     }
 }

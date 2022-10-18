@@ -25,14 +25,26 @@ namespace NetCore.ORM.Simple.Entity
             ConstFieldType = new List<FieldInfo>();
         }
         public string DisplayName { get { return displayName; } set { displayName = value; } }
+        /// <summary>
+        /// 常量-字段
+        /// </summary>
         public eConditionType ConditionType { get { return conditionType; } set { conditionType = value; } }
+        /// <summary>
+        /// 符号类型
+        /// </summary>
         public eSignType SignType { get { return signType; } set { signType = value; } }
+        public eDataType DataType { get { return dataType; } set { dataType = value; } }
 
         public Type PropertyType { get { return propertyType; } set { propertyType = value; } }
         public PropertyInfo ConstPropType { get { return constType; } set { constType = value; } }
         public List<FieldInfo> ConstFieldType { get { return constFieldType; } set { constFieldType = value; } }
         public int Index { get { return index; } set { index = value; } }
         public string Key { get { return key; } set { key = value; } }
+
+        /// <summary>
+        /// 将一些值进行保存
+        /// </summary>
+        public object Value { get { return val; } set { val = value; } }
 
 
 
@@ -44,5 +56,7 @@ namespace NetCore.ORM.Simple.Entity
         private List<FieldInfo> constFieldType;
         private int index;
         private string key;
+        private object val;
+        private eDataType dataType;
     }
 }

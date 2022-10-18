@@ -37,10 +37,6 @@ namespace NetCore.ORM.Simple.Visitor
         /// 是否经过多次映射- 根据最后一次映射数据
         /// </summary>
         private bool IsMultipleMap;
-        /// <summary>
-        /// 初始化是包含的所有表
-        /// </summary>
-        private TableEntity tableNames;
 
         /// <summary>
         /// 当前表达式目录树中表的别称
@@ -215,10 +211,9 @@ namespace NetCore.ORM.Simple.Visitor
         {
             if (Check.IsNull(currentTree))
             {
-                currentTree = new TreeConditionEntity();
+                currentTree = select.CreateTreeConditon();
                 currentTree.LeftCondition = new ConditionEntity(eConditionType.Constant);
                 currentTree.LeftCondition.DisplayName = $"{node.Value}";
-                select.CreateTreeConditon(currentTree);
                 return node;
             }
             if (Check.IsNull(currentTree.RightCondition))
@@ -264,24 +259,11 @@ namespace NetCore.ORM.Simple.Visitor
             }
             else if (!Check.IsNull(currentTree.LeftCondition.ConstFieldType) && currentTree.LeftCondition.ConstFieldType.Count > 0)
             {
-                if (currentTree.RelationCondition.DisplayName.Equals("Contains"))
+                if (!Check.IsNullOrEmpty(currentTree.RelationCondition.DisplayName)&&currentTree.RelationCondition.DisplayName.Equals("Contains"))
                 {
-                    
-                    var obj = currentTree.LeftCondition.ConstFieldType[0].GetValue(node.Value);
-                    StringBuilder sb = new StringBuilder();
-                    foreach (var item in (dynamic)obj)
-                    {
-                        if (item.GetType()==typeof(int)|| item.GetType()== typeof(float)|| item.GetType() == typeof(double) || item.GetType() == typeof(decimal))
-                        {
-                            sb.Append($"{item},");
-                        }
-                        else
-                        {
-                            sb.Append($"'{item}',");
-                        }
-                    }
-                    currentTree.RightCondition.DisplayName =sb.Remove(sb.Length-1,1).ToString();
-                    
+
+                    currentTree.RightCondition.Value= currentTree.LeftCondition.ConstFieldType[0].GetValue(node.Value);
+                    currentTree.RightCondition.PropertyType = currentTree.RightCondition.Value.GetType();
                 }
                 else if (currentTree.LeftCondition.ConstFieldType.Count >= 2)
                 {
@@ -317,8 +299,9 @@ namespace NetCore.ORM.Simple.Visitor
             {
                 currentTree.RightCondition.DisplayName = node.Value.ToString();
             }
-
-            return base.VisitConstant(node);
+            base.VisitConstant(node);
+            IsComplete = true;
+            return node;
         }
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
@@ -326,7 +309,7 @@ namespace NetCore.ORM.Simple.Visitor
             {
                 if (Check.IsNull(currentTree))
                 {
-                    currentTree = new TreeConditionEntity();
+                    currentTree =select.CreateTreeConditon();
                 }
                 else
                 {
@@ -355,7 +338,6 @@ namespace NetCore.ORM.Simple.Visitor
                 {
                     currentTree.RelationCondition = new ConditionEntity(eConditionType.Method);
                     currentTree.RelationCondition.DisplayName = node.Method.Name;
-                    select.CreateTreeConditon(currentTree);
                 }
 
             }
@@ -377,7 +359,6 @@ namespace NetCore.ORM.Simple.Visitor
         }
         protected override Expression VisitUnary(UnaryExpression node)
         {
-            Console.WriteLine(node.ToString());
             return base.VisitUnary(node);
         }
         protected override Expression VisitMember(MemberExpression node)
@@ -453,7 +434,7 @@ namespace NetCore.ORM.Simple.Visitor
         {
             if (Check.IsNull(currentTree))
             {
-                currentTree = new TreeConditionEntity();
+                currentTree=select.CreateTreeConditon();
             }
             if (node.Left is MemberExpression leftMember)
             {
@@ -481,7 +462,6 @@ namespace NetCore.ORM.Simple.Visitor
                 currentTree.RightCondition = new ConditionEntity(eConditionType.ColumnName);
                 GetMemberValue(rightMember, currentTree.RightCondition);
             }
-            select.CreateTreeConditon(currentTree);
             IsComplete = true;
         }
 
@@ -494,7 +474,7 @@ namespace NetCore.ORM.Simple.Visitor
         {
             if (IsComplete)
             {
-                currentTree = new TreeConditionEntity();
+                currentTree=select.CreateTreeConditon();
                 IsComplete = false;
             }
             currentTree.LeftBracket.Add(eSignType.LeftBracket);
@@ -506,7 +486,7 @@ namespace NetCore.ORM.Simple.Visitor
             }
             if (IsComplete)
             {
-                currentTree = new TreeConditionEntity();
+                currentTree = select.CreateTreeConditon();
                 IsComplete = false;
             }
             currentTree.LeftBracket.Add(eSignType.LeftBracket);

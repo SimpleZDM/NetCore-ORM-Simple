@@ -252,18 +252,15 @@ namespace NetCore.ORM.Simple.Visitor
 
         protected override Expression VisitRuntimeVariables(RuntimeVariablesExpression node)
         {
-            Console.WriteLine(node.ToString());
             return base.VisitRuntimeVariables(node);
         }
 
         protected override MemberMemberBinding VisitMemberMemberBinding(MemberMemberBinding node)
         {
-            Console.WriteLine(node.ToString());
             return base.VisitMemberMemberBinding(node);
         }
         protected override LabelTarget? VisitLabelTarget(LabelTarget? node)
         {
-            Console.WriteLine(node.ToString());
             return base.VisitLabelTarget(node);
         }
         /// <summary>

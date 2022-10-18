@@ -157,7 +157,11 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 Console.WriteLine("****************查询测试*****************");
                 Console.WriteLine("****************1.简单单表查询*****************");
                 /// 返回所有
-                List<UserEntity> users = client.Queryable<UserEntity>().ToList();
+                int[] ids = new int[] { 1774, 1775, 1776, 1777, 1779 };
+                string[] names = new string[] { "111", "222", "333" };
+                string str;
+
+                List<UserEntity> users = client.Queryable<UserEntity>().Where(u => ids.Contains(u.Id) && names.Contains(u.Name)).ToList();
                 UserEntity user = client.Queryable<UserEntity>().FirstOrDefault();
                 //数据的条数
                 int count = client.Queryable<UserEntity>().Take(10).Count();

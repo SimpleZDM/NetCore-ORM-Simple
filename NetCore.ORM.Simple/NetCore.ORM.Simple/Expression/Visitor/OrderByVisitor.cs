@@ -53,14 +53,12 @@ namespace NetCore.ORM.Simple.Visitor
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            Console.WriteLine(node.Method.Name);
             return base.VisitMethodCall(node);
         }
 
         protected override MemberBinding VisitMemberBinding(MemberBinding node)
         {
             base.VisitMemberBinding(node);
-            Console.WriteLine(node.Member.Name);
             return node;
         }
 
@@ -96,7 +94,6 @@ namespace NetCore.ORM.Simple.Visitor
 
         protected override Expression VisitNewArray(NewArrayExpression node)
         {
-            Console.WriteLine(node.ToString());
             return base.VisitNewArray(node);
         }
     }

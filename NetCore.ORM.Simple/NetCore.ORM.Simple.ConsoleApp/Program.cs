@@ -12,8 +12,18 @@ public static class Program
 {
     public static int Main(string []args)
     {
+        object o = 1;
+        object o2 = "232";
+        object o3 = 1.1;
+        Console.WriteLine(o);
+        Console.WriteLine(o2);
+        Console.WriteLine($"{o3}");
+        Console.WriteLine($"{o}");
+        Console.WriteLine($"{o2}");
+
+
         //SimpleExpressionTest test = new SimpleExpressionTest();
-        // test.Select();
+        ////test.Select();
         //test.Where();
         SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
         //MysqlTest.InsertTest();
@@ -21,17 +31,17 @@ public static class Program
         //MysqlTest.DeleteTest();
         MysqlTest.QueryTest();
 
-        //SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
+        SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
         //sqliteTest.InsertTest();
         //sqliteTest.UpdateTest();
         //sqliteTest.DeleteTest();
-        //sqliteTest.QueryTest();
+        sqliteTest.QueryTest();
 
-        //SimpleSqlServiceTest sqlServcie = new SimpleSqlServiceTest();
+        SimpleSqlServiceTest sqlServcie = new SimpleSqlServiceTest();
         //sqlServcie.InsertTest();
         //sqlServcie.UpdateTest();
         //sqlServcie.DeleteTest();
-        //sqlServcie.QueryTest();
+        sqlServcie.QueryTest();
         return 0;
     }
 }

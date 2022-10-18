@@ -87,4 +87,27 @@ namespace NetCore.ORM.Simple.Entity
        Ascending=0,
        Descending=1,
     }
+    
+    public enum eDataType
+    {
+        SimpleString=0,//字符串
+        SimpleInt,//字符串
+        SimpleGuid,//字符串
+        SimpleTime,//字符串
+        SimpleFloat,//字符串
+        SimpleDouble,//字符串
+        SimpleDecimal,//字符串
+        SimpleArrayInt,//字符串
+        SimpleArrayString,
+        SimpleArrayGuid,
+        SimpleArrayDouble,
+        SimpleArrayFloat,
+        SimpleArrayDecimal,
+        SimpleListInt,
+        SimpleListString,
+        SimpleListGuid,
+        SimpleListFloat,
+        SimpleListDouble,
+        SimpleListDecimal,
+    }
 }
