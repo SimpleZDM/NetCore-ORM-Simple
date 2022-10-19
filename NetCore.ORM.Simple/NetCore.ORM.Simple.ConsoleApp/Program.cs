@@ -30,16 +30,16 @@ public static class Program
         ////test.Select();
         //test.Where();
         SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
-         MysqlTest.InsertTest();
-         MysqlTest.UpdateTest();
-         MysqlTest.DeleteTest();
-         MysqlTest.QueryTest();
+        //MysqlTest.InsertTest();
+        //MysqlTest.UpdateTest();
+        //MysqlTest.DeleteTest();
+        MysqlTest.QueryTest();
 
         SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
         //sqliteTest.InsertTest();
         //sqliteTest.UpdateTest();
         //sqliteTest.DeleteTest();
-       // sqliteTest.QueryTest();
+        sqliteTest.QueryTest();
 
         SimpleSqlServiceTest sqlServcie = new SimpleSqlServiceTest();
         //sqlServcie.InsertTest();

@@ -228,7 +228,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 throw new ArgumentNullException(nameof(select));
             }
-           
+
             if (select.MapInfos.Count.Equals(CommonConst.ZeroOrNull))
             {
                 Type type = typeof(TData);
@@ -442,7 +442,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
                 string leftValue = string.Empty;
                 string rightValue = string.Empty;
-                ConditionEntity currentConditon=null;
+                ConditionEntity currentConditon = null;
                 switch (treeConditions[i].LeftCondition.ConditionType)
                 {
                     case eConditionType.ColumnName:
@@ -454,7 +454,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
                         {
                             rightValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
-                            GetConditionValue(treeConditions[i].RightCondition,sqlEntity,rightValue);
+                            GetConditionValue(treeConditions[i].RightCondition, sqlEntity, rightValue);
                             currentConditon = treeConditions[i].RightCondition;
                         }
                         else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
@@ -466,7 +466,14 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     case eConditionType.Constant:
                         if (Check.IsNull(treeConditions[i].RelationCondition))
                         {
-                            leftValue = $"{treeConditions[i].LeftCondition.DisplayName}";
+                            if (treeConditions[i].IsNot)
+                            {
+                                leftValue = $"Not {treeConditions[i].LeftCondition.DisplayName}";
+                            }
+                            else
+                            {
+                                leftValue = $"{treeConditions[i].LeftCondition.DisplayName}";
+                            }
                             // sqlEntity.DbParams.Add(new MySqlParameter(leftValue, treeConditions[i].LeftCondition.DisplayName));
                         }
                         else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
@@ -480,7 +487,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
                         {
                             rightValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
-                            GetConditionValue(treeConditions[i].LeftCondition,sqlEntity, rightValue);
+                            GetConditionValue(treeConditions[i].LeftCondition, sqlEntity, rightValue);
                             currentConditon = treeConditions[i].LeftCondition;
                             leftValue = $" {treeConditions[i].RightCondition.DisplayName} ";
                         }
@@ -494,7 +501,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 }
                 else if (treeConditions[i].RelationCondition.ConditionType.Equals(eConditionType.Method))
                 {
-                    StrValue.Append(MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue, currentConditon));
+                    StrValue.Append(MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue, currentConditon, treeConditions[i].IsNot));
                 }
                 else
                 {
@@ -542,15 +549,15 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
                 string leftValue = string.Empty;
                 string rightValue = string.Empty;
-                ConditionEntity currentConditon=null;
+                ConditionEntity currentConditon = null;
                 switch (treeConditions[i].LeftCondition.ConditionType)
                 {
                     case eConditionType.ColumnName:
                         leftValue = $" {treeConditions[i].LeftCondition.DisplayName} ";
                         if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
-                        { 
+                        {
                             rightValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
-                            GetConditionValue(treeConditions[i].RightCondition,sqlEntity,rightValue);
+                            GetConditionValue(treeConditions[i].RightCondition, sqlEntity, rightValue);
                             currentConditon = treeConditions[i].RightCondition;
                         }
                         else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
@@ -569,10 +576,10 @@ namespace NetCore.ORM.Simple.SqlBuilder
                             sqlEntity.AddParameter(DbType, rightValue, treeConditions[i].RightCondition.DisplayName);
                         }
                         else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
-                        { 
+                        {
                             rightValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
                             leftValue = $" {treeConditions[i].RightCondition.DisplayName}";
-                            GetConditionValue(treeConditions[i].LeftCondition,sqlEntity, rightValue);
+                            GetConditionValue(treeConditions[i].LeftCondition, sqlEntity, rightValue);
                             currentConditon = treeConditions[i].LeftCondition;
                         }
                         break;
@@ -581,7 +588,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 }
                 if (treeConditions[i].RelationCondition.ConditionType.Equals(eConditionType.Method))
                 {
-                    sqlEntity.StrSqlValue.Append(MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue,currentConditon));
+                    sqlEntity.StrSqlValue.Append(MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue, currentConditon,treeConditions[i].IsNot));
                 }
                 else
                 {
@@ -620,7 +627,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 sqlEntity.PageNumber = 1;
             }
-            if (sqlEntity.PageNumber >1 && sqlEntity.PageSize <= 0)
+            if (sqlEntity.PageNumber > 1 && sqlEntity.PageSize <= 0)
             {
                 sqlEntity.PageSize = 50;
             }
@@ -716,7 +723,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
         protected bool IsGroup(SelectEntity entity)
         {
-            if (!Check.IsNull(entity)&&!Check.IsNull(entity.OrderInfos)&&entity.OrderInfos.Any(u=>u.IsGroupBy))
+            if (!Check.IsNull(entity) && !Check.IsNull(entity.OrderInfos) && entity.OrderInfos.Any(u => u.IsGroupBy))
             {
                 return true;
             }
@@ -732,7 +739,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         }
 
 
-        protected virtual  void GetConditionValue(ConditionEntity condition,SqlBase entity,string key)
+        protected virtual void GetConditionValue(ConditionEntity condition, SqlBase entity, string key)
         {
             StringBuilder sValue = new StringBuilder();
             if (Check.IsNull(condition))
@@ -741,14 +748,14 @@ namespace NetCore.ORM.Simple.SqlBuilder
             }
             if (!Check.IsNullOrEmpty(condition.DisplayName))
             {
-                entity.AddParameter(DbType,key,condition.DisplayName);
+                entity.AddParameter(DbType, key, condition.DisplayName);
                 return;
             }
             if (Check.IsNull(condition.Value))
             {
                 return;
             }
-           condition.DataType = CommonConst.GetType(condition.PropertyType);
+            condition.DataType = CommonConst.GetType(condition.PropertyType);
             switch (condition.DataType)
             {
                 case eDataType.SimpleString:
@@ -776,7 +783,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 case eDataType.SimpleArrayFloat:
                 case eDataType.SimpleArrayDecimal:
                 case eDataType.SimpleListInt:
-               
+
                 case eDataType.SimpleListFloat:
                 case eDataType.SimpleListDouble:
                 case eDataType.SimpleListDecimal:
@@ -784,15 +791,15 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     {
                         sValue.Append($"{item},");
                     }
-                    sValue.Remove(sValue.Length-1,1);
+                    sValue.Remove(sValue.Length - 1, 1);
                     break;
                 default:
                     break;
             }
-            condition.DisplayName=sValue.ToString();
+            condition.DisplayName = sValue.ToString();
         }
 
-        protected virtual string MapMethod(string methodName, string leftValue, string rightValue, ConditionEntity condition)
+        protected virtual string MapMethod(string methodName, string leftValue, string rightValue, ConditionEntity condition, bool IsNot)
         {
             string value = MysqlConst.EqualSign.ToString();
             if (Check.IsNullOrEmpty(methodName))
@@ -804,18 +811,39 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 case "ToString":
                     break;
                 case "Equals":
-                    value = $"{leftValue}={rightValue}";
+                    if (IsNot)
+                    {
+                        value = $"{leftValue}<>{rightValue}";
+                    }
+                    else
+                    {
+                        value = $"{leftValue}={rightValue}";
+                    }
                     break;
                 case "IsNullOrEmpty":
                 case "IsNull":
-                    if (!Check.IsNullOrEmpty(leftValue))
+                    if (IsNot)
                     {
-                        value = $"{leftValue} IS NULL";
+                        if (!Check.IsNullOrEmpty(leftValue))
+                        {
+                            value = $"{leftValue} IS NOT NULL";
+                        }
+                        else if (!Check.IsNullOrEmpty(rightValue))
+                        {
+                            value = $"{rightValue} IS NOT NULL";
+                        }
                     }
-                    else if (!Check.IsNullOrEmpty(rightValue))
-                    {
-                        value = $"{rightValue} IS NULL";
+                    else {
+                        if (!Check.IsNullOrEmpty(leftValue))
+                        {
+                            value = $"{leftValue} IS  NULL";
+                        }
+                        else if (!Check.IsNullOrEmpty(rightValue))
+                        {
+                            value = $"{rightValue} IS  NULL";
+                        }
                     }
+
                     break;
                 case "Sum":
                     value = $" SUM({leftValue}) ";
@@ -838,25 +866,57 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     value = $" {leftValue}";
                     break;
                 case "Contains":
-                    if (eDataType.SimpleString==condition.DataType)
+                    if (eDataType.SimpleString == condition.DataType)
                     {
-                        value= $"{leftValue} Like '%{condition.DisplayName}%' ";
-                    }else if ((int)eDataType.SimpleArrayInt <= (int)condition.DataType
+                        if (IsNot)
+                        {
+                            value = $"{leftValue} NOT Like '%{condition.DisplayName}%' ";
+                        }
+                        else
+                        {
+                            value = $"{leftValue}  Like '%{condition.DisplayName}%' ";
+
+                        }
+                    }
+                    else if ((int)eDataType.SimpleArrayInt <= (int)condition.DataType
                         && (int)eDataType.SimpleListDecimal >= (int)condition.DataType)
                     {
-                         value=$"{leftValue} in ({condition.DisplayName}) ";
+                        if (IsNot)
+                        {
+                            value = $"{leftValue} NOT in ({condition.DisplayName}) ";
+                        }
+                        else
+                        {
+                            value = $"{leftValue}  in ({condition.DisplayName}) ";
+                        }
                     }
                     break;
                 case "LeftContains":
                     if (eDataType.SimpleString == condition.DataType)
                     {
-                        value = $"{leftValue} Like '%{condition.DisplayName}' ";
+                        if (IsNot)
+                        {
+                            value = $"{leftValue} NOT Like '%{condition.DisplayName}' ";
+                        }
+                        else
+                        {
+                            value = $"{leftValue} Like '%{condition.DisplayName}' ";
+                        }
+                       
                     }
                     break;
                 case "RightContains":
                     if (eDataType.SimpleString == condition.DataType)
                     {
-                        value = $"{leftValue} Like '{condition.DisplayName}%' ";
+                        if (IsNot)
+                        {
+                            value = $"{leftValue} NOT Like '{condition.DisplayName}%' ";
+                        }
+                        else
+                        {
+                            value = $"{leftValue} Like '{condition.DisplayName}%' ";
+                        }
+                       
                     }
                     break;
                 default:

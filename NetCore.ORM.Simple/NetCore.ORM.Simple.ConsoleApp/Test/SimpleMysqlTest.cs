@@ -23,9 +23,11 @@ namespace NetCore.ORM.Simple.ConsoleApp
         ISimpleClient client;
         public SimpleMysqlTest()
         {
+            string strLocalhost = "server=localhost;database=testdb;user=root;pwd=123456;Allow Zero Datetime=true;Convert Zero Datetime=True;";
+            string StrService = "server=49.233.33.36;database=virtualsoftplatformdb;user=root;pwd=[Txy*!14@msql*^];SSL Mode=None";
             client = new SimpleClient(
           new DataBaseConfiguration(false,
-          new ConnectionEntity("server=localhost;database=testdb;user=root;pwd=123456;Allow Zero Datetime=true;Convert Zero Datetime=True;")
+          new ConnectionEntity(strLocalhost)
           {
               IsAutoClose = true,
               DBType = eDBType.Mysql,
@@ -93,7 +95,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 const int Lenght = 100;
                 for (int i = 0; i < users.Count(); i++)
                 {
-                    users[i].Name = "更新用户名称{i}";
+                    users[i].Name = $"更新用户名称{i}";
                 }
                 var result1 = client.Update(users).SaveChange();
                 Console.WriteLine($"*****************受影响行数:{result1}****************");
@@ -152,16 +154,18 @@ namespace NetCore.ORM.Simple.ConsoleApp
         {
             try
             {
+
+                //var datasss = client.Queryable<MissionDetailEntity>().Where(m => !m.IsDelete || (m.EndTime < DateTime.Now && m.StartTime >DateTime.MinValue)||!m.Id.Equals(Guid.Empty)).Take(500).ToList();
                 Console.WriteLine("****************查询测试*****************");
                 Console.WriteLine("****************1.简单单表查询*****************");
                 ///返回所有
-                int[] ids = new int[] { 1774, 1775, 1776,1777,1779};
+                int[] ids = new int[] { 1811, 1813, 1814, 1815, 18116};
                 Dictionary<int, int> dic = new Dictionary<int, int>();
                 List<int> lids = new List<int>();
-                lids.Add(1774);
-                lids.Add(1787);
-                dic.Add(1774,1774);
-                dic.Add(1775, 1775);
+                lids.Add(1811);
+                lids.Add(1816);
+                dic.Add(1816, 1816);
+                dic.Add(1817, 1817);
                 string[] names = new string[] { "111","222","333"};
                 string str="111";
                 
@@ -169,11 +173,13 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 List<ViewEntity> c = new List<ViewEntity>();
                 c.Count();
                 ids.Count();
-                c.Add(new ViewEntity() { RoleId= 1774 });
-                //UserEntity user = client.Queryable<UserEntity>().Where(u=>c[0].RoleId.Equals(u.Id)&&u.Name.Contains(str)).FirstOrDefault();
+                c.Add(new ViewEntity() { RoleId= 1816 });
+                UserEntity user = client.Queryable<UserEntity>().Where(u=>c[0].RoleId.Equals(u.Id)&&u.Name.Contains(str)).FirstOrDefault();
                 List<UserEntity> left = client.Queryable<UserEntity>().Where(u =>u.Name.LeftContains(str)).ToList();
-                List<UserEntity> user1 = client.Queryable<UserEntity>().Where(u => u.Id.Equals(dic[1774]) && u.Id.Equals(ids[0]) || Check.IsNullOrEmpty(u.Name) || lids[1].Equals(u.Id)).ToList();
+                List<UserEntity> user1 = client.Queryable<UserEntity>().Where(u => u.Id.Equals(dic[1816]) && u.Id.Equals(ids[0]) || Check.IsNullOrEmpty(u.Name) || lids[1].Equals(u.Id)).ToList();
                  List<UserEntity> user2 = client.Queryable<UserEntity>().Where(u =>  lids[1].Equals(u.Id)).ToList();
+                 List<UserEntity> user3= client.Queryable<UserEntity>().Where(u =>  ids.Contains(u.Id)).ToList();
+                 List<UserEntity> user4= client.Queryable<UserEntity>().Where(u =>  lids.Contains(u.Id)).ToList();
                 ///数据的条数
                  int count = client.Queryable<UserEntity>().Count();
                 ////是否存在

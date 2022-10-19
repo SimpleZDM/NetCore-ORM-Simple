@@ -31,6 +31,7 @@ namespace NetCore.ORM.Simple.Entity
         public ConditionEntity RelationCondition { get { return relation; } set { relation = value; } }
         public string Key { get { return key; } set { key = value; } }
         public int Index { get { return index; } set { index = value; } }
+        public bool IsNot { get { return isNot; } set { isNot = value; } }
 
         private ConditionEntity left;
         private ConditionEntity right;
@@ -39,5 +40,6 @@ namespace NetCore.ORM.Simple.Entity
         private List<eSignType> rightBracket;
         private string key;
         private int index;
+        private bool isNot;
     }
 }

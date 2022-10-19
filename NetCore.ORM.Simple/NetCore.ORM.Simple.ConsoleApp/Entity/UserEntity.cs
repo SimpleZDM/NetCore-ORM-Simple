@@ -59,7 +59,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
         public string FirstOrDefaultName { get; set; }
         public int Max { get; set; }
     }
-    [TableName("missiondetailtable")]
+    [MyTableAttrbute("missiondetailtable")]
     public class MissionDetailEntity
     {
         public MissionDetailEntity()

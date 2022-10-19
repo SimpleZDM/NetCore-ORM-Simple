@@ -352,7 +352,10 @@ namespace NetCore.ORM.Simple.Entity
             string mName = string.Empty;
             if (!Check.IsNull(member))
             {
-
+                if(SetConstMember(member,ref condition))
+                {
+                    return true;
+                }
                 if (IsMultipleMap)
                 {
                     var map = MapInfos.Where((map) => map.PropName.Equals(member.Member.Name)).ToArray();
@@ -377,16 +380,7 @@ namespace NetCore.ORM.Simple.Entity
                         }
                         else
                         {
-                            if (member.ToString().Equals("DateTime.Now"))
-                            {
-                                condition.DisplayName = DateTime.Now.ToString("yyyy-MM-dd H:m:s");
-                                condition.ConditionType = eConditionType.Constant;
-
-                            }
-                            else if (member.ToString().Equals("DateTime.Now"))
-                            {
-
-                            }
+                            SetConstMember(member,ref condition);
                         }
 
                     }
@@ -563,6 +557,162 @@ namespace NetCore.ORM.Simple.Entity
                 }
                 currentTree.LeftCondition.ConstPropType = prop;
             }
+
+            //SetConstMember(member,currentTree.RightCondition);
+        }
+
+        public bool SetConstMember(MemberExpression member,ref ConditionEntity condition)
+        {
+            bool value = false;
+            if (member.ToString().Equals("DateTime.Now"))
+            {
+                if (Check.IsNull(condition))
+                {
+                    condition = new ConditionEntity(eConditionType.Constant);
+                }
+                condition.DisplayName = DateTime.Now.ToString("yyyy-MM-dd H:m:s");
+                condition.ConditionType = eConditionType.Constant;
+
+                value = true;
+            }
+            else if (member.ToString().Equals("DateTime.MaxValue"))
+            {
+                if (Check.IsNull(condition))
+                {
+                    condition = new ConditionEntity(eConditionType.Constant);
+                }
+                condition.DisplayName = DateTime.MaxValue.ToString("yyyy-MM-dd H:m:s");
+                condition.ConditionType = eConditionType.Constant;
+                value = true;
+            }
+            else if (member.ToString().Equals("DateTime.MinValue"))
+            {
+                if (Check.IsNull(condition))
+                {
+                    condition = new ConditionEntity(eConditionType.Constant);
+                }
+                condition.DisplayName = DateTime.MinValue.ToString("yyyy-MM-dd H:m:s");
+                condition.ConditionType = eConditionType.Constant;
+                value = true;
+            }
+            else if (member.ToString().Equals("DateTime.MinValue"))
+            {
+                if (Check.IsNull(condition))
+                {
+                    condition = new ConditionEntity(eConditionType.Constant);
+                }
+                condition.DisplayName = DateTime.MinValue.ToString("yyyy-MM-dd H:m:s");
+                condition.ConditionType = eConditionType.Constant;
+                value = true;
+            }
+            else if (member.ToString().Equals("Guid.Empty"))
+            {
+                if (Check.IsNull(condition))
+                {
+                    condition = new ConditionEntity(eConditionType.Constant);
+                }
+                condition.DisplayName = Guid.Empty.ToString();
+                condition.ConditionType = eConditionType.Constant;
+                value = true;
+            }
+            else if (member.ToString().Equals("int.MaxValue"))
+            {
+                if (Check.IsNull(condition))
+                {
+                    condition = new ConditionEntity(eConditionType.Constant);
+                }
+                condition.DisplayName = int.MaxValue.ToString();
+                condition.ConditionType = eConditionType.Constant;
+                value = true;
+            }
+            else if (member.ToString().Equals("int.MinValue"))
+            {
+                if (Check.IsNull(condition))
+                {
+                    condition = new ConditionEntity(eConditionType.Constant);
+                }
+                condition.DisplayName = int.MinValue.ToString();
+                condition.ConditionType = eConditionType.Constant;
+                value = true;
+            }
+            return value;
+        }
+        public bool SetConstMember(MemberInfo member, ConditionEntity condition)
+        {
+           
+            bool value = false;
+            if (member.ToString().Equals("DateTime.Now"))
+            {
+                if (Check.IsNull(condition))
+                {
+                    condition = new ConditionEntity(eConditionType.Constant);
+                }
+                condition.DisplayName = DateTime.Now.ToString("yyyy-MM-dd H:m:s");
+                condition.ConditionType = eConditionType.Constant;
+
+                value = true;
+            }
+            else if (member.ToString().Equals("DateTime.MaxValue"))
+            {
+                if (Check.IsNull(condition))
+                {
+                    condition = new ConditionEntity(eConditionType.Constant);
+                }
+                condition.DisplayName = DateTime.MaxValue.ToString("yyyy-MM-dd H:m:s");
+                condition.ConditionType = eConditionType.Constant;
+                value = true;
+            }
+            else if (member.ToString().Equals("DateTime.MinValue"))
+            {
+                if (Check.IsNull(condition))
+                {
+                    condition = new ConditionEntity(eConditionType.Constant);
+                }
+                condition.DisplayName = DateTime.MinValue.ToString("yyyy-MM-dd H:m:s");
+                condition.ConditionType = eConditionType.Constant;
+                value = true;
+            }
+            else if (member.ToString().Equals("DateTime.MinValue"))
+            {
+                if (Check.IsNull(condition))
+                {
+                    condition = new ConditionEntity(eConditionType.Constant);
+                }
+                condition.DisplayName = DateTime.MinValue.ToString("yyyy-MM-dd H:m:s");
+                condition.ConditionType = eConditionType.Constant;
+                value = true;
+            }
+            else if (member.ToString().Equals("Guid.Empty"))
+            {
+                if (Check.IsNull(condition))
+                {
+                    condition = new ConditionEntity(eConditionType.Constant);
+                }
+                condition.DisplayName =Guid.Empty.ToString();
+                condition.ConditionType = eConditionType.Constant;
+                value = true;
+            }
+            else if (member.ToString().Equals("int.MaxValue"))
+            {
+                if (Check.IsNull(condition))
+                {
+                    condition = new ConditionEntity(eConditionType.Constant);
+                }
+                condition.DisplayName = int.MaxValue.ToString();
+                condition.ConditionType = eConditionType.Constant;
+                value = true;
+            }
+            else if (member.ToString().Equals("int.MinValue"))
+            {
+                if (Check.IsNull(condition))
+                {
+                    condition = new ConditionEntity(eConditionType.Constant);
+                }
+                condition.DisplayName = int.MinValue.ToString();
+                condition.ConditionType = eConditionType.Constant;
+                value = true;
+            }
+            return value;
         }
 
         public void VisitMethod(ref TreeConditionEntity currentTree,MethodCallExpression node)
