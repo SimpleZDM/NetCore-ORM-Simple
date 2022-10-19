@@ -1,4 +1,5 @@
 ﻿using NetCore.ORM.Simple.Common;
+using NetCore.ORM.Simple.Visitor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -152,16 +153,20 @@ namespace NetCore.ORM.Simple.Entity
             JoinInfos.Add(Table.TableNames[0], new JoinTableEntity() { DisplayName = Table.TableNames[0], TableType = eTableType.Master });
         }
 
-        public bool CreateJoin(int index, JoinTableEntity Join)
+        public bool CreateJoin(int index,ref JoinTableEntity Join,ConditionEntity condition,string memberName)
         {
             if (Check.IsNull(Join))
             {
                 Join = new JoinTableEntity();
             }
+            if (Check.IsNull(condition))
+            {
+                condition = new ConditionEntity(eConditionType.ColumnName);
+            }
             string mName = string.Empty;
             if (Table.TableNames.Length > index)
             {
-
+                condition.DisplayName = $"{GetTableName(index)}.{memberName}";
                 if (!JoinInfos.ContainsKey(Table.TableNames[index]))
                 {
                     Dictionary<string, string> dic = new Dictionary<string, string>();
@@ -241,9 +246,9 @@ namespace NetCore.ORM.Simple.Entity
                     default:
                         break;
                 }
-                if (MapInfos.Where(m => m.PropName.Equals(PropName)).Any() && MapInfos.Where(m => m.PropName.Equals(PropName)).Count() == 1)
+                if (MapInfos.Where(m => m.PropName.Equals(PropName)).Count() == 1)
                 {
-                    var map = MapFirstOrDefault(m => m.PropName.Equals(m.PropName));
+                    var map = MapFirstOrDefault(m => m.PropName.Equals(PropName));
                     if (!Check.IsNull(map))
                     {
                         order.TableName = map.TableName;
@@ -253,7 +258,7 @@ namespace NetCore.ORM.Simple.Entity
                 }
                 else
                 {
-                    if (Index >=0)
+                    if (Index >= 0)
                     {
                         Prop = GetPropertyType(Index, PropName);
                         order.TableName = Table.GetTableName(GetEntityType(Index));
@@ -270,7 +275,7 @@ namespace NetCore.ORM.Simple.Entity
 
         }
 
-        public void CreateLastType<TResult>(int start,int end)
+        public void CreateLastType<TResult>(int start, int end)
         {
             LastAnonymity = CommonConst.IsAnonymityObject<TResult>(Table.TableAtrr);
             Type type = typeof(TResult);
@@ -284,15 +289,315 @@ namespace NetCore.ORM.Simple.Entity
             {
                 if (LastType.Count() == CommonConst.ZeroOrNull)
                 {
-                    for (int i = start; i <=end; i++)
+                    for (int i = start; i <= end; i++)
                     {
                         LastType.Add(Table.TableNames[i], Table.DicTable[Table.TableNames[i]].ClassType);
                     }
-                   
+
                 }
 
             }
         }
+
+
+
+
+        #region Expression Visitor
+
+
+        /// <summary>
+        /// 解析 或与非
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="action"></param>
+        public void SingleLogicBinary(BinaryExpression node,ref TreeConditionEntity currentTree, eSignType signType,ref bool IsComplete,Action<Expression,TreeConditionEntity> Visitor)
+        {
+            if (Check.IsNull(Visitor))
+            {
+                throw new Exception("is null visitor!");
+            }
+            if (IsComplete)
+            {
+                currentTree = CreateTreeConditon();
+                //bool res = object.ReferenceEquals(currentTree,TreeConditions[TreeConditions.Count-1]);
+                IsComplete = false;
+            }
+            currentTree.LeftBracket.Add(eSignType.LeftBracket);
+            Visitor(node.Left,currentTree);
+            currentTree.RightBracket.Add(eSignType.RightBracket);
+
+            CreateCondition(new ConditionEntity(eConditionType.Sign)
+            {
+                SignType = signType
+            });
+            if (IsComplete)
+            {
+                currentTree = CreateTreeConditon();
+                //bool res = object.ReferenceEquals(currentTree, TreeConditions[TreeConditions.Count - 1]);
+                IsComplete = false;
+            }
+            currentTree.LeftBracket.Add(eSignType.LeftBracket);
+            Visitor(node.Right,currentTree);
+            currentTree.RightBracket.Add(eSignType.RightBracket);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="member"></param>
+        /// <param name="condition"></param>
+        /// <returns></returns>
+        public bool GetMemberValue(MemberExpression member,ref ConditionEntity condition, int Index, bool IsMultipleMap)
+        {
+            string mName = string.Empty;
+            if (!Check.IsNull(member))
+            {
+
+                if (IsMultipleMap)
+                {
+                    var map = MapInfos.Where((map) => map.PropName.Equals(member.Member.Name)).ToArray();
+
+                    if (!Check.IsNull(map) && map.Count() == 1)
+                    {
+                        condition.DisplayName = $"{map[0].TableName}.{map[0].ColumnName}";
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (Table.TableNames.Length > CommonConst.ZeroOrNull)
+                    {
+                        if (!Check.IsNull(member.Expression))
+                        {
+                            condition.DisplayName = $"{GetTableName(Index)}.{member.Member.Name}";
+                        }
+                        else
+                        {
+                            if (member.ToString().Equals("DateTime.Now"))
+                            {
+                                condition.DisplayName = DateTime.Now.ToString("yyyy-MM-dd H:m:s");
+                                condition.ConditionType = eConditionType.Constant;
+
+                            }
+                            else if (member.ToString().Equals("DateTime.Now"))
+                            {
+
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        condition.DisplayName= member.Member.Name;
+                    }
+                }
+            }
+            return true;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="constant"></param>
+        /// <param name="condition"></param>
+        /// <returns></returns>
+        public void GetConstantValue(ConstantExpression constant,ConditionEntity condition)
+        {
+            string mName = string.Empty;
+            if (!Check.IsNull(constant))
+            {
+
+                if (constant.Type == typeof(string))
+                {
+                    condition.DisplayName = $"'{constant.Value}'";
+                }
+                else
+                {
+                    condition.DisplayName = $"{constant.Value}";
+                }
+            }
+        }
+
+        public bool VisitConstant(ref TreeConditionEntity currentTree,ConstantExpression node)
+        {
+           
+            if (Check.IsNull(currentTree.RightCondition))
+            {
+                currentTree.RightCondition = new ConditionEntity(eConditionType.Constant);
+            }
+            else
+            {
+                if (!currentTree.RightCondition.ConditionType.Equals(eConditionType.Constant))
+                {
+                    currentTree.RightCondition.ConditionType = eConditionType.Constant;
+                }
+            }
+            if (!Check.IsNullOrEmpty(currentTree.RightCondition.DisplayName))
+            {
+                return false;
+            }
+            if (!Check.IsNull(currentTree.LeftCondition.ConstPropType))
+            {
+                if (!Check.IsNull(currentTree.LeftCondition.ConstFieldType))
+                {
+                    var obj = currentTree.LeftCondition.ConstFieldType[0].GetValue(node.Value);
+                    SetProperty(ref currentTree,node,obj);
+                   
+                }
+
+            }
+            else if (!Check.IsNull(currentTree.LeftCondition.ConstFieldType) && currentTree.LeftCondition.ConstFieldType.Count > 0)
+            {
+                SetField(ref currentTree,node);
+            }
+            else
+            {
+                currentTree.RightCondition.DisplayName = node.Value.ToString();
+            }
+            return true;
+        }
+
+        public void SetField(ref TreeConditionEntity currentTree, ConstantExpression node)
+        {
+            if (!Check.IsNullOrEmpty(currentTree.RelationCondition.DisplayName) && currentTree.RelationCondition.DisplayName.Equals("Contains"))
+            {
+
+                currentTree.RightCondition.Value = currentTree.LeftCondition.ConstFieldType[0].GetValue(node.Value);
+                currentTree.RightCondition.PropertyType = currentTree.RightCondition.Value.GetType();
+            }
+            else if (currentTree.LeftCondition.ConstFieldType.Count >= 2)
+            {
+                var obj = currentTree.LeftCondition.ConstFieldType[1].GetValue(node.Value);
+                if (currentTree.Index >= 0)
+                {
+                    currentTree.RightCondition.DisplayName = currentTree.LeftCondition.ConstFieldType[0].GetValue(((dynamic)obj)[currentTree.Index]).ToString();
+                }
+                else
+                {
+
+                    currentTree.RightCondition.DisplayName = currentTree.LeftCondition.ConstFieldType[0].GetValue(obj).ToString();
+                }
+
+            }
+            else if (currentTree.Index >= 0)
+            {
+                var obj = currentTree.LeftCondition.ConstFieldType[0].GetValue(node.Value);
+                currentTree.RightCondition.DisplayName = ArrayExtension.GetValue(currentTree.Index, obj);
+            }
+            else if (!Check.IsNullOrEmpty(currentTree.Key))
+            {
+                var obj = currentTree.LeftCondition.ConstFieldType[0].GetValue(node.Value);
+                currentTree.RightCondition.DisplayName = ArrayExtension.GetValue(currentTree.Key, obj);
+            }
+            else
+            {
+                currentTree.RightCondition.DisplayName = currentTree.LeftCondition.ConstFieldType[0].GetValue(node.Value).ToString();
+            }
+        }
+
+        public void SetProperty(ref TreeConditionEntity currentTree, ConstantExpression node,object obj)
+        {
+            if (currentTree.Index >= 0)
+            {
+                currentTree.RightCondition.DisplayName = ArrayExtension.GetValue(currentTree.Index, obj, currentTree.LeftCondition.ConstPropType);
+                if (Check.IsNull(currentTree.RightCondition.DisplayName))
+                {
+                    var currentobj = ((dynamic)obj)[currentTree.Index];
+
+                    if (!Check.IsNull(currentobj.GetType().GetProperty(currentTree.LeftCondition.ConstPropType.Name)))
+                    {
+                        currentTree.RightCondition.DisplayName = currentTree.LeftCondition.ConstPropType.GetValue(currentobj).ToString();
+                    }
+                    else
+                    {
+                        SetField(ref currentTree, node);
+                    }
+                        
+                }
+            }
+            else if (!Check.IsNullOrEmpty(currentTree.Key))
+            {
+                currentTree.RightCondition.DisplayName = ArrayExtension.GetValue(currentTree.Key, obj, currentTree.LeftCondition.ConstPropType);
+            }
+            else
+            {
+                if (!Check.IsNull(obj.GetType().GetProperty(currentTree.LeftCondition.ConstPropType.Name)))
+                {
+                    currentTree.RightCondition.DisplayName = currentTree.LeftCondition.ConstPropType.GetValue(obj).ToString();
+                }
+                else
+                {
+                    currentTree.RightCondition.DisplayName = obj.ToString();
+                }
+            }
+        }
+        public void VisitMember(ref TreeConditionEntity currentTree,MemberInfo member)
+        {
+            if (member is FieldInfo field)
+            {
+                if (Check.IsNull(currentTree.LeftCondition))
+                {
+                    currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
+                }
+                currentTree.LeftCondition.ConstFieldType.Add(field);
+            }
+            else if (member is PropertyInfo prop)
+            {
+                if (Check.IsNull(currentTree.LeftCondition))
+                {
+                    currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
+                }
+                currentTree.LeftCondition.ConstPropType = prop;
+            }
+        }
+
+        public void VisitMethod(ref TreeConditionEntity currentTree,MethodCallExpression node)
+        {
+            if (Check.IsNull(currentTree))
+            {
+                currentTree = CreateTreeConditon();
+            }
+
+            if (Check.IsNull(currentTree.RelationCondition))
+            {
+                currentTree.RelationCondition = new ConditionEntity(eConditionType.Method);
+                currentTree.RelationCondition.DisplayName = node.Method.Name;
+
+            }
+            if (node.Arguments.Count() >= 1)
+            {
+                int value = 0;
+                if (node.Arguments[0] is MethodCallExpression call)
+                {
+                    if (int.TryParse(call.Arguments[0].ToString(), out value))
+                    {
+                        currentTree.Index = value;
+                    }
+                    else
+                    {
+                        currentTree.Key = call.Arguments[0].ToString();
+                    }
+
+                }
+                if (node.Arguments[0] is ConstantExpression content)
+                {
+                    if (int.TryParse(content.Value.ToString(), out value))
+                    {
+                        currentTree.Index = value;
+                    }
+                    else
+                    {
+                        currentTree.Key = content.Value.ToString();
+                    }
+                }
+
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// 

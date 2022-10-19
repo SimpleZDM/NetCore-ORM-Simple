@@ -21,6 +21,10 @@ public static class Program
         Console.WriteLine($"{o}");
         Console.WriteLine($"{o2}");
 
+        Console.WriteLine(typeof(List<object>).FullName);
+        Console.WriteLine(typeof(object[]).FullName);
+        Console.WriteLine(typeof(List<object>).Name);
+        Console.WriteLine(typeof(object[]).Name);
 
         //SimpleExpressionTest test = new SimpleExpressionTest();
         ////test.Select();
@@ -29,13 +33,13 @@ public static class Program
         //MysqlTest.InsertTest();
         //MysqlTest.UpdateTest();
         //MysqlTest.DeleteTest();
-        MysqlTest.QueryTest();
+         MysqlTest.QueryTest();
 
         SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
         //sqliteTest.InsertTest();
         //sqliteTest.UpdateTest();
         //sqliteTest.DeleteTest();
-        sqliteTest.QueryTest();
+       // sqliteTest.QueryTest();
 
         SimpleSqlServiceTest sqlServcie = new SimpleSqlServiceTest();
         //sqlServcie.InsertTest();

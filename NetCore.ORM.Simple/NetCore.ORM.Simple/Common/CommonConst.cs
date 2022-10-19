@@ -112,7 +112,7 @@ namespace NetCore.ORM.Simple.Common
         }
         public static eDataType GetType(Type type)
         {
-            eDataType dataType = eDataType.SimpleString;
+            eDataType dataType = eDataType.NuKnow;
             if (type.Equals(typeof(int)))
             {
                 dataType = eDataType.SimpleInt;
@@ -120,6 +120,10 @@ namespace NetCore.ORM.Simple.Common
             else if (type.Equals(typeof(float)))
             {
                 dataType = eDataType.SimpleFloat;
+            }
+            else if (type.Equals(typeof(string)))
+            {
+                dataType = eDataType.SimpleString;
             }
             else if (type.Equals(typeof(double)))
             {
@@ -176,6 +180,13 @@ namespace NetCore.ORM.Simple.Common
             else if (type.Equals(typeof(string[])))
             {
                 dataType = eDataType.SimpleArrayString;
+            }else if (type.Name.Contains("[]"))
+            {
+                dataType = eDataType.SimpleArray;
+
+            }else if (type.Name.Contains("List`"))
+            {
+                dataType=eDataType.SimpleList;
             }
             return dataType;
         }

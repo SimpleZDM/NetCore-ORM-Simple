@@ -113,14 +113,14 @@ namespace NetCore.ORM.Simple.Visitor
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            Type type = node.Value.GetType();
-            var obj1=type.GetField("ids").GetValue(node.Value); //ids
-            var obj2=type.GetField("lids").GetValue(node.Value); //lids
-            var obj3=type.GetField("str").GetValue(node.Value); //lids
-            Console.WriteLine(type.Name);
-            Console.WriteLine(obj1.GetType());
-            Console.WriteLine(obj2.GetType());
-            Console.WriteLine(obj3.GetType());
+            //Type type = node.Value.GetType();
+            //var obj1=type.GetField("ids").GetValue(node.Value); //ids
+            //var obj2=type.GetField("lids").GetValue(node.Value); //lids
+            //var obj3=type.GetField("str").GetValue(node.Value); //lids
+            //Console.WriteLine(type.Name);
+            //Console.WriteLine(obj1.GetType());
+            //Console.WriteLine(obj2.GetType());
+            //Console.WriteLine(obj3.GetType());
             base.VisitConstant(node);
             return node;
         }

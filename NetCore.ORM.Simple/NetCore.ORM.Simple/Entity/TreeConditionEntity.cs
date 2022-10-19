@@ -21,6 +21,7 @@ namespace NetCore.ORM.Simple.Entity
         {
             LeftBracket = new List<eSignType>();
             RightBracket = new List<eSignType>();
+            Index = -1;
         }
 
         public List<eSignType> LeftBracket { get { return leftBracket; } set { leftBracket = value; } }
@@ -28,11 +29,15 @@ namespace NetCore.ORM.Simple.Entity
         public ConditionEntity LeftCondition { get { return left; } set { left = value; } }
         public ConditionEntity RightCondition { get { return right; } set { right = value; } }
         public ConditionEntity RelationCondition { get { return relation; } set { relation = value; } }
+        public string Key { get { return key; } set { key = value; } }
+        public int Index { get { return index; } set { index = value; } }
 
         private ConditionEntity left;
         private ConditionEntity right;
         private ConditionEntity relation;
         private List<eSignType> leftBracket;
         private List<eSignType> rightBracket;
+        private string key;
+        private int index;
     }
 }

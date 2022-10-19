@@ -21,7 +21,6 @@ namespace NetCore.ORM.Simple.Entity
         public ConditionEntity(eConditionType type)
         {
             ConditionType = type;
-            Index = -1;
             ConstFieldType = new List<FieldInfo>();
         }
         public string DisplayName { get { return displayName; } set { displayName = value; } }
@@ -38,8 +37,6 @@ namespace NetCore.ORM.Simple.Entity
         public Type PropertyType { get { return propertyType; } set { propertyType = value; } }
         public PropertyInfo ConstPropType { get { return constType; } set { constType = value; } }
         public List<FieldInfo> ConstFieldType { get { return constFieldType; } set { constFieldType = value; } }
-        public int Index { get { return index; } set { index = value; } }
-        public string Key { get { return key; } set { key = value; } }
 
         /// <summary>
         /// 将一些值进行保存
@@ -54,8 +51,6 @@ namespace NetCore.ORM.Simple.Entity
         private Type propertyType;
         private PropertyInfo constType;
         private List<FieldInfo> constFieldType;
-        private int index;
-        private string key;
         private object val;
         private eDataType dataType;
     }

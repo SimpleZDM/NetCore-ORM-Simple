@@ -447,6 +447,10 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 {
                     case eConditionType.ColumnName:
                         leftValue = $" {treeConditions[i].LeftCondition.DisplayName} ";
+                        if (Check.IsNull(treeConditions[i].RightCondition))
+                        {
+                            break;
+                        }
                         if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
                         {
                             rightValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
@@ -835,7 +839,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 case "Contains":
                     if (eDataType.SimpleString==condition.DataType)
                     {
-                        value= $"{leftValue} Like '%{rightValue}%' ";
+                        value= $"{leftValue} Like '%{condition.DisplayName}%' ";
                     }else if ((int)eDataType.SimpleArrayInt <= (int)condition.DataType
                         && (int)eDataType.SimpleListDecimal >= (int)condition.DataType)
                     {

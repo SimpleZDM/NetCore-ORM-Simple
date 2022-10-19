@@ -92,14 +92,7 @@ namespace NetCore.ORM.Simple.Visitor
                 switch (node.NodeType)
                 {
                     case ExpressionType.AndAlso:
-                        SingleLogicBinary(node, (queue) =>
-                        {
-                            CurrentJoinTable.Conditions.Add(
-                                new ConditionEntity(eConditionType.Sign)
-                                {
-                                    SignType = eSignType.And
-                                });
-                        });
+                        select.SingleLogicBinary(node, ref currentTree, eSignType.And, ref IsComplete, (mynode, tree) => { base.Visit(mynode); });
                         break;
                     case ExpressionType.Call:
                         break;
@@ -158,14 +151,7 @@ namespace NetCore.ORM.Simple.Visitor
                         });
                         break;
                     case ExpressionType.OrElse:
-                        SingleLogicBinary(node, (queue) =>
-                        {
-                            CurrentJoinTable.Conditions.Add(
-                                    new ConditionEntity(eConditionType.Sign)
-                                    {
-                                        SignType = eSignType.Or
-                                    });
-                        });
+                        select.SingleLogicBinary(node, ref currentTree, eSignType.Or, ref IsComplete, (mynode, tree) => { base.Visit(mynode); });
                         break;
                     case ExpressionType.ArrayIndex:
                         //currentTree.RightCondition = new ConditionEntity(eConditionType.Constant);  
@@ -173,7 +159,7 @@ namespace NetCore.ORM.Simple.Visitor
                         int.TryParse(node.Right.ToString(), out index);
                         if (!Check.IsNull(currentTree.LeftCondition))
                         {
-                            currentTree.LeftCondition.Index = index;
+                            currentTree.Index = index;
                         }
                         base.Visit(node.Left);
                         break;
@@ -217,78 +203,12 @@ namespace NetCore.ORM.Simple.Visitor
                 }
                 else
                 {
-                    //currentTree.RightCondition = new ConditionEntity(eConditionType.Constant);
-                    //currentTree.RightCondition.DisplayName= $"{node.Value}";
-                    if (Check.IsNull(currentTree.RightCondition))
+                    if (select.VisitConstant(ref currentTree, node))
                     {
-                        currentTree.RightCondition = new ConditionEntity(eConditionType.Constant);
+                        base.VisitConstant(node);
+                        //IsComplete = true;
                     }
-                    if (!Check.IsNullOrEmpty(currentTree.RightCondition.DisplayName))
-                    {
-                        return base.VisitConstant(node);
-                    }
-                    if (!Check.IsNull(currentTree.LeftCondition.ConstPropType))
-                    {
-                        if (!Check.IsNull(currentTree.LeftCondition.ConstFieldType))
-                        {
-                            var obj = currentTree.LeftCondition.ConstFieldType[0].GetValue(node.Value);
 
-                            if (currentTree.LeftCondition.Index >= 0)
-                            {
-                                currentTree.RightCondition.DisplayName = ArrayExtension.GetValue(currentTree.LeftCondition.Index, obj, currentTree.LeftCondition.ConstPropType);
-                                if (Check.IsNull(currentTree.RightCondition.DisplayName))
-                                {
-                                    var currentobj = ((dynamic)obj)[currentTree.LeftCondition.Index];
-                                    currentTree.RightCondition.DisplayName = currentTree.LeftCondition.ConstPropType.GetValue(currentobj).ToString();
-                                }
-                            }
-                            else if (!Check.IsNullOrEmpty(currentTree.LeftCondition.Key))
-                            {
-                                currentTree.RightCondition.DisplayName = ArrayExtension.GetValue(currentTree.LeftCondition.Key, obj, currentTree.LeftCondition.ConstPropType);
-                            }
-                            else
-                            {
-                                currentTree.RightCondition.DisplayName = currentTree.LeftCondition.ConstPropType.GetValue(obj).ToString();
-                            }
-                        }
-
-                    }
-                    else if (!Check.IsNull(currentTree.LeftCondition.ConstFieldType))
-                    {
-                        if (currentTree.LeftCondition.ConstFieldType.Count >= 2)
-                        {
-                            var obj = currentTree.LeftCondition.ConstFieldType[1].GetValue(node.Value);
-                            if (currentTree.LeftCondition.Index >= 0)
-                            {
-                                currentTree.RightCondition.DisplayName = currentTree.LeftCondition.ConstFieldType[0].GetValue(((dynamic)obj)[currentTree.LeftCondition.Index]).ToString();
-                            }
-                            else
-                            {
-
-                                currentTree.RightCondition.DisplayName = currentTree.LeftCondition.ConstFieldType[0].GetValue(obj).ToString();
-                            }
-
-                        }
-                        else if (currentTree.LeftCondition.Index >= 0)
-                        {
-                            var obj = currentTree.LeftCondition.ConstFieldType[0].GetValue(node.Value);
-                            currentTree.RightCondition.DisplayName = ArrayExtension.GetValue(currentTree.LeftCondition.Index, obj);
-                        }
-                        else if (!Check.IsNullOrEmpty(currentTree.LeftCondition.Key))
-                        {
-                            var obj = currentTree.LeftCondition.ConstFieldType[0].GetValue(node.Value);
-                            currentTree.RightCondition.DisplayName = ArrayExtension.GetValue(currentTree.LeftCondition.Key, obj);
-                        }
-                        else
-                        {
-                            currentTree.RightCondition.DisplayName = currentTree.LeftCondition.ConstFieldType[0].GetValue(node.Value).ToString();
-                        }
-
-                    }
-                    else
-                    {
-                        currentTree.RightCondition.DisplayName = node.Value.ToString();
-                    }
                 }
 
             }
@@ -301,30 +221,38 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (!Check.IsNull(currentTree.LeftCondition))
-            {
-                if (node.Arguments.Count() >= 1)
-                {
-                    int value = 0;
-                    if (int.TryParse(node.Arguments[0].ToString(), out value))
-                    {
-                        currentTree.LeftCondition.Index = value;
-                    }
-                    else
-                    {
-                        if (node.Arguments[0] is ConstantExpression content)
-                        {
-                            currentTree.LeftCondition.Key = content.Value.ToString();
-                        }
-                    }
-
-                }
-
-            }
-
             base.VisitMethodCall(node);
-            currentTree.RelationCondition = new ConditionEntity(eConditionType.Method);
-            currentTree.RelationCondition.DisplayName = node.Method.Name;
+            select.VisitMethod(ref currentTree, node);
+            //currentTree.RelationCondition = new ConditionEntity(eConditionType.Method);
+            //currentTree.RelationCondition.DisplayName = node.Method.Name;
+            //if (node.Arguments.Count() >= 1)
+            //{
+            //    int value = 0;
+            //    if (node.Arguments[0] is MethodCallExpression call)
+            //    {
+            //        if (int.TryParse(call.Arguments[0].ToString(), out value))
+            //        {
+            //            currentTree.Index = value;
+            //        }
+            //        else
+            //        {
+            //            currentTree.Key = call.Arguments[0].ToString();
+            //        }
+
+            //    }
+            //    if (node.Arguments[0] is ConstantExpression content)
+            //    {
+            //        if (int.TryParse(content.Value.ToString(), out value))
+            //        {
+            //            currentTree.Index = value;
+            //        }
+            //        else
+            //        {
+            //            currentTree.Key = content.Value.ToString();
+            //        }
+            //    }
+
+            //}
             IsComplete = true;
             CurrentJoinTable.TreeConditions.Add(currentTree);
             return node;
@@ -364,32 +292,44 @@ namespace NetCore.ORM.Simple.Visitor
 
         protected override Expression VisitMember(MemberExpression node)
         {
-
-            if (currentTables.ContainsKey(node.Expression.ToString()))
+           
+            if (!Check.IsNull(node.Expression)&&currentTables.ContainsKey(node.Expression.ToString()))
             {
-                if (Check.IsNull(currentTree.LeftCondition))
-                {
-                    currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
-                    GetMemberValue(node, currentTree.LeftCondition);
-                    currentTree.LeftCondition.PropertyType = node.Type;
-                }
-                else if (Check.IsNull(currentTree.RightCondition))
-                {
-                    currentTree.RightCondition = new ConditionEntity(eConditionType.ColumnName);
-                    GetMemberValue(node, currentTree.RightCondition);
+                    string StrP=node.Expression.ToString();
+                    if (Check.IsNull(currentTree.LeftCondition))
+                    {
+                        currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
+                        //GetMemberValue(node, currentTree.LeftCondition);
+                        currentTree.LeftCondition.PropertyType = node.Type;
+                        select.CreateJoin(currentTables[StrP], ref CurrentJoinTable,currentTree.LeftCondition,node.Member.Name);
+                        //string Params;
+                        //if (!Check.IsNull(member.Expression))
+                        //{
+                        //    Params = member.Expression.ToString();
+                        //    if (currentTables.ContainsKey(Params))
+                        //    {
+
+                        //        select.CreateJoin(currentTables[Params], ref CurrentJoinTable);
+                        //        condition.DisplayName = $"{select.GetTableName(currentTables[Params])}.{member.Member.Name}";
+                        //    }
+                        //    else
+                        //    {
+                        //        VisitMember(member);
+                        //    }
+
+                        //}
+
+                    }
+                    else if (Check.IsNull(currentTree.RightCondition))
+                    {
+                        currentTree.RightCondition = new ConditionEntity(eConditionType.ColumnName);
+                        select.CreateJoin(currentTables[StrP], ref CurrentJoinTable, currentTree.RightCondition,node.Member.Name);
                 }
 
             }
             else
             {
-                if (node.Member is FieldInfo field)
-                {
-                    currentTree.LeftCondition.ConstFieldType.Add(field);
-                }
-                else if (node.Member is PropertyInfo prop)
-                {
-                    currentTree.LeftCondition.ConstPropType = prop;
-                }
+                select.VisitMember(ref currentTree, node.Member);
             }
             base.VisitMember(node);
             return node;
@@ -402,7 +342,7 @@ namespace NetCore.ORM.Simple.Visitor
         protected override Expression VisitNew(NewExpression node)
         {
 
-            
+
             base.VisitNew(node);
             return node;
         }
@@ -490,25 +430,22 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         private void GetMemberValue(MemberExpression member, ConditionEntity condition)
         {
-            string mName = string.Empty;
-            if (!Check.IsNull(member))
-            {
+            //string Params;
+            //if (!Check.IsNull(member.Expression))
+            //{
+            //    Params = member.Expression.ToString();
+            //    if (currentTables.ContainsKey(Params))
+            //    {
 
+            //        select.CreateJoin(currentTables[Params], ref CurrentJoinTable);
+            //        condition.DisplayName = $"{select.GetTableName(currentTables[Params])}.{member.Member.Name}";
+            //    }
+            //    else
+            //    {
+            //        VisitMember(member);
+            //    }
 
-                if (currentTables.ContainsKey(member.Expression.ToString()))
-                {
-                    
-                    CreateJoinTable(member);
-                    condition.DisplayName = $"{select.GetTableName(currentTables[member.Expression.ToString()])}.{member.Member.Name}";
-                    mName = condition.DisplayName;
-                }
-                else
-                {
-                    VisitMember(member);
-                }
-
-            }
-            //return mName;
+            //}
         }
         /// <summary>
         /// 
@@ -529,18 +466,6 @@ namespace NetCore.ORM.Simple.Visitor
         /// 
         /// </summary>
         /// <param name="member"></param>
-
-        private void CreateJoinTable(MemberExpression member)
-        {
-            if (!Check.IsNull(member))
-            {
-
-                if (currentTables.ContainsKey(member.Expression.ToString()))
-                {
-                    select.CreateJoin(currentTables[member.Expression.ToString()],CurrentJoinTable);
-                }
-            }
-        }
 
         public string GetValue()
         {

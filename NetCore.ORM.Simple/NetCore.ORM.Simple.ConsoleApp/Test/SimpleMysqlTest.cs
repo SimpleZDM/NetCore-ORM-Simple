@@ -1,5 +1,6 @@
 ﻿using NetCore.ORM.Simple.Client;
 using NetCore.ORM.Simple.Entity;
+using NetCore.ORM.Simple.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -155,24 +156,37 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 Console.WriteLine("****************1.简单单表查询*****************");
                 ///返回所有
                 int[] ids = new int[] { 1774, 1775, 1776,1777,1779};
+                Dictionary<int, int> dic = new Dictionary<int, int>();
+                List<int> lids = new List<int>();
+                lids.Add(1774);
+                lids.Add(1787);
+                dic.Add(1774,1774);
+                dic.Add(1775, 1775);
                 string[] names = new string[] { "111","222","333"};
-                string str;
+                string str="111";
+                
+                 //List<UserEntity> users = client.Queryable<UserEntity>().Where(u=>ids.Contains(u.Id)&&names.Contains(u.Name)).ToList();
+                List<ViewEntity> c = new List<ViewEntity>();
+                c.Count();
+                ids.Count();
+                c.Add(new ViewEntity() { RoleId= 1774 });
+                //UserEntity user = client.Queryable<UserEntity>().Where(u=>c[0].RoleId.Equals(u.Id)&&u.Name.Contains(str)).FirstOrDefault();
 
-                List<UserEntity> users = client.Queryable<UserEntity>().Where(u=>ids.Contains(u.Id)&&names.Contains(u.Name)).ToList();
-                UserEntity user = client.Queryable<UserEntity>().FirstOrDefault();
+                 List<UserEntity> user1 = client.Queryable<UserEntity>().Where(u => u.Id.Equals(dic[1774]) && u.Id.Equals(ids[0]) || Check.IsNullOrEmpty(u.Name) || lids[1].Equals(u.Id)).ToList();
+                 List<UserEntity> user2 = client.Queryable<UserEntity>().Where(u =>  lids[1].Equals(u.Id)).ToList();
                 ///数据的条数
-                int count = client.Queryable<UserEntity>().Count();
-                //是否存在
-                bool any = client.Queryable<UserEntity>().Any();
+                 int count = client.Queryable<UserEntity>().Count();
+                ////是否存在
+                 bool any = client.Queryable<UserEntity>().Any();
 
-                var first = client.Queryable<UserEntity>().First();
+                 var first = client.Queryable<UserEntity>().First();
 
-                var firstordefault = client.Queryable<UserEntity>().FirstOrDefault();
+                 var firstordefault = client.Queryable<UserEntity>().FirstOrDefault();
 
                 //返回匿名对象
-                var data0 = client.Queryable<UserEntity>().Select(u => new { Name = u.Name, Id = u.Id }).ToList();
-                var data = client.Queryable<UserEntity>().Select(u => new UserEntity { Name = u.Name, Id = u.Id }).
-                    Select(u => new { Name = u.Name, Id = u.Id }).ToList();
+                 var data0 = client.Queryable<UserEntity>().Select(u => new { Name = u.Name, Id = u.Id }).ToList();
+                 var data = client.Queryable<UserEntity>().Select(u => new UserEntity { Name = u.Name, Id = u.Id }).
+                   Select(u => new { Name = u.Name, Id = u.Id }).ToList();
                 //加条件
                 int min = 1746;
                 int max = 19999;

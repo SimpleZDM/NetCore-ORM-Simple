@@ -47,7 +47,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
             lids.Add(1);
             lids.Add(2);
             lids.Add(3);
-            u.Where(u =>u.Name.Contains(str)&&ids.Contains(u.Id)&&lids.Contains(u.Id));
+            u.Where(u => lids[2].Equals(u.Id));
         }
 
     }

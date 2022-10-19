@@ -109,5 +109,8 @@ namespace NetCore.ORM.Simple.Entity
         SimpleListFloat,
         SimpleListDouble,
         SimpleListDecimal,
+        SimpleArray,
+        SimpleList,
+        NuKnow
     }
 }

@@ -224,26 +224,26 @@ namespace NetCore.ORM.Simple.ConsoleApp
 
                 var data111 = JoinData1.ToList();
                 /////连接查询分组
-                var JoinData2 = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) => new JoinInfoEntity(
-                  new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
-                  new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
-                  )).
-                  Where((u, r, c) => u.Id > 10).Select((u, r, c) =>
-                  new ViewEntity
-                  {
-                      UserName = u.Name,
-                      CompanyId = c.Id,
-                      CompanyName = c.CompanyName,
-                      RoleId = r.Id
-                  }
-                  ).
-                  GroupBy(v => new { v.RoleId, v.UserName }).
-                  Select((v) => new GroupEntity()
-                  {
-                      Count = v.Count(),
-                      FirstOrDefaultName = v.FirstOrDefault(s => s.UserName),
-                      Max = v.Max(s => s.RoleId)
-                  }).ToList();
+                //var JoinData2 = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) => new JoinInfoEntity(
+                //  new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
+                //  new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
+                //  )).
+                //  Where((u, r, c) => u.Id > 10).Select((u, r, c) =>
+                //  new ViewEntity
+                //  {
+                //      UserName = u.Name,
+                //      CompanyId = c.Id,
+                //      CompanyName = c.CompanyName,
+                //      RoleId = r.Id
+                //  }
+                //  ).
+                //  GroupBy(v => new { v.RoleId, v.UserName }).
+                //  Select((v) => new GroupEntity()
+                //  {
+                //      Count = v.Count(),
+                //      FirstOrDefaultName = v.FirstOrDefault(s => s.UserName),
+                //      Max = v.Max(s => s.RoleId)
+                //  }).ToList();
 
                 var orderBy = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) => new JoinInfoEntity(
                    new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
