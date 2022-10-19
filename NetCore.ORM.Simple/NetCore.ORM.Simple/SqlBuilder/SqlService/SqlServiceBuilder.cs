@@ -135,6 +135,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     }
                 }
             }
+            sql.StrSqlValue.Append(" ;");
             return sql;
         }
         public override void GetSelect<TData>(QueryEntity sql)
@@ -267,6 +268,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
                 base.OrderBy(select.OrderInfos, entity);
             }
+
+            entity.StrSqlValue.Append(" ;");
         }
 
         public override void GetCount(SelectEntity select, QueryEntity entity)
@@ -354,7 +357,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 GroupBy(select.OrderInfos,entity);
             }
             //视图
-
+            entity.StrSqlValue.Append(";");
         }
 
         /// <summary>

@@ -441,12 +441,23 @@ namespace NetCore.ORM.Simple.Entity
             }
             if (!Check.IsNull(currentTree.LeftCondition.ConstPropType))
             {
-                if (!Check.IsNull(currentTree.LeftCondition.ConstFieldType))
+                if (!Check.IsNull(currentTree.LeftCondition.ConstFieldType) 
+                    && currentTree.LeftCondition.ConstFieldType.Count() > 0
+                    )
                 {
-                    var obj = currentTree.LeftCondition.ConstFieldType[0].GetValue(node.Value);
-                    SetProperty(ref currentTree,node,obj);
-                   
+                    if (node.Value.GetType().GetField(currentTree.LeftCondition.ConstFieldType[0].Name) == null)
+                    {
+                        SetField(ref currentTree,node);
+                    }
+                    else
+                    {
+                        var obj = currentTree.LeftCondition.ConstFieldType[0].GetValue(node.Value);
+                        SetProperty(ref currentTree, node, obj);
+                    }
+                  
+
                 }
+                else { currentTree.RightCondition.DisplayName = node.Value.ToString(); }
 
             }
             else if (!Check.IsNull(currentTree.LeftCondition.ConstFieldType) && currentTree.LeftCondition.ConstFieldType.Count > 0)
@@ -572,7 +583,7 @@ namespace NetCore.ORM.Simple.Entity
                 int value = 0;
                 if (node.Arguments[0] is MethodCallExpression call)
                 {
-                    if (int.TryParse(call.Arguments[0].ToString(), out value))
+                    if (call.Arguments[0].GetType() == typeof(int) && int.TryParse(call.Arguments[0].ToString(),out value))
                     {
                         currentTree.Index = value;
                     }
@@ -584,7 +595,7 @@ namespace NetCore.ORM.Simple.Entity
                 }
                 if (node.Arguments[0] is ConstantExpression content)
                 {
-                    if (int.TryParse(content.Value.ToString(), out value))
+                    if (content.Value.GetType()==typeof(int)&&int.TryParse(content.Value.ToString(),out value))
                     {
                         currentTree.Index = value;
                     }

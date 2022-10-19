@@ -91,7 +91,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 Console.WriteLine($"*****************更新100条****************");
                 List<UserEntity> users = client.Queryable<UserEntity>().Take(100).ToList();
                 const int Lenght = 100;
-                for (int i = 0; i < Lenght; i++)
+                for (int i = 0; i < users.Count(); i++)
                 {
                     users[i].Name = "更新用户名称{i}";
                 }
@@ -121,25 +121,25 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 Dictionary<string, UserEntity> duser = new Dictionary<string, UserEntity>();
                 duser.Add("1", users[4]);
                 //var result0 = client.Delete<UserEntity>(d => d.Id.Equals(1503)).SaveChange();
-                // var result1 = client.Delete<UserEntity>(d => d.Id.Equals(id)).SaveChange();
+                //var result1 = client.Delete<UserEntity>(d => d.Id.Equals(id)).SaveChange();
                 //var result2 = client.Delete<UserEntity>(d => d.Id.Equals(user.Id)).SaveChange();
-                var result14 = client.Delete<UserEntity>(d => d.Id.Equals(duser["1"].Id)).SaveChange();
+               // var result14 = client.Delete<UserEntity>(d => d.Id.Equals(duser["1"].Id)).SaveChange();
                 var result13 = client.Delete<UserEntity>(d => d.Id.Equals(users[3].IDDD)).SaveChange();
                 var result15 = client.Delete<UserEntity>(d => d.Id.Equals(user.IDDD)).SaveChange();
 
                 client.SaveChange();
 
                 Console.WriteLine($"*****************受影响行数:{result}****************");
-                // Console.WriteLine($"*****************受影响行数:{result1}****************");
+                 //Console.WriteLine($"*****************受影响行数:{result1}****************");
 
                 Console.WriteLine("****************2.多条删除*****************");
                 Console.WriteLine($"*****************删除100条****************");
 
                 //删除多个数据
-                //var result2 = client.Delete(users[0]).SaveChange();
-                // var result3 = client.Delete<UserEntity>(d=>d.Id.Equals(10)).SaveChange();
+                var result12 = client.Delete(users[0]).SaveChange();
+                var result32 = client.Delete<UserEntity>(d=>d.Id.Equals(10)).SaveChange();
                 //Console.WriteLine($"*****************受影响行数:{result1}****************");
-                // Console.WriteLine($"*****************受影响行数:{result2}****************");
+                 //Console.WriteLine($"*****************受影响行数:{result2}****************");
                 Console.WriteLine("****************测试结束*****************");
             }
             catch (Exception ex)
@@ -171,8 +171,8 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 ids.Count();
                 c.Add(new ViewEntity() { RoleId= 1774 });
                 //UserEntity user = client.Queryable<UserEntity>().Where(u=>c[0].RoleId.Equals(u.Id)&&u.Name.Contains(str)).FirstOrDefault();
-
-                 List<UserEntity> user1 = client.Queryable<UserEntity>().Where(u => u.Id.Equals(dic[1774]) && u.Id.Equals(ids[0]) || Check.IsNullOrEmpty(u.Name) || lids[1].Equals(u.Id)).ToList();
+                List<UserEntity> left = client.Queryable<UserEntity>().Where(u =>u.Name.LeftContains(str)).ToList();
+                List<UserEntity> user1 = client.Queryable<UserEntity>().Where(u => u.Id.Equals(dic[1774]) && u.Id.Equals(ids[0]) || Check.IsNullOrEmpty(u.Name) || lids[1].Equals(u.Id)).ToList();
                  List<UserEntity> user2 = client.Queryable<UserEntity>().Where(u =>  lids[1].Equals(u.Id)).ToList();
                 ///数据的条数
                  int count = client.Queryable<UserEntity>().Count();

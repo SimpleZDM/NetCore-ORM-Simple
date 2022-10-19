@@ -34,5 +34,14 @@ namespace NetCore.ORM.Simple.Common
             }
             return false;
         }
+        public static bool LeftContains(this string value,string left)
+        {
+            return default(bool);
+        }
+        public static bool RightContains(this string value,string right)
+        {
+            return default(bool);
+        }
+
     }
 }

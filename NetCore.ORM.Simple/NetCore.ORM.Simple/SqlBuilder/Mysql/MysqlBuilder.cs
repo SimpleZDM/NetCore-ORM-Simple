@@ -86,6 +86,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
             OrderBy(select.OrderInfos, entity);
 
             SetPageList(entity);
+
+            entity.StrSqlValue.Append(";") ;
         }
 
         public override void GetCount(SelectEntity select, QueryEntity entity)
@@ -95,6 +97,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
             GroupBy(select.OrderInfos, entity);
 
             SetPageList(entity);
+
+            entity.StrSqlValue.Append(";");
         }
 
         /// <summary>

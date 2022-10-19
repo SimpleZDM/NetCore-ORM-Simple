@@ -55,7 +55,6 @@ namespace NetCore.ORM.Simple.SqlBuilder
             sql.StrSqlValue.Append(");");
 
             sql.DbCommandType = eDbCommandType.Insert;
-
             return sql;
         }
 
@@ -109,7 +108,6 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 Index++;
             }
             sql.DbCommandType = eDbCommandType.Update;
-            sql.StrSqlValue.Append(" ;");
             return sql;
         }
 
@@ -303,6 +301,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             }
             sqlCommand.StrSqlValue.Append($" {MainWordType.Where.GetMainWordStr()} ");
             LinkConditions(conditions, treeConditions, sqlCommand);
+            sqlCommand.StrSqlValue.Append(" ;");
             return sqlCommand;
         }
         /// <summary>
@@ -323,6 +322,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             var key = $"{MainWordType.AT.GetMainWordStr()}{GetColName(PropKey)}{random}";
             sqlCommand.StrSqlValue.Append($"{MainWordType.Delete.GetMainWordStr()} {MainWordType.From.GetMainWordStr()} `{GetTableName(type)}` {MainWordType.Where.GetMainWordStr()} `{GetColName(PropKey)}`={key}");
             sqlCommand.AddParameter(DbType, key, PropKey.GetValue(data));
+            sqlCommand.StrSqlValue.Append(" ;");
             return sqlCommand;
         }
 
@@ -549,8 +549,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         leftValue = $" {treeConditions[i].LeftCondition.DisplayName} ";
                         if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
                         { 
-                            GetConditionValue(treeConditions[i].RightCondition,sqlEntity,rightValue);
                             rightValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                            GetConditionValue(treeConditions[i].RightCondition,sqlEntity,rightValue);
                             currentConditon = treeConditions[i].RightCondition;
                         }
                         else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
@@ -807,6 +807,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     value = $"{leftValue}={rightValue}";
                     break;
                 case "IsNullOrEmpty":
+                case "IsNull":
                     if (!Check.IsNullOrEmpty(leftValue))
                     {
                         value = $"{leftValue} IS NULL";
@@ -844,6 +845,18 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         && (int)eDataType.SimpleListDecimal >= (int)condition.DataType)
                     {
                          value=$"{leftValue} in ({condition.DisplayName}) ";
+                    }
+                    break;
+                case "LeftContains":
+                    if (eDataType.SimpleString == condition.DataType)
+                    {
+                        value = $"{leftValue} Like '%{condition.DisplayName}' ";
+                    }
+                    break;
+                case "RightContains":
+                    if (eDataType.SimpleString == condition.DataType)
+                    {
+                        value = $"{leftValue} Like '{condition.DisplayName}%' ";
                     }
                     break;
                 default:

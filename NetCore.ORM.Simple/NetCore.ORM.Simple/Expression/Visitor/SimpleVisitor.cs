@@ -25,7 +25,6 @@ namespace NetCore.ORM.Simple.Visitor
         private OrderByVisitor OrderVistor;
         private ConditionVisitor conditionVisitor;
         private SelectEntity Select;
-        private QueryEntity Query;
 
         /// <summary>
         /// 
