@@ -63,7 +63,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 const int Lenght = 100;
                 for (int i = 0; i < Lenght; i++)
                 {
-                    users.Add(new UserEntity() { Name = $"测试添加{i}", Age = 100, RoleId = 1, CompanyId = 1, Description = "测试" });
+                    users.Add(new UserEntity() { Name = $"测试添加{i}", Age = i, RoleId = 1, CompanyId = 1, Description = "测试" });
                 }
                 var result1 = client.Insert(users).SaveChange();
                 Console.WriteLine($"*****************受影响行数:{result1}****************");
@@ -125,23 +125,23 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 //var result0 = client.Delete<UserEntity>(d => d.Id.Equals(1503)).SaveChange();
                 //var result1 = client.Delete<UserEntity>(d => d.Id.Equals(id)).SaveChange();
                 //var result2 = client.Delete<UserEntity>(d => d.Id.Equals(user.Id)).SaveChange();
-               // var result14 = client.Delete<UserEntity>(d => d.Id.Equals(duser["1"].Id)).SaveChange();
+                // var result14 = client.Delete<UserEntity>(d => d.Id.Equals(duser["1"].Id)).SaveChange();
                 var result13 = client.Delete<UserEntity>(d => d.Id.Equals(users[3].IDDD)).SaveChange();
                 var result15 = client.Delete<UserEntity>(d => d.Id.Equals(user.IDDD)).SaveChange();
 
                 client.SaveChange();
 
                 Console.WriteLine($"*****************受影响行数:{result}****************");
-                 //Console.WriteLine($"*****************受影响行数:{result1}****************");
+                //Console.WriteLine($"*****************受影响行数:{result1}****************");
 
                 Console.WriteLine("****************2.多条删除*****************");
                 Console.WriteLine($"*****************删除100条****************");
 
                 //删除多个数据
                 var result12 = client.Delete(users[0]).SaveChange();
-                var result32 = client.Delete<UserEntity>(d=>d.Id.Equals(10)).SaveChange();
+                var result32 = client.Delete<UserEntity>(d => d.Id.Equals(10)).SaveChange();
                 //Console.WriteLine($"*****************受影响行数:{result1}****************");
-                 //Console.WriteLine($"*****************受影响行数:{result2}****************");
+                //Console.WriteLine($"*****************受影响行数:{result2}****************");
                 Console.WriteLine("****************测试结束*****************");
             }
             catch (Exception ex)
@@ -159,40 +159,40 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 Console.WriteLine("****************查询测试*****************");
                 Console.WriteLine("****************1.简单单表查询*****************");
                 ///返回所有
-                int[] ids = new int[] { 1811, 1813, 1814, 1815, 18116};
+                int[] ids = new int[] { 1811, 1813, 1814, 1815, 18116 };
                 Dictionary<int, int> dic = new Dictionary<int, int>();
                 List<int> lids = new List<int>();
                 lids.Add(1811);
                 lids.Add(1816);
                 dic.Add(1816, 1816);
                 dic.Add(1817, 1817);
-                string[] names = new string[] { "111","222","333"};
-                string str="111";
-                
-                 //List<UserEntity> users = client.Queryable<UserEntity>().Where(u=>ids.Contains(u.Id)&&names.Contains(u.Name)).ToList();
+                string[] names = new string[] { "111", "222", "333" };
+                string str = "111";
+
+                //List<UserEntity> users = client.Queryable<UserEntity>().Where(u=>ids.Contains(u.Id)&&names.Contains(u.Name)).ToList();
                 List<ViewEntity> c = new List<ViewEntity>();
                 c.Count();
                 ids.Count();
-                c.Add(new ViewEntity() { RoleId= 1816 });
-                UserEntity user = client.Queryable<UserEntity>().Where(u=>c[0].RoleId.Equals(u.Id)&&u.Name.Contains(str)).FirstOrDefault();
-                List<UserEntity> left = client.Queryable<UserEntity>().Where(u =>u.Name.LeftContains(str)).ToList();
+                c.Add(new ViewEntity() { RoleId = 1816 });
+                UserEntity user = client.Queryable<UserEntity>().Where(u => c[0].RoleId.Equals(u.Id) && u.Name.Contains(str)).FirstOrDefault();
+                List<UserEntity> left = client.Queryable<UserEntity>().Where(u => u.Name.LeftContains(str)).ToList();
                 List<UserEntity> user1 = client.Queryable<UserEntity>().Where(u => u.Id.Equals(dic[1816]) && u.Id.Equals(ids[0]) || Check.IsNullOrEmpty(u.Name) || lids[1].Equals(u.Id)).ToList();
-                 List<UserEntity> user2 = client.Queryable<UserEntity>().Where(u =>  lids[1].Equals(u.Id)).ToList();
-                 List<UserEntity> user3= client.Queryable<UserEntity>().Where(u =>  ids.Contains(u.Id)).ToList();
-                 List<UserEntity> user4= client.Queryable<UserEntity>().Where(u =>  lids.Contains(u.Id)).ToList();
+                List<UserEntity> user2 = client.Queryable<UserEntity>().Where(u => lids[1].Equals(u.Id)).ToList();
+                List<UserEntity> user3 = client.Queryable<UserEntity>().Where(u => ids.Contains(u.Id)).ToList();
+                List<UserEntity> user4 = client.Queryable<UserEntity>().Where(u => lids.Contains(u.Id)).ToList();
                 ///数据的条数
-                 int count = client.Queryable<UserEntity>().Count();
+                int count = client.Queryable<UserEntity>().Count();
                 ////是否存在
-                 bool any = client.Queryable<UserEntity>().Any();
+                bool any = client.Queryable<UserEntity>().Any();
 
-                 var first = client.Queryable<UserEntity>().First();
+                var first = client.Queryable<UserEntity>().First();
 
-                 var firstordefault = client.Queryable<UserEntity>().FirstOrDefault();
+                var firstordefault = client.Queryable<UserEntity>().FirstOrDefault();
 
                 //返回匿名对象
-                 var data0 = client.Queryable<UserEntity>().Select(u => new { Name = u.Name, Id = u.Id }).ToList();
-                 var data = client.Queryable<UserEntity>().Select(u => new UserEntity { Name = u.Name, Id = u.Id }).
-                   Select(u => new { Name = u.Name, Id = u.Id }).ToList();
+                var data0 = client.Queryable<UserEntity>().Select(u => new { Name = u.Name, Id = u.Id }).ToList();
+                var data = client.Queryable<UserEntity>().Select(u => new UserEntity { Name = u.Name, Id = u.Id }).
+                  Select(u => new { Name = u.Name, Id = u.Id }).ToList();
                 //加条件
                 int min = 1746;
                 int max = 19999;

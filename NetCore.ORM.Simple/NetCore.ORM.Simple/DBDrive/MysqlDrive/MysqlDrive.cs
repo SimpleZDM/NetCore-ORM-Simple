@@ -1,10 +1,11 @@
-﻿using MySqlConnector;
+﻿using MySql.Data.MySqlClient;
 using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
 using NetCore.ORM.Simple.SqlBuilder;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -28,9 +29,11 @@ namespace NetCore.ORM.Simple
         /// </summary>
         /// <param name="connect"></param>
         /// <exception cref="ArgumentNullException"></exception>
+        /// 
+        private MySqlConnection c;
+        private MySqlCommand cmd;
         public MysqlDrive(DataBaseConfiguration cfg) : base(cfg)
         {
-            connection = new MySqlConnection(configuration.CurrentConnectInfo.ConnectStr);
         }
 
         /// <summary>
@@ -62,16 +65,20 @@ namespace NetCore.ORM.Simple
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
         {
+           
             IEnumerable<TResult> data = null;
             await ExcuteAsync(entity, async (command) =>
             {
+               
                 dataRead = await command.ExecuteReaderAsync();
                 data = MapData<TResult>(entity);
+                
             });
             return data;
         }
         public IEnumerable<TResult> Read<TResult>(QueryEntity entity)
         {
+
             IEnumerable<TResult> data = null;
             Excute(entity, (command) =>
            {
@@ -265,7 +272,7 @@ namespace NetCore.ORM.Simple
             {
                 Open();
             }
-            command = new MySqlCommand(entity.StrSqlValue.ToString(), (MySqlConnection)connection);
+            command = new MySqlCommand(entity.StrSqlValue.ToString(),(MySqlConnection)connection);
             if (!Check.IsNull(entity.DbParams) && entity.DbParams.Count > 0)
             {
                 command.Parameters.AddRange(entity.DbParams.ToArray());
@@ -277,7 +284,7 @@ namespace NetCore.ORM.Simple
             action((MySqlCommand)command);
             if (configuration.CurrentConnectInfo.IsAutoClose)
             {
-                command.Dispose();
+                //cmd.Dispose();
                 Close();
             }
         }

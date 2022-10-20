@@ -795,33 +795,5 @@ namespace NetCore.ORM.Simple.Entity
         private List<dynamic> dyToMap;
         private Dictionary<string, Type> lastType;
         private TableEntity table;
-        private Type tableAtrr;
-        private Type columnAttr;
-
-        public string GetTableName(Type type)
-        {
-            return type.GetTableName(tableAtrr);
-        }
-        public string GetColName(PropertyInfo Prop)
-        {
-            return Prop.GetColName(columnAttr);
-        }
-
-        public IEnumerable<PropertyInfo> GetNotKeyAndIgnore(Type type)
-        {
-            return type.GetNotKeyAndIgnore(columnAttr);
-        }
-        public IEnumerable<PropertyInfo> GetNoIgnore(Type type)
-        {
-            return type.GetNoIgnore(columnAttr);
-        }
-        public PropertyInfo GetKey(Type type)
-        {
-            return type.GetKey(columnAttr);
-        }
-        public PropertyInfo GetAutoKey(Type type)
-        {
-            return type.GetAutoKey(columnAttr);
-        }
     }
 }

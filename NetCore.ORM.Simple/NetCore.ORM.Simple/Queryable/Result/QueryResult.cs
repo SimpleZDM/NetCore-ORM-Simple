@@ -9,6 +9,7 @@ using NetCore.ORM.Simple.Visitor;
 using NetCore.ORM.Simple.SqlBuilder;
 using NetCore.ORM.Simple.Common;
 using System.Data.Common;
+using System.Diagnostics;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.Queryable
@@ -166,9 +167,9 @@ namespace NetCore.ORM.Simple.Queryable
         }
         public List<TResult> ToList()
         {
-
             builder.GetSelect<TResult>(visitor.GetSelectInfo(), sqlEntity);
-            return DbDrive.Read<TResult>(sqlEntity).ToList();
+            List<TResult> data = DbDrive.Read<TResult>(sqlEntity).ToList();
+            return data;
         }
       
         public async Task<List<TResult>> ToListAsync()

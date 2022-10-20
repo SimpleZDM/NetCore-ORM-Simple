@@ -1,5 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
-using MySqlConnector;
+using MySql.Data.MySqlClient;
 using NetCore.ORM.Simple.Common;
 using System;
 using System.Collections.Generic;

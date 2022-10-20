@@ -1,5 +1,4 @@
-﻿using MySqlConnector;
-using NetCore.ORM.Simple.Common;
+﻿using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
 using NetCore.ORM.Simple.Visitor;
 using System;
@@ -45,7 +44,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
       
         public override SqlCommandEntity GetInsert<TData>(List<TData> datas,int offset)
         {
-            return base.GetUpdate(datas,offset);
+            return base.GetInsert(datas,offset);
         }
         public override void GetSelect<TData>(QueryEntity sql)
         {
