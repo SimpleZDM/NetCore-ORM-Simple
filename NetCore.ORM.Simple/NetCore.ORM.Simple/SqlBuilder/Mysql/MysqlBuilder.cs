@@ -86,7 +86,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
             SetPageList(entity);
 
-            entity.StrSqlValue.Append(";") ;
+            entity.StrSqlValue.Append(DBMDConst.Semicolon);
         }
 
         public override void GetCount(SelectEntity select, QueryEntity entity)
@@ -97,7 +97,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
             SetPageList(entity);
 
-            entity.StrSqlValue.Append(";");
+            entity.StrSqlValue.Append(DBMDConst.Semicolon);
         }
 
         /// <summary>
@@ -139,8 +139,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
         {
             if (!Check.IsNull(OrderByInfos) && OrderByInfos.Where(o => o.IsOrderBy).Any())
             {
-                entity.StrSqlValue.Append(" Order By ");
-                entity.StrSqlValue.Append(string.Join(',', OrderByInfos.Where(o => o.IsOrderBy).OrderBy(o => o.OrderSoft).Select(o => $"{o.TableName}.{o.ColumnName} {MysqlConst.AscendOrDescend(o.OrderType)}")));
+                entity.StrSqlValue.Append($" {DBMDConst.Order} {DBMDConst.By} ");
+                entity.StrSqlValue.Append(string.Join(DBMDConst.Comma, OrderByInfos.Where(o => o.IsOrderBy).OrderBy(o => o.OrderSoft).Select(o => $"{o.TableName}.{o.ColumnName} {MysqlConst.AscendOrDescend(o.OrderType)}")));
                 entity.StrSqlValue.Append(" ");
             }
 
@@ -153,8 +153,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
         {
             if (!Check.IsNull(OrderByInfos) && OrderByInfos.Where(g => g.IsGroupBy).Any())
             {
-                entity.StrSqlValue.Append(" Group By ");
-                entity.StrSqlValue.Append(string.Join(',', OrderByInfos.Where(g => g.IsGroupBy).OrderBy(g => g.GroupSoft).Select(g => $"{g.TableName}.{g.ColumnName}")));
+                entity.StrSqlValue.Append($" {DBMDConst.Group} {DBMDConst.By} ");
+                entity.StrSqlValue.Append(string.Join(DBMDConst.Comma, OrderByInfos.Where(g => g.IsGroupBy).OrderBy(g => g.GroupSoft).Select(g => $"{g.TableName}.{g.ColumnName}")));
                 entity.StrSqlValue.Append(" ");
             }
 
@@ -163,17 +163,17 @@ namespace NetCore.ORM.Simple.SqlBuilder
         protected override void Update<TEntity>(SqlCommandEntity sql,string keyName,string tableName,PropertyInfo pKey,TEntity data,IEnumerable<PropertyInfo> Props,int index)
         {
             sql.AddParameter(DbType,$"{keyName}{index}", pKey.GetValue(data));
-            sql.StrSqlValue.Append($"UPDATE `{tableName}` SET ");
-            sql.StrSqlValue.Append(string.Join(',',
+            sql.StrSqlValue.Append($"{DBMDConst.Update} {DBMDConst.UnSingleQuotes}{tableName}{DBMDConst.UnSingleQuotes} {DBMDConst.Set} ");
+            sql.StrSqlValue.Append(string.Join(DBMDConst.Comma,
             Props.Select(p =>
             {
                 string colName = $"{GetColName(p)}";
-                sql.AddParameter(DbType,$"@{colName}{index}", p.GetValue(data));
-                return $"`{colName}`=@{colName}{index}";
+                sql.AddParameter(DbType,$"{DBMDConst.AT}{colName}{DBMDConst.DownLine}{index}", p.GetValue(data));
+                return $"{DBMDConst.UnSingleQuotes}{colName}{DBMDConst.UnSingleQuotes}{DBMDConst.Equal}{DBMDConst.AT}{colName}{DBMDConst.DownLine}{index}";
             })));
-            sql.StrSqlValue.Append(" Where ");
-            sql.StrSqlValue.Append($"{GetColName(pKey)}={keyName}{index}");
-            sql.StrSqlValue.Append(";");
+            sql.StrSqlValue.Append(DBMDConst.Where);
+            sql.StrSqlValue.Append($"{GetColName(pKey)}{DBMDConst.Where}{keyName}{index}");
+            sql.StrSqlValue.Append(DBMDConst.Semicolon);
         }
 
         public override void SetAttr(Type Table = null, Type Column = null)

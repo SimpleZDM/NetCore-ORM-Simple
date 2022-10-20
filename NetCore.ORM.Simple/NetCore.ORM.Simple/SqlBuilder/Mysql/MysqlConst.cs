@@ -45,7 +45,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <returns></returns>
         public static string MapMethod(string methodName,string leftValue,string rightValue,ConditionEntity condition)
         {
-            string value = EqualSign.ToString();
+            string value = DBMDConst.Equal;
             if (Check.IsNullOrEmpty(methodName))
             {
                 return value;

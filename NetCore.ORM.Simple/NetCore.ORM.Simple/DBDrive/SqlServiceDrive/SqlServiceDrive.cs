@@ -26,19 +26,18 @@ namespace NetCore.ORM.Simple
         public SqlServiceDrive(DataBaseConfiguration cfg):base(cfg)
         {
             connection = new SqlConnection(configuration.CurrentConnectInfo.ConnectStr);
+            command = new SqlCommand();
+            command.Connection= connection;
         }
-        public int Excute(SqlCommandEntity entity)
+        public override int Excute(SqlCommandEntity entity)
         {
-            int result = 0;
-            Excute(entity, (command) =>
-            {
-                result = command.ExecuteNonQuery();
-            });
-            return result;
+            Open();
+            return base.Excute(entity);
         }
 
         public int Excute(SqlCommandEntity[] sqlCommand)
         {
+            Open();
             int result = 0;
             int count = 0;
             int current = 0;
@@ -50,7 +49,7 @@ namespace NetCore.ORM.Simple
             {
                 if (count >SqliteConst.INSERTMAXCOUNT)
                 {
-                    Excute(sqlCommand[current], (command) =>
+                    Excute(sqlCommand[current], () =>
                     {
                         result += command.ExecuteNonQuery();
                     });
@@ -65,37 +64,21 @@ namespace NetCore.ORM.Simple
             return result;
         }
 
-        public TEntity Excute<TEntity>(SqlCommandEntity entity,string query) where TEntity : class
+        public override TEntity Excute<TEntity>(SqlCommandEntity entity,string query) where TEntity : class
         {
-            TEntity Entity = null;
-
-            Excute(entity, (command) =>
-            {
-                int result = command.ExecuteNonQuery();
-                if (result == 0)
-                {
-                    return;
-                }
-                command.CommandText = query;
-                command.Parameters.Clear();
-                dataRead = command.ExecuteReader();
-                Entity = MapData<TEntity>().FirstOrDefault();
-            });
-            return Entity;
+            Open();
+           return base.Excute<TEntity>(entity, query);
         }
 
-        public async Task<int> ExcuteAsync(SqlCommandEntity entity)
+        public override async Task<int> ExcuteAsync(SqlCommandEntity entity)
         {
-            int result = 0;
-            await ExcuteAsync(entity, async (command) =>
-            {
-                result = await command.ExecuteNonQueryAsync();
-            });
-            return result;
+            Open();
+          return await base.ExcuteAsync(entity);
         }
 
         public async Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand)
         {
+            Open();
             int result = 0;
             int count = 0;
             int current = 0;
@@ -109,7 +92,7 @@ namespace NetCore.ORM.Simple
                 {
                     if (count >SqliteConst.INSERTMAXCOUNT)
                     {
-                        await ExcuteAsync(sqlCommand[current], async (command) =>
+                        await ExcuteAsync(sqlCommand[current], async () =>
                         {
                             result += await command.ExecuteNonQueryAsync();
                         });
@@ -126,122 +109,65 @@ namespace NetCore.ORM.Simple
             return result;
         }
 
-        public async Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
+        public override async Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
         {
-            TEntity Entity = null;
-            await ExcuteAsync(entity, async (command) =>
-            {
-                int result = await command.ExecuteNonQueryAsync();
-                if (result == 0)
-                {
-                    return;
-                }
-                command.CommandText = query;
-                command.Parameters.Clear();
-                dataRead = await command.ExecuteReaderAsync();
-                Entity = MapData<TEntity>().FirstOrDefault();
-            });
-            return Entity;
+            Open();
+            return await ExcuteAsync<TEntity>(entity, query);
         }
 
-        public IEnumerable<TResult> Read<TResult>(QueryEntity entity)
+        public override IEnumerable<TResult> Read<TResult>(QueryEntity entity)
         {
-            IEnumerable<TResult> data = null;
-            Excute(entity, (command) =>
-            {
-                dataRead = command.ExecuteReader();
-                data = MapData<TResult>(entity);
-            });
-            return data;
+            Open();
+            return Read<TResult>(entity);
         }
 
-        public bool ReadAny(QueryEntity entity)
+        public override bool ReadAny(QueryEntity entity)
         {
-            return ReadCount(entity) > CommonConst.ZeroOrNull;
+            Open();
+            return base.ReadAny(entity);
         }
 
-        public async Task<bool> ReadAnyAsync(QueryEntity entity)
+        public override async Task<bool> ReadAnyAsync(QueryEntity entity)
         {
-            return await ReadCountAsync(entity) > CommonConst.ZeroOrNull;
+            Open();
+            return await base.ReadAnyAsync(entity);
         }
 
-        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params)
+        public override async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params)
         {
-            var entity = new QueryEntity();
-            entity.StrSqlValue.Append(sql);
-            entity.DbParams.AddRange(Params);
-            IEnumerable<TResult> data = null;
-            await ExcuteAsync(entity, async (command) =>
-            {
-                dataRead = await command.ExecuteReaderAsync();
-                data = MapData<TResult>();
-            });
-            return data;
+            Open();
+            return await base.ReadAsync<TResult>(sql,Params);
         }
 
-        public async Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
+        public override async Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
         {
-            IEnumerable<TResult> data = null;
-            await ExcuteAsync(entity, async (command) =>
-            {
-                dataRead = await command.ExecuteReaderAsync();
-                data = MapData<TResult>(entity);
-            });
-            return data;
+            Open();
+            return await base.ReadAsync<TResult>(entity);
         }
 
 
-        public int ReadCount(QueryEntity entity)
+        public override int ReadCount(QueryEntity entity)
         {
-            int value = 0;
-            Excute(entity, (command) =>
-            {
-                dataRead = command.ExecuteReader();
-                while (dataRead.Read())
-                {
-                    string strValue = dataRead[CommonConst.StrDataCount].ToString();
-                    int.TryParse(strValue, out value);
-                }
-            });
-            return value;
+            Open();
+            return base.ReadCount(entity);
         }
 
-        public async Task<int> ReadCountAsync(QueryEntity entity)
+        public override async Task<int> ReadCountAsync(QueryEntity entity)
         {
-            int value = 0;
-            await ExcuteAsync(entity, async (command) =>
-            {
-                dataRead = await command.ExecuteReaderAsync();
-                while (dataRead.Read())
-                {
-                    string strValue = dataRead[CommonConst.StrDataCount].ToString();
-                    int.TryParse(strValue, out value);
-                }
-            });
-            return value;
+            Open();
+            return await base.ReadCountAsync(entity);
         }
 
-        public TResult ReadFirstOrDefault<TResult>(QueryEntity entity)
+        public override  TResult ReadFirstOrDefault<TResult>(QueryEntity entity)
         {
-
-            TResult data = default(TResult);
-            Excute(entity, (command) =>
-            {
-                dataRead = command.ExecuteReader();
-                data = MapDataFirstOrDefault<TResult>(entity);
-            });
-            return data;
+            Open();
+            return  base.ReadFirstOrDefault<TResult>(entity);
         }
 
-        public async Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity)
+        public override async Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity)
         {
-            TResult data = default(TResult);
-            await ExcuteAsync(entity, async (command) =>
-            {
-                dataRead = await command.ExecuteReaderAsync();
-                data = MapDataFirstOrDefault<TResult>(entity);
-            });
-            return data;
+            Open();
+            return await base.ReadFirstOrDefaultAsync<TResult>(entity);
         }
 
        
@@ -260,82 +186,10 @@ namespace NetCore.ORM.Simple
                 connection = new SqlConnection(configuration.CurrentConnectInfo.ConnectStr);
             }
             base.Open();
+           
+            
         }
     
-        private void Excute(QueryEntity entity, Action<SqlCommand> action)
-        {
-            if (Check.IsNull(action))
-            {
-                throw new ArgumentNullException(nameof(action));
-            }
-            if (!IsOpenConnect())
-            {
-                Open();
-            }
-            command = new SqlCommand(entity.StrSqlValue.ToString(), (SqlConnection)connection);
-
-            if (!Check.IsNull(entity.DbParams) && entity.DbParams.Count > 0)
-            {
-                command.Parameters.AddRange(entity.DbParams.ToArray());
-            }
-            if (!Check.IsNull(AOPSqlLog))
-            {
-                AOPSqlLog.Invoke(entity.StrSqlValue.ToString(), entity.DbParams.ToArray());
-            }
-            action((SqlCommand)command);
-
-            if (configuration.CurrentConnectInfo.IsAutoClose)
-            {
-                command.Dispose();
-                Close();
-            }
-        }
-
-        private async Task ExcuteAsync(QueryEntity entity, Action<SqlCommand> action)
-        {
-            await Task.Run(() =>
-            {
-                Excute(entity,action);
-            });
-        }
-
-        private void Excute(SqlCommandEntity entity, Action<SqlCommand> action)
-        {
-            if (Check.IsNull(action))
-            {
-                throw new ArgumentNullException(nameof(action));
-            }
-            if (!IsOpenConnect())
-            {
-                Open();
-            }
-            command = new SqlCommand(entity.StrSqlValue.ToString(),(SqlConnection)connection);
-            if (!Check.IsNull(entity.DbParams) && entity.DbParams.Count > 0)
-            {
-                command.Parameters.AddRange(entity.DbParams.ToArray());
-            }
-
-            if (!Check.IsNull(AOPSqlLog))
-            {
-                AOPSqlLog.Invoke(entity.StrSqlValue.ToString(), entity.DbParams.ToArray());
-            }
-            action((SqlCommand)command);
-
-            if (configuration.CurrentConnectInfo.IsAutoClose && !isBeginTransaction)
-            {
-                Close();
-            }
-        }
-
-        private async Task ExcuteAsync(SqlCommandEntity entity, Action<SqlCommand> action)
-        {
-            await Task.Run(() =>
-            {
-                Excute(entity,action);
-            });
-
-        }
-
         public override void SetAttr(Type Table = null, Type Column = null)
         {
             base.SetAttr(Table, Column);

@@ -39,20 +39,20 @@ namespace NetCore.ORM.Simple.SqlBuilder
             Type type = typeof(TData);
             var Props = GetNotKeyAndIgnore(type).ToArray();
 
-            sql.StrSqlValue.Append($"{MainWordType.Insert.GetMainWordStr()} {MainWordType.Into.GetMainWordStr()} `{GetTableName(type)}` ");
-            sql.StrSqlValue.Append("(");
-            sql.StrSqlValue.Append(string.Join(',', Props.Select(p => $"`{GetColName(p)}`")));
-            sql.StrSqlValue.Append(") ");
-            sql.StrSqlValue.Append($" {MainWordType.Value.GetMainWordStr()}(");
-            sql.StrSqlValue.Append(string.Join(',',
+            sql.StrSqlValue.Append($"{DBMDConst.Insert}{DBMDConst.Into} {DBMDConst.UnSingleQuotes}{GetTableName(type)}{DBMDConst.UnSingleQuotes} ");
+            sql.StrSqlValue.Append(DBMDConst.LeftBracket);
+            sql.StrSqlValue.Append(string.Join(DBMDConst.Comma, Props.Select(p => $"{DBMDConst.UnSingleQuotes}{GetColName(p)}{DBMDConst.UnSingleQuotes}")));
+            sql.StrSqlValue.Append(DBMDConst.RightBracket);
+            sql.StrSqlValue.Append($" {MainWordType.Value.GetMainWordStr()}{DBMDConst.LeftBracket}");
+            sql.StrSqlValue.Append(string.Join(DBMDConst.Comma,
                 Props.Select(p =>
                 {
-                    string key = $"{MainWordType.AT.GetMainWordStr()}{random}{GetColName(p)}";
+                    string key = $"{DBMDConst.AT}{random}{GetColName(p)}";
 
                     sql.AddParameter(DbType, key, p.GetValue(data));
                     return key;
                 })));
-            sql.StrSqlValue.Append(");");
+            sql.StrSqlValue.Append($"{DBMDConst.RightBracket}{DBMDConst.Semicolon}");
 
             sql.DbCommandType = eDbCommandType.Insert;
             return sql;
@@ -75,10 +75,10 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 throw new Exception(ErrorType.NotKey.GetErrorInfo());
             }
-            string keyName = $"{MainWordType.AT.GetMainWordStr()}{GetColName(pKey)}";
+            string keyName = $"{DBMDConst.AT}{GetColName(pKey)}";
             Update(sql, keyName, GetTableName(type), pKey, data, Props, random);
             sql.DbCommandType = eDbCommandType.Update;
-            sql.StrSqlValue.Append(" ;");
+            sql.StrSqlValue.Append(DBMDConst.Semicolon);
             return sql;
         }
         /// <summary>
@@ -101,7 +101,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 throw new Exception(ErrorType.NotKey.GetErrorInfo());
             }
-            string keyName = $"{MainWordType.AT.GetMainWordStr()}{GetColName(pKey)}";
+            string keyName = $"{DBMDConst.AT}{GetColName(pKey)}";
             foreach (var data in datas)
             {
                 Update(sql, keyName, tableName, pKey, data, Props, Index);
@@ -128,37 +128,37 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 if (count == 0)
                 {
-                    sql.StrSqlValue.Append($"{MainWordType.Insert.GetMainWordStr()} {MainWordType.Into.GetMainWordStr()} `{GetTableName(type)}` ");
-                    sql.StrSqlValue.Append("(");
-                    sql.StrSqlValue.Append(string.Join(',', Props.Select(p => $"`{GetColName(p)}`")));
-                    sql.StrSqlValue.Append(") ");
-                    sql.StrSqlValue.Append($" {MainWordType.Value.GetMainWordStr()}");
+                    sql.StrSqlValue.Append($"{DBMDConst.Insert} {DBMDConst.Into} {DBMDConst.UnSingleQuotes}{GetTableName(type)}{DBMDConst.UnSingleQuotes} ");
+                    sql.StrSqlValue.Append(DBMDConst.LeftBracket);
+                    sql.StrSqlValue.Append(string.Join(DBMDConst.Comma, Props.Select(p => $"{DBMDConst.UnSingleQuotes}{GetColName(p)}{DBMDConst.UnSingleQuotes}")));
+                    sql.StrSqlValue.Append(DBMDConst.RightBracket);
+                    sql.StrSqlValue.Append($" {DBMDConst.Value}");
                 }
                 Index++;
                 count++;
-                sql.StrSqlValue.Append(" (");
+                sql.StrSqlValue.Append(DBMDConst.LeftBracket);
                 sql.StrSqlValue.Append(string.Join(',',
                   Props.Select(p =>
                   {
-                      string key = $"{MainWordType.AT.GetMainWordStr()}{Index + offset}{charConnectSign}{GetColName(p)}";
+                      string key = $"{DBMDConst.AT}{GetColName(p)}{DBMDConst.DownLine}{Index + offset}";
                       sql.AddParameter(DbType, key, p.GetValue(data));
                       return key;
                   })));
-                sql.StrSqlValue.Append(" )");
+                sql.StrSqlValue.Append(DBMDConst.RightBracket);
                 if (count == MysqlConst.INSERTMAX)
                 {
-                    sql.StrSqlValue.Append(";");
+                    sql.StrSqlValue.Append(DBMDConst.Semicolon);
                     count = 0;
                 }
                 else
                 {
                     if (Index == datas.Count())
                     {
-                        sql.StrSqlValue.Append(";");
+                        sql.StrSqlValue.Append(DBMDConst.Semicolon);
                     }
                     else
                     {
-                        sql.StrSqlValue.Append(",");
+                        sql.StrSqlValue.Append(DBMDConst.Comma);
                     }
                 }
             }
@@ -176,9 +176,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 sql = new QueryEntity();
             }
             Type type = typeof(TData);
-            sql.StrSqlValue.Append($"SELECT " +
-                $"{string.Join(',', GetNoIgnore(type))} " +
-                $"FROM {GetTableName(type)} ");
+            sql.StrSqlValue.Append($"{DBMDConst.Select} " +
+                $"{string.Join(DBMDConst.Comma, GetNoIgnore(type))} " +
+                $"{DBMDConst.From} {GetTableName(type)} ");
         }
         /// <summary>
         /// 
@@ -191,9 +191,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 sql = new QueryEntity();
             }
-            sql.StrSqlValue.Append($"SELECT " +
-                $"{string.Join(',', GetNoIgnore(type).Select(p => GetColName(p)))} " +
-                $"FROM {GetTableName(type)} ");
+            sql.StrSqlValue.Append($"{DBMDConst.Select} " +
+                $"{string.Join(DBMDConst.Comma, GetNoIgnore(type).Select(p => GetColName(p)))} " +
+                $"{DBMDConst.From} {GetTableName(type)} ");
         }
         /// <summary>
         /// 
@@ -209,7 +209,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             Type type = typeof(TData);
             GetSelect(sql, type);
             var Key = GetKey(type);
-            sql.StrSqlValue.Append($" Where {GetColName(Key)}=LAST_INSERT_ID();");
+            sql.StrSqlValue.Append($" {DBMDConst.Where} {GetColName(Key)}{DBMDConst.Equal}{DBMDConst.LAST_INSERT_ID}{DBMDConst.Semicolon}");
         }
         /// <summary>
         /// 
@@ -244,7 +244,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 }
             }
             //视图
-            entity.StrSqlValue.Append($"{MainWordType.Select.GetMainWordStr()} ");
+            entity.StrSqlValue.Append($"{DBMDConst.Select} ");
 
             entity.MapInfos = select.MapInfos.ToArray();
 
@@ -255,7 +255,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             //条件
             if (!Check.IsNull(select.TreeConditions) && select.TreeConditions.Count > CommonConst.ZeroOrNull)
             {
-                entity.StrSqlValue.Append($" {MainWordType.Where.GetMainWordStr()}");
+                entity.StrSqlValue.Append($" {DBMDConst.Where}");
                 LinkConditions(select.Conditions, select.TreeConditions, entity);
             }
 
@@ -273,14 +273,14 @@ namespace NetCore.ORM.Simple.SqlBuilder
             }
 
             //视图
-            entity.StrSqlValue.Append($"{MainWordType.Select.GetMainWordStr()} {MainWordType.Count.GetMainWordStr()}(*) {MainWordType.As.GetMainWordStr()} {MainWordType.SimpleNumber.GetMainWordStr()}");
+            entity.StrSqlValue.Append($"{DBMDConst.Select} {DBMDConst.Count}{DBMDConst.LeftBracket}{DBMDConst.Asterisk}{DBMDConst.RightBracket} {DBMDConst.As} {DBMDConst.SimpleNumber}");
 
             //连接
             LinkJoinInfos(select.JoinInfos.Values.ToArray(), entity);
             //条件
             if (!Check.IsNull(select.TreeConditions) && select.TreeConditions.Count > CommonConst.ZeroOrNull)
             {
-                entity.StrSqlValue.Append($" {MainWordType.Where.GetMainWordStr()}");
+                entity.StrSqlValue.Append($" {DBMDConst.Where}");
                 LinkConditions(select.Conditions, select.TreeConditions, entity);
             }
         }
@@ -294,14 +294,14 @@ namespace NetCore.ORM.Simple.SqlBuilder
         {
 
             SqlCommandEntity sqlCommand = new SqlCommandEntity();
-            sqlCommand.StrSqlValue.Append($"{MainWordType.Delete.GetMainWordStr()}  {MainWordType.From} `{GetTableName(type)}` ");
+            sqlCommand.StrSqlValue.Append($"{DBMDConst.Delete}  {DBMDConst.From} {DBMDConst.UnSingleQuotes}{GetTableName(type)}{DBMDConst.UnSingleQuotes} ");
             if (Check.IsNull(treeConditions) || treeConditions.Count.Equals(CommonConst.ZeroOrNull))
             {
                 throw new Exception(ErrorType.DeleteNotMatch.GetErrorInfo());
             }
-            sqlCommand.StrSqlValue.Append($" {MainWordType.Where.GetMainWordStr()} ");
+            sqlCommand.StrSqlValue.Append($" {DBMDConst.Where} ");
             LinkConditions(conditions, treeConditions, sqlCommand);
-            sqlCommand.StrSqlValue.Append(" ;");
+            sqlCommand.StrSqlValue.Append(DBMDConst.Semicolon);
             return sqlCommand;
         }
         /// <summary>
@@ -319,10 +319,10 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 throw new Exception(ErrorType.NotKey.GetErrorInfo());
             }
             SqlCommandEntity sqlCommand = new SqlCommandEntity();
-            var key = $"{MainWordType.AT.GetMainWordStr()}{GetColName(PropKey)}{random}";
-            sqlCommand.StrSqlValue.Append($"{MainWordType.Delete.GetMainWordStr()} {MainWordType.From.GetMainWordStr()} `{GetTableName(type)}` {MainWordType.Where.GetMainWordStr()} `{GetColName(PropKey)}`={key}");
+            var key = $"{DBMDConst.AT}{GetColName(PropKey)}{random}";
+            sqlCommand.StrSqlValue.Append($"{DBMDConst.Delete} {DBMDConst.From} `{GetTableName(type)}` {DBMDConst.Where} {DBMDConst.UnSingleQuotes}{GetColName(PropKey)}{DBMDConst.UnSingleQuotes}{DBMDConst.Equal}{key}");
             sqlCommand.AddParameter(DbType, key, PropKey.GetValue(data));
-            sqlCommand.StrSqlValue.Append(" ;");
+            sqlCommand.StrSqlValue.Append(DBMDConst.Semicolon);
             return sqlCommand;
         }
 
@@ -352,7 +352,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         }
                         else
                         {
-                            sqlEntity.StrSqlValue.Append(",");
+                            sqlEntity.StrSqlValue.Append(DBMDConst.Comma);
                         }
                         if (Check.IsNullOrEmpty(mapInfos[i].TableName) && Check.IsNullOrEmpty(mapInfos[i].ColumnName))
                         {
@@ -360,11 +360,11 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         }
                         else
                         {
-                            mapInfos[i].AsColumnName = $"{mapInfos[i].TableName}{charConnectSign}{mapInfos[i].ColumnName}";
+                            mapInfos[i].AsColumnName = $"{mapInfos[i].TableName}{DBMDConst.DownLine}{mapInfos[i].ColumnName}";
                         }
                         if (Check.IsNullOrEmpty(mapInfos[i].MethodName))
                         {
-                            sqlEntity.StrSqlValue.Append($" { mapInfos[i].TableName}.{mapInfos[i].ColumnName} {MainWordType.As.GetMainWordStr()} {mapInfos[i].AsColumnName} ");
+                            sqlEntity.StrSqlValue.Append($" { mapInfos[i].TableName}.{mapInfos[i].ColumnName} {DBMDConst.As} {mapInfos[i].AsColumnName} ");
                         }
                         else
                         {
@@ -379,7 +379,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                             }
 
 
-                            sqlEntity.StrSqlValue.Append($" {vaule} {MainWordType.As.GetMainWordStr()} {mapInfos[i].AsColumnName} ");
+                            sqlEntity.StrSqlValue.Append($" {vaule} {DBMDConst.As} {mapInfos[i].AsColumnName} ");
                         }
 
 
@@ -406,11 +406,11 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 {
                     if (join.TableType.Equals(eTableType.Master))
                     {
-                        sqlEntity.StrSqlValue.Append($" FROM {join.DisplayName} ");
+                        sqlEntity.StrSqlValue.Append($" {DBMDConst.From} {join.DisplayName} ");
                     }
                     else
                     {
-                        sqlEntity.StrSqlValue.Append($" {MysqlConst.StrJoins[(int)join.JoinType]} {join.DisplayName} ON ");
+                        sqlEntity.StrSqlValue.Append($" {MysqlConst.StrJoins[(int)join.JoinType]} {join.DisplayName} {DBMDConst.On} ");
                         LinkConditions(join.Conditions, join.TreeConditions, sqlEntity);
                     }
                 }
@@ -453,7 +453,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         }
                         if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
                         {
-                            rightValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                            rightValue = $"{DBMDConst.AT}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
                             GetConditionValue(treeConditions[i].RightCondition, sqlEntity, rightValue);
                             currentConditon = treeConditions[i].RightCondition;
                         }
@@ -468,7 +468,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         {
                             if (treeConditions[i].IsNot)
                             {
-                                leftValue = $"Not {treeConditions[i].LeftCondition.DisplayName}";
+                                leftValue = $"{DBMDConst.Not} {treeConditions[i].LeftCondition.DisplayName}";
                             }
                             else
                             {
@@ -478,15 +478,15 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         }
                         else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
                         {
-                            leftValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                            leftValue = $"{DBMDConst.AT}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
                             sqlEntity.AddParameter(DbType, leftValue, treeConditions[i].LeftCondition.DisplayName);
 
-                            rightValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                            rightValue = $"{DBMDConst.AT}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
                             sqlEntity.AddParameter(DbType, rightValue, treeConditions[i].RightCondition.DisplayName);
                         }
                         else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
                         {
-                            rightValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                            rightValue = $"{DBMDConst.AT}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
                             GetConditionValue(treeConditions[i].LeftCondition, sqlEntity, rightValue);
                             currentConditon = treeConditions[i].LeftCondition;
                             leftValue = $" {treeConditions[i].RightCondition.DisplayName} ";
@@ -519,10 +519,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 }
 
             }
-
             sqlEntity.StrSqlValue.Append(StrValue.ToString());
-
-
         }
 
         protected virtual void LinkConditions(List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions, SqlCommandEntity sqlEntity)
@@ -556,7 +553,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         leftValue = $" {treeConditions[i].LeftCondition.DisplayName} ";
                         if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
                         {
-                            rightValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                            rightValue = $"{DBMDConst.AT}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
                             GetConditionValue(treeConditions[i].RightCondition, sqlEntity, rightValue);
                             currentConditon = treeConditions[i].RightCondition;
                         }
@@ -569,15 +566,15 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     case eConditionType.Constant:
                         if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
                         {
-                            leftValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                            leftValue = $"{DBMDConst.AT}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
                             sqlEntity.AddParameter(DbType, leftValue, treeConditions[i].LeftCondition.DisplayName);
 
-                            rightValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                            rightValue = $"{DBMDConst.AT}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
                             sqlEntity.AddParameter(DbType, rightValue, treeConditions[i].RightCondition.DisplayName);
                         }
                         else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
                         {
-                            rightValue = $"{MainWordType.AT.GetMainWordStr()}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
+                            rightValue = $"{DBMDConst.AT}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), 8)}{i}";
                             leftValue = $" {treeConditions[i].RightCondition.DisplayName}";
                             GetConditionValue(treeConditions[i].LeftCondition, sqlEntity, rightValue);
                             currentConditon = treeConditions[i].LeftCondition;
@@ -615,9 +612,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
             if (IsPage(sqlEntity))
             {
-                sqlEntity.StrSqlValue.Append($" {MainWordType.Limit.GetMainWordStr()} {MainWordType.AT.GetMainWordStr()}{MainWordType.SkipNumber.GetMainWordStr()},{MainWordType.AT.GetMainWordStr()}{MainWordType.TakeNumber.GetMainWordStr()}");
-                sqlEntity.AddParameter(DbType, $"{MainWordType.AT.GetMainWordStr()}{MainWordType.SkipNumber.GetMainWordStr()}", (sqlEntity.PageNumber - 1) * sqlEntity.PageSize);
-                sqlEntity.AddParameter(DbType, $"{MainWordType.AT.GetMainWordStr()}{MainWordType.TakeNumber.GetMainWordStr()}", sqlEntity.PageSize);
+                sqlEntity.StrSqlValue.Append($" {DBMDConst.Limit} {DBMDConst.AT}{DBMDConst.SkipNumber}{DBMDConst.Comma}{DBMDConst.AT}{DBMDConst.TakeNumber}");
+                sqlEntity.AddParameter(DbType, $"{DBMDConst.AT}{DBMDConst.SkipNumber}", (sqlEntity.PageNumber - 1) * sqlEntity.PageSize);
+                sqlEntity.AddParameter(DbType, $"{DBMDConst.AT}{DBMDConst.TakeNumber}", sqlEntity.PageSize);
             }
         }
 
@@ -645,7 +642,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         {
             if (!Check.IsNull(OrderByInfos) && OrderByInfos.Where(o => o.IsOrderBy).Any())
             {
-                entity.StrSqlValue.Append($" {MainWordType.Order.GetMainWordStr()} {MainWordType.By.GetMainWordStr()} ");
+                entity.StrSqlValue.Append($" {DBMDConst.Order} {DBMDConst.By} ");
                 entity.StrSqlValue.Append(string.Join(',', OrderByInfos.Where(o => o.IsOrderBy).OrderBy(o => o.OrderSoft).Select(o => $"{o.TableName}.{o.ColumnName} {MysqlConst.AscendOrDescend(o.OrderType)}")));
                 entity.StrSqlValue.Append(" ");
             }
@@ -659,7 +656,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         {
             if (!Check.IsNull(OrderByInfos) && OrderByInfos.Where(g => g.IsGroupBy).Any())
             {
-                entity.StrSqlValue.Append($" {MainWordType.Group.GetMainWordStr()} {MainWordType.By.GetMainWordStr()} ");
+                entity.StrSqlValue.Append($" {DBMDConst.Group} {DBMDConst.By} ");
                 entity.StrSqlValue.Append(string.Join(',', OrderByInfos.Where(g => g.IsGroupBy).OrderBy(g => g.GroupSoft).Select(g => $"{g.TableName}.{g.ColumnName}")));
                 entity.StrSqlValue.Append(" ");
             }
@@ -668,18 +665,18 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
         protected virtual void Update<TEntity>(SqlCommandEntity sql, string keyName, string tableName, PropertyInfo pKey, TEntity data, IEnumerable<PropertyInfo> Props, int index)
         {
-            sql.AddParameter(DbType, $"{keyName}{index}", pKey.GetValue(data));
-            sql.StrSqlValue.Append($"{MainWordType.Update.GetMainWordStr()} `{tableName}` {MainWordType.Set.GetMainWordStr()} ");
-            sql.StrSqlValue.Append(string.Join(',',
+            sql.AddParameter(DbType, $"{DBMDConst.AT}{keyName}{DBMDConst.DownLine}{index}", pKey.GetValue(data));
+            sql.StrSqlValue.Append($"{DBMDConst.Update} {DBMDConst.UnSingleQuotes}{tableName}{DBMDConst.UnSingleQuotes} {DBMDConst.Set} ");
+            sql.StrSqlValue.Append(string.Join(DBMDConst.Comma,
             Props.Select(p =>
             {
                 string colName = $"{GetColName(p)}";
-                sql.AddParameter(DbType, $"{MainWordType.AT.GetMainWordStr()}{colName}{index}", p.GetValue(data));
-                return $"`{colName}`={MainWordType.AT.GetMainWordStr()}{colName}{index}";
+                sql.AddParameter(DbType, $"{DBMDConst.AT}{colName}{DBMDConst.DownLine}{index}", p.GetValue(data));
+                return $"{DBMDConst.UnSingleQuotes}{colName}{DBMDConst.UnSingleQuotes}{DBMDConst.Equal}{DBMDConst.AT}{colName}{DBMDConst.DownLine}{index}";
             })));
-            sql.StrSqlValue.Append($" {MainWordType.Where.GetMainWordStr()} ");
-            sql.StrSqlValue.Append($"{GetColName(pKey)}={keyName}{index}");
-            sql.StrSqlValue.Append(";");
+            sql.StrSqlValue.Append($" {DBMDConst.Where} ");
+            sql.StrSqlValue.Append($"{GetColName(pKey)}{DBMDConst.Equal}{keyName}{DBMDConst.DownLine}{index}");
+            sql.StrSqlValue.Append(DBMDConst.Semicolon);
         }
 
         protected string GetTableName(Type type)
@@ -783,7 +780,6 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 case eDataType.SimpleArrayFloat:
                 case eDataType.SimpleArrayDecimal:
                 case eDataType.SimpleListInt:
-
                 case eDataType.SimpleListFloat:
                 case eDataType.SimpleListDouble:
                 case eDataType.SimpleListDecimal:

@@ -162,11 +162,13 @@ namespace NetCore.ORM.Simple
             return PropsMapNames;
         }
 
+        #region map data
         /// <summary>
         /// 
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
+        /// 
         protected IEnumerable<TResult> MapData<TResult>()
         {
             if (Check.IsNull(dataRead))
@@ -256,6 +258,10 @@ namespace NetCore.ORM.Simple
             }
             return tResult;
         }
+
+        #endregion
+
+        #region read data
         protected TResult ReadDataAnonymityFirstOrDefault<TResult>(QueryEntity entity)
         {
             return ReadDataAnonymity<TResult>(entity, true).FirstOrDefault();
@@ -264,6 +270,7 @@ namespace NetCore.ORM.Simple
         {
             return ReadDataAnonymitys<TResult>(entity, true).FirstOrDefault();
         }
+        
 
         /// <summary>
         /// 映射匿名对象
@@ -391,6 +398,86 @@ namespace NetCore.ORM.Simple
             }
             return data;
         }
+
+        #endregion
+
+        #region command
+        protected void Excute(QueryEntity entity, Action action)
+        {
+            if (Check.IsNull(action))
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+            command.CommandText = entity.StrSqlValue.ToString();
+
+            if (!Check.IsNull(entity.DbParams) && entity.DbParams.Count > 0)
+            {
+                if (command.Parameters.Count > 0)
+                {
+                    command.Parameters.Clear();
+                }
+                command.Parameters.AddRange(entity.DbParams.ToArray());
+            }
+            if (!Check.IsNull(AOPSqlLog))
+            {
+                AOPSqlLog.Invoke(entity.StrSqlValue.ToString(), entity.DbParams.ToArray());
+            }
+            action();
+
+            if (configuration.CurrentConnectInfo.IsAutoClose)
+            {
+                Close();
+            }
+        }
+
+        protected async Task ExcuteAsync(QueryEntity entity, Action action)
+        {
+            await Task.Run(() =>
+            {
+                Excute(entity,action);
+            });
+        }
+
+        protected void Excute(SqlCommandEntity entity, Action action)
+        {
+            if (Check.IsNull(action))
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+            command.CommandText = entity.StrSqlValue.ToString();
+
+            if (!Check.IsNull(entity.DbParams) && entity.DbParams.Count > 0)
+            {
+                if (command.Parameters.Count > 0)
+                {
+                    command.Parameters.Clear();
+                }
+                command.Parameters.AddRange(entity.DbParams.ToArray());
+            }
+
+            if (!Check.IsNull(AOPSqlLog))
+            {
+                AOPSqlLog.Invoke(entity.StrSqlValue.ToString(), entity.DbParams.ToArray());
+            }
+            action();
+
+            if (configuration.CurrentConnectInfo.IsAutoClose && !isBeginTransaction)
+            {
+                Close();
+            }
+        }
+
+        protected async Task ExcuteAsync(SqlCommandEntity entity,Action action)
+        {
+            await Task.Run(() =>
+            {
+                Excute(entity, action);
+            });
+
+        }
+        #endregion
+
+        #region connection
         protected virtual  void Open()
         {
            
@@ -403,8 +490,13 @@ namespace NetCore.ORM.Simple
             {
                 connection.Open();
             }
+
+            if (!Check.IsNull(dataRead) && !dataRead.IsClosed)
+            {
+                dataRead.Close();
+            }
         }
-        protected bool IsOpenConnect()
+        protected virtual bool IsOpenConnect()
         {
             if (!Check.IsNull(connection))
             {
@@ -417,12 +509,21 @@ namespace NetCore.ORM.Simple
         }
         protected void Close()
         {
+            if (!Check.IsNull(dataRead))
+            {
+                dataRead.Close();
+            }
+        }
+        protected void CloseConnection()
+        {
             if (!Check.IsNull(connection))
             {
                 connection.Close();
             }
         }
+        #endregion
 
+        #region extension attr
         protected string GetTableName(Type type)
         {
             return type.GetTableName(tableAtrr);
@@ -453,6 +554,172 @@ namespace NetCore.ORM.Simple
             tableAtrr = Table;
             columnAttr = Column;
         }
+        #endregion
+
+
+        #region api
+
+        /// <summary>
+        /// 读取
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        public virtual async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params)
+        {
+
+            var entity = new QueryEntity();
+            entity.StrSqlValue.Append(sql);
+            entity.DbParams.AddRange(Params);
+            IEnumerable<TResult> data = null;
+            await ExcuteAsync(entity, async () =>
+            {
+                dataRead = await command.ExecuteReaderAsync();
+                data = MapData<TResult>();
+            });
+            return data;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="Params"></param>
+        /// <returns></returns>
+        public virtual async Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
+        {
+
+            IEnumerable<TResult> data = null;
+            await ExcuteAsync(entity, async () =>
+            {
+
+                dataRead = await command.ExecuteReaderAsync();
+                data = MapData<TResult>(entity);
+
+            });
+            return data;
+        }
+        public virtual IEnumerable<TResult> Read<TResult>(QueryEntity entity)
+        {
+            IEnumerable<TResult> data = null;
+            Excute(entity, () =>
+            {
+                dataRead = command.ExecuteReader();
+                data = MapData<TResult>(entity);
+            });
+            return data;
+        }
+        public virtual TResult ReadFirstOrDefault<TResult>(QueryEntity entity)
+        {
+            TResult data = default(TResult);
+            Excute(entity, () =>
+            {
+                dataRead = command.ExecuteReader();
+                data = MapDataFirstOrDefault<TResult>(entity);
+            });
+            return data;
+        }
+        public virtual async Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity)
+        {
+            TResult data = default(TResult);
+            await ExcuteAsync(entity, async () =>
+            {
+                dataRead = await command.ExecuteReaderAsync();
+                data = MapDataFirstOrDefault<TResult>(entity);
+            });
+            return data;
+        }
+        public virtual int ReadCount(QueryEntity entity)
+        {
+            int value = 0;
+            Excute(entity, () =>
+            {
+                dataRead = command.ExecuteReader();
+                while (dataRead.Read())
+                {
+                    string strValue = dataRead[CommonConst.StrDataCount].ToString();
+                    int.TryParse(strValue, out value);
+                }
+            });
+            return value;
+        }
+        public virtual async Task<int> ReadCountAsync(QueryEntity entity)
+        {
+            int value = 0;
+            await ExcuteAsync(entity, async () =>
+            {
+                dataRead = await command.ExecuteReaderAsync();
+                while (dataRead.Read())
+                {
+                    string strValue = dataRead[CommonConst.StrDataCount].ToString();
+                    int.TryParse(strValue, out value);
+                }
+            });
+            return value;
+        }
+        public virtual async Task<bool> ReadAnyAsync(QueryEntity entity)
+        {
+            return await ReadCountAsync(entity) > CommonConst.ZeroOrNull;
+        }
+        public virtual bool ReadAny(QueryEntity entity)
+        {
+            return ReadCount(entity) > CommonConst.ZeroOrNull;
+        }
+        public virtual async Task<int> ExcuteAsync(SqlCommandEntity entity)
+        {
+            int result = 0;
+            await ExcuteAsync(entity, async () =>
+            {
+                result = await command.ExecuteNonQueryAsync();
+            });
+            return result;
+        }
+        public virtual int Excute(SqlCommandEntity entity)
+        {
+            int result = 0;
+            Excute(entity, () =>
+            {
+                result = command.ExecuteNonQuery();
+            });
+            return result;
+        }
+
+        public virtual async Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
+        {
+            TEntity Entity = null;
+            await ExcuteAsync(entity, async () =>
+            {
+                int result = await command.ExecuteNonQueryAsync();
+                if (result == 0)
+                {
+                    return;
+                }
+                command.CommandText = query;
+                command.Parameters.Clear();
+                dataRead = await command.ExecuteReaderAsync();
+                Entity = MapData<TEntity>().FirstOrDefault();
+            });
+            return Entity;
+        }
+        public virtual TEntity Excute<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
+        {
+            TEntity Entity = null;
+
+            Excute(entity, () =>
+            {
+                int result = command.ExecuteNonQuery();
+                if (result == 0)
+                {
+                    return;
+                }
+                command.CommandText = query;
+                command.Parameters.Clear();
+                dataRead = command.ExecuteReader();
+                Entity = MapData<TEntity>().FirstOrDefault();
+            });
+            return Entity;
+        }
+        #endregion
 
     }
 }

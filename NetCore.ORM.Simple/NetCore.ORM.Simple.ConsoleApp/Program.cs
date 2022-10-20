@@ -13,7 +13,7 @@ public static class Program
     public static int Main(string []args)
     {
         //StartTast("server=49.233.33.36;database=virtualsoftplatformdb;user=root;pwd=[Txy*!14@msql*^];SSL Mode=None");
-
+        Console.WriteLine();
         //object o = 1;
         //object o2 = "232";
         //object o3 = 1.1;
@@ -33,9 +33,9 @@ public static class Program
         //test.Where();
         SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
         MysqlTest.InsertTest();
-        //MysqlTest.UpdateTest();
-        //MysqlTest.DeleteTest();
-        //MysqlTest.QueryTest();
+        MysqlTest.UpdateTest();
+        MysqlTest.DeleteTest();
+        MysqlTest.QueryTest();
 
        // SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
         //sqliteTest.InsertTest();
@@ -59,13 +59,13 @@ public static class Program
         ISimpleClient client = new SimpleClient(new DataBaseConfiguration(false, new ConnectionEntity(strConnection)
         {
             DBType = eDBType.Mysql,
-            IsAutoClose = true,
+            IsAutoClose = false,
             Name = "Test"
         })
             );
         client.SetAPOLog((sql, pars) =>
         {
-            Console.WriteLine(sql);
+            //Console.WriteLine(sql);
             //Console.WriteLine($"Date:{DateTime.Now}\t \t sql:{sql}");
         });
         int DataLength = 20;
