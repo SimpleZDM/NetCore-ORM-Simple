@@ -19,7 +19,7 @@ namespace NetCore.ORM.Simple.Entity
 {
     public class JoinInfoEntity
     {
-        public JoinMapEntity[] JoinMaps { get; set; }
+        public JoinMapEntity[] JoinMaps { get { return _joinMaps; } set { _joinMaps=value; } }
         public JoinInfoEntity(params JoinMapEntity[] joinMaps)
         {
             if (Check.IsNull(joinMaps))

@@ -287,7 +287,7 @@ namespace NetCore.ORM.Simple.Entity
             }
             else
             {
-                if (LastType.Count() == CommonConst.ZeroOrNull)
+                if (LastType.Count() == CommonConst.Zero)
                 {
                     for (int i = start; i <= end; i++)
                     {
@@ -372,7 +372,7 @@ namespace NetCore.ORM.Simple.Entity
                 }
                 else
                 {
-                    if (Table.TableNames.Length > CommonConst.ZeroOrNull)
+                    if (Table.TableNames.Length > CommonConst.Zero)
                     {
                         if (!Check.IsNull(member.Expression))
                         {

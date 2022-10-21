@@ -25,6 +25,8 @@ namespace NetCore.ORM.Simple
         public SqliteDrive(DataBaseConfiguration cfg) : base(cfg)
         {
             connection = new SqliteConnection(configuration.CurrentConnectInfo.ConnectStr);
+            command = new SqliteCommand();
+            command.Connection = connection;
         }
         public override int Excute(SqlCommandEntity entity)
         {
@@ -32,36 +34,9 @@ namespace NetCore.ORM.Simple
             return base.Excute(entity);
         }
 
-        public int Excute(SqlCommandEntity[] sqlCommand)
+        public  int Excute(SqlCommandEntity[] sqlCommand)
         {
-            int result = 0;
-            int count = 0;
-            int current = 0;
-            if (sqlCommand.Length == 1)
-            {
-                result=Excute(sqlCommand[0]);
-            }
-            else
-            {
-                for (int i = 1; i < sqlCommand.Length; i++)
-                {
-                    if (count > SqliteConst.INSERTMAXCOUNT)
-                    {
-                        Excute(sqlCommand[current], () =>
-                        {
-                            result += command.ExecuteNonQuery();
-                        });
-                        count = 0;
-                        current = i;
-                        i++;
-                    }
-                    sqlCommand[current].StrSqlValue.Append(sqlCommand[i].StrSqlValue.ToString());
-                    sqlCommand[current].DbParams.AddRange(sqlCommand[i].DbParams);
-                    count++;
-                }
-            }
-
-            return result;
+           return base.Excute(sqlCommand,SqliteConst.INSERTMAXCOUNT);
         }
 
         public override TEntity Excute<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
@@ -76,49 +51,22 @@ namespace NetCore.ORM.Simple
             return await base.ExcuteAsync(entity);
         }
 
-        public async Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand)
+        public  async Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand)
         {
             Open();
-            int result = 0;
-            int count = 0;
-            int current = 0;
-            if (sqlCommand.Length == 1)
-            {
-                result = await ExcuteAsync(sqlCommand[0]);
-            }
-            else
-            {
-                for (int i = 1; i < sqlCommand.Length; i++)
-                {
-                    if (count > SqliteConst.INSERTMAXCOUNT)
-                    {
-                        await ExcuteAsync(sqlCommand[current], async () =>
-                        {
-                            result += await command.ExecuteNonQueryAsync();
-                        });
-                        count = 0;
-                        current = i;
-                        i++;
-                    }
-                    sqlCommand[current].StrSqlValue.Append(sqlCommand[i].StrSqlValue.ToString());
-                    sqlCommand[current].DbParams.AddRange(sqlCommand[i].DbParams);
-                    count++;
-                }
-            }
-
-            return result;
+            return await base.ExcuteAsync(sqlCommand, SqliteConst.INSERTMAXCOUNT);
         }
 
         public override async Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
         {
             Open();
-            return await ExcuteAsync<TEntity>(entity, query);
+            return await base.ExcuteAsync<TEntity>(entity, query);
         }
 
         public override IEnumerable<TResult> Read<TResult>(QueryEntity entity)
         {
             Open();
-            return Read<TResult>(entity);
+            return base.Read<TResult>(entity);
         }
 
         public override bool ReadAny(QueryEntity entity)

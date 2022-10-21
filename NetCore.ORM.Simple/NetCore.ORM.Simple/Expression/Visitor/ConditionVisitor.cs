@@ -97,7 +97,7 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            if (currentTables.Count() > CommonConst.ZeroOrNull)
+            if (currentTables.Count() > CommonConst.Zero)
             {
                 #region
                 switch (node.NodeType)
@@ -424,7 +424,7 @@ namespace NetCore.ORM.Simple.Visitor
             PropertyInfo Prop = null;
             string PropName = node.Member.Name;
             string TableName;
-            if (currentTables.Count > CommonConst.ZeroOrNull)
+            if (currentTables.Count > CommonConst.Zero)
             {
                 var Map = select.MapFirstOrDefault(m => m.PropName.Equals(PropName));
                 if (!Check.IsNull(Map))

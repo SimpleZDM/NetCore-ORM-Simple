@@ -88,7 +88,7 @@ namespace NetCore.ORM.Simple
         public override async Task<bool> ReadAnyAsync(QueryEntity entity)
         {
             Open();
-            return await ReadCountAsync(entity) > CommonConst.ZeroOrNull;
+            return await ReadCountAsync(entity) > CommonConst.Zero;
         }
         public override bool ReadAny(QueryEntity entity)
         {
@@ -152,34 +152,7 @@ namespace NetCore.ORM.Simple
         public int Excute(SqlCommandEntity[] sqlCommand)
         {
             Open();
-            int result = 0;
-            int count = 0;
-            int current = 0;
-            if (sqlCommand.Length == 1)
-            {
-                result = Excute(sqlCommand[0]);
-            }
-            else
-            {
-                for (int i = 1; i < sqlCommand.Length; i++)
-                {
-                    if (count > MysqlConst.INSERTMAXCOUNT)
-                    {
-                        Excute(sqlCommand[current], () =>
-                        {
-                            result += command.ExecuteNonQuery();
-                        });
-                        count = 0;
-                        current = i;
-                        i++;
-                    }
-                    sqlCommand[current].StrSqlValue.Append(sqlCommand[i].StrSqlValue.ToString());
-                    sqlCommand[current].DbParams.AddRange(sqlCommand[i].DbParams);
-                    count++;
-                }
-            }
-
-            return result;
+            return base.Excute(sqlCommand,MysqlConst.INSERTMAXCOUNT);
         }
 
         #region

@@ -41,7 +41,7 @@ namespace NetCore.ORM.Simple.Entity
             {
                 return currentUseConnectName;
             }
-            set
+            private set
             {
                 currentUseConnectName = value;
                 if (!ConnectMapName.ContainsKey(currentUseConnectName))

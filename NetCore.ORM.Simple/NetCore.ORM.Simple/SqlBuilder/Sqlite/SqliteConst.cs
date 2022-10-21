@@ -21,15 +21,30 @@ namespace NetCore.ORM.Simple.SqlBuilder
     {
         static SqliteConst()
         {
-            StrJoins = new string[] { "INNER JOIN", "LEFT JOIN", "RIGHT JOIN" };
+            StrJoins = new string[] {
+                $"{DBMDConst.Inner} {DBMDConst.Join} ",
+                $"{DBMDConst.Left} {DBMDConst.Join} ",
+                $"{DBMDConst.Right} {DBMDConst.Join} " };
+
+            cStrSign = new string[] {
+              DBMDConst.LeftBracket.ToString(),
+              DBMDConst.RightBracket.ToString(),
+              DBMDConst.Equal.ToString(),
+              $"{DBMDConst.GreaterThan}{DBMDConst.Equal}",
+              $"{DBMDConst.LessThan}{DBMDConst.Equal}",
+              DBMDConst.GreaterThan.ToString(),
+              DBMDConst.LessThan.ToString(),
+              DBMDConst.Or,DBMDConst.And,
+              $"{DBMDConst.LessThan}{DBMDConst.GreaterThan}" };
         }
-        public static char EqualSign = '=';
         /// <summary>
         /// 单条语句最多插入的量
+        /// insert into [table](*****) value(),value();罪过八百个value
         /// </summary>
         public const int INSERTMAX = 800;
         /// <summary>
-        /// 最大的操作量
+        ///多个insert组合
+        ///insert into [table]() value();insert into [table]() value();.....
         /// </summary>
         public const int INSERTMAXCOUNT = 30;
 
@@ -43,62 +58,11 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// </summary>
         /// <param name="methodName"></param>
         /// <returns></returns>
-        public static string MapMethod(string methodName, string leftValue, string rightValue)
-        {
-            string value = EqualSign.ToString();
-            if (Check.IsNullOrEmpty(methodName))
-            {
-                return value;
-            }
-            switch (methodName)
-            {
-                case "ToString":
-                    break;
-                case "Equals":
-                    value = $"{leftValue}={rightValue}";
-                    break;
-                case "IsNullOrEmpty":
-                    if (!Check.IsNullOrEmpty(leftValue))
-                    {
-                        value = $"{leftValue} IS NULL";
-                    }
-                    else if (!Check.IsNullOrEmpty(rightValue))
-                    {
-                        value = $"{rightValue} IS NULL";
-                    }
-                    break;
-                case "Sum":
-                    value = $" SUM({leftValue}) ";
-                    break;
-                case "Min":
-                    value = $" Min({leftValue}) ";
-                    break;
-                case "Max":
-                    value = $" Max({leftValue}) ";
-                    break;
-                case "Count":
-                    var star = "*";
-                    leftValue = Check.IsNullOrEmpty(leftValue) ? star : leftValue;
-                    value = $" COUNT({leftValue}) ";
-                    break;
-                case "Average":
-                    value = $" AVG({leftValue}) ";
-                    break;
-                case "FirstOrDefault":
-                    value = $" {leftValue}";
-                    break;
-                default:
-                    break;
-            }
-            return value;
-        }
 
         /// <summary>
         /// 常用的符号
         /// </summary>
-        public static string[]
-          cStrSign =
-          new string[] { "(", ")", "=", ">=", "<=", ">", "<", "AND", "OR", "<>" };
+        public static string[] cStrSign;
 
         public static string AscendOrDescend(eOrderType OrderType)
         {
@@ -106,10 +70,10 @@ namespace NetCore.ORM.Simple.SqlBuilder
             switch (OrderType)
             {
                 case eOrderType.Ascending:
-                    value = "ASC";
+                    value = DBMDConst.Ascending;
                     break;
                 case eOrderType.Descending:
-                    value = "DESC";
+                    value = DBMDConst.Descending;
                     break;
                 default:
                     break;

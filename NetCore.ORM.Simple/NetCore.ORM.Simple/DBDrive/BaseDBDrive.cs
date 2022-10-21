@@ -659,11 +659,11 @@ namespace NetCore.ORM.Simple
         }
         public virtual async Task<bool> ReadAnyAsync(QueryEntity entity)
         {
-            return await ReadCountAsync(entity) > CommonConst.ZeroOrNull;
+            return await ReadCountAsync(entity) > CommonConst.Zero;
         }
         public virtual bool ReadAny(QueryEntity entity)
         {
-            return ReadCount(entity) > CommonConst.ZeroOrNull;
+            return ReadCount(entity) > CommonConst.Zero;
         }
         public virtual async Task<int> ExcuteAsync(SqlCommandEntity entity)
         {
@@ -718,6 +718,68 @@ namespace NetCore.ORM.Simple
                 Entity = MapData<TEntity>().FirstOrDefault();
             });
             return Entity;
+        }
+
+        public virtual int Excute(SqlCommandEntity[] sqlCommand,int InsertMaxCount=800)
+        {
+            Open();
+            int result = 0;
+            int count = 0;
+            int current = 0;
+            if (sqlCommand.Length == 1)
+            {
+                result = Excute(sqlCommand[0]);
+            }
+            for (int i = 1; i < sqlCommand.Length; i++)
+            {
+                if (count >InsertMaxCount)
+                {
+                    Excute(sqlCommand[current], () =>
+                    {
+                        result += command.ExecuteNonQuery();
+                    });
+                    count = 0;
+                    current = i;
+                    i++;
+                }
+                sqlCommand[current].StrSqlValue.Append(sqlCommand[i].StrSqlValue.ToString());
+                sqlCommand[current].DbParams.AddRange(sqlCommand[i].DbParams);
+                count++;
+            }
+            return result;
+        }
+
+        public virtual async Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand,int InsertMaxCount=800)
+        {
+            Open();
+            int result = 0;
+            int count = 0;
+            int current = 0;
+            if (sqlCommand.Length == 1)
+            {
+                result = await ExcuteAsync(sqlCommand[0]);
+            }
+            else
+            {
+                for (int i = 1; i < sqlCommand.Length; i++)
+                {
+                    if (count > InsertMaxCount)
+                    {
+                        await ExcuteAsync(sqlCommand[current], async () =>
+                        {
+                            result += await command.ExecuteNonQueryAsync();
+                        });
+                        count = 0;
+                        current = i;
+                        i++;
+                    }
+                    sqlCommand[current].StrSqlValue.Append(sqlCommand[i].StrSqlValue.ToString());
+                    sqlCommand[current].DbParams.AddRange(sqlCommand[i].DbParams);
+                    count++;
+                }
+            }
+
+            return result;
         }
         #endregion
 

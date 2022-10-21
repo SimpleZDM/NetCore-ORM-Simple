@@ -140,7 +140,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
             if (!Check.IsNull(OrderByInfos) && OrderByInfos.Where(o => o.IsOrderBy).Any())
             {
                 entity.StrSqlValue.Append($" {DBMDConst.Order} {DBMDConst.By} ");
-                entity.StrSqlValue.Append(string.Join(DBMDConst.Comma, OrderByInfos.Where(o => o.IsOrderBy).OrderBy(o => o.OrderSoft).Select(o => $"{o.TableName}.{o.ColumnName} {MysqlConst.AscendOrDescend(o.OrderType)}")));
+                entity.StrSqlValue.Append(string.Join(DBMDConst.Comma, 
+                    OrderByInfos.Where(o => o.IsOrderBy).OrderBy(o => o.OrderSoft).
+                    Select(o => $"{o.TableName}.{o.ColumnName} {MysqlConst.AscendOrDescend(o.OrderType)}")));
                 entity.StrSqlValue.Append(" ");
             }
 
@@ -154,31 +156,143 @@ namespace NetCore.ORM.Simple.SqlBuilder
             if (!Check.IsNull(OrderByInfos) && OrderByInfos.Where(g => g.IsGroupBy).Any())
             {
                 entity.StrSqlValue.Append($" {DBMDConst.Group} {DBMDConst.By} ");
-                entity.StrSqlValue.Append(string.Join(DBMDConst.Comma, OrderByInfos.Where(g => g.IsGroupBy).OrderBy(g => g.GroupSoft).Select(g => $"{g.TableName}.{g.ColumnName}")));
+                entity.StrSqlValue.Append(string.Join(DBMDConst.Comma,
+                    OrderByInfos.Where(g => g.IsGroupBy).OrderBy(g => g.GroupSoft).
+                    Select(g => $"{g.TableName}.{g.ColumnName}")));
                 entity.StrSqlValue.Append(" ");
             }
 
         }
 
-        protected override void Update<TEntity>(SqlCommandEntity sql,string keyName,string tableName,PropertyInfo pKey,TEntity data,IEnumerable<PropertyInfo> Props,int index)
-        {
-            sql.AddParameter(DbType,$"{keyName}{index}", pKey.GetValue(data));
-            sql.StrSqlValue.Append($"{DBMDConst.Update} {DBMDConst.UnSingleQuotes}{tableName}{DBMDConst.UnSingleQuotes} {DBMDConst.Set} ");
-            sql.StrSqlValue.Append(string.Join(DBMDConst.Comma,
-            Props.Select(p =>
-            {
-                string colName = $"{GetColName(p)}";
-                sql.AddParameter(DbType,$"{DBMDConst.AT}{colName}{DBMDConst.DownLine}{index}", p.GetValue(data));
-                return $"{DBMDConst.UnSingleQuotes}{colName}{DBMDConst.UnSingleQuotes}{DBMDConst.Equal}{DBMDConst.AT}{colName}{DBMDConst.DownLine}{index}";
-            })));
-            sql.StrSqlValue.Append(DBMDConst.Where);
-            sql.StrSqlValue.Append($"{GetColName(pKey)}{DBMDConst.Where}{keyName}{index}");
-            sql.StrSqlValue.Append(DBMDConst.Semicolon);
-        }
-
         public override void SetAttr(Type Table = null, Type Column = null)
         {
             base.SetAttr(Table,Column);
+        }
+
+        protected override string MapMethod(string methodName, string leftValue, string rightValue, ConditionEntity condition, bool IsNot)
+        {
+            string value = DBMDConst.Equal.ToString();
+            if (Check.IsNullOrEmpty(methodName))
+            {
+                return value;
+            }
+            switch (methodName)
+            {
+                case MethodConst._ToString:
+                    break;
+                case MethodConst._Equals:
+                    if (IsNot)
+                    {
+                        value = $"{leftValue}{DBMDConst.LessThan}{DBMDConst.GreaterThan}{rightValue}";
+                    }
+                    else
+                    {
+                        value = $"{leftValue}{DBMDConst.Equal}{rightValue}";
+                    }
+                    break;
+                case MethodConst._IsNull:
+                case MethodConst._IsNullOrEmpty:
+                    if (IsNot)
+                    {
+                        if (!Check.IsNullOrEmpty(leftValue))
+                        {
+                            value = $"{leftValue} {DBMDConst.Is} {DBMDConst.Not} {DBMDConst.StrNULL}";
+                        }
+                        else if (!Check.IsNullOrEmpty(rightValue))
+                        {
+                            value = $"{rightValue} {DBMDConst.Is} {DBMDConst.Not} {DBMDConst.StrNULL}";
+                        }
+                    }
+                    else
+                    {
+                        if (!Check.IsNullOrEmpty(leftValue))
+                        {
+                            value = $"{leftValue} {DBMDConst.Is} {DBMDConst.StrNULL}";
+                        }
+                        else if (!Check.IsNullOrEmpty(rightValue))
+                        {
+                            value = $"{rightValue} {DBMDConst.Is}  {DBMDConst.StrNULL}";
+                        }
+                    }
+
+                    break;
+                case MethodConst._Sum:
+                    value = $" SUM{DBMDConst.LeftBracket}{leftValue}{DBMDConst.RightBracket} ";
+                    break;
+                case MethodConst._Min:
+                    value = $" Min{DBMDConst.LeftBracket}{leftValue}{DBMDConst.RightBracket} ";
+                    break;
+                case MethodConst._Max:
+                    value = $" Max{DBMDConst.LeftBracket}{leftValue}{DBMDConst.RightBracket}";
+                    break;
+                case MethodConst._Count:
+                    leftValue = Check.IsNullOrEmpty(leftValue) ? DBMDConst.Asterisk.ToString() : leftValue;
+                    value = $" COUNT{DBMDConst.LeftBracket}{leftValue}{DBMDConst.RightBracket}";
+                    break;
+                case MethodConst._Average:
+                    value = $" AVG{DBMDConst.LeftBracket}{leftValue}{DBMDConst.RightBracket} ";
+                    break;
+                case MethodConst._FirstOrDefault:
+                    value = $" {leftValue}";
+                    break;
+                case MethodConst._Contains:
+                    if (eDataType.SimpleString == condition.DataType)
+                    {
+                        if (IsNot)
+                        {
+                            value = $"{leftValue} {DBMDConst.Not} {DBMDConst.Like} {DBMDConst.SingleQuotes}{DBMDConst.Percent}{condition.DisplayName}{DBMDConst.Percent}{DBMDConst.SingleQuotes} ";
+                        }
+                        else
+                        {
+                            value = $"{leftValue}  {DBMDConst.Like} {DBMDConst.SingleQuotes}{DBMDConst.Percent}{condition.DisplayName}{DBMDConst.Percent}{DBMDConst.SingleQuotes} ";
+
+                        }
+                    }
+                    else if ((int)eDataType.SimpleArrayInt <= (int)condition.DataType
+                        && (int)eDataType.SimpleListDecimal >= (int)condition.DataType)
+                    {
+                        if (IsNot)
+                        {
+                            value = $"{leftValue} {DBMDConst.Not} {DBMDConst.In} {DBMDConst.LeftBracket}{condition.DisplayName}{DBMDConst.RightBracket} ";
+                        }
+                        else
+                        {
+                            value = $"{leftValue}  {DBMDConst.In} {DBMDConst.LeftBracket}{condition.DisplayName}{DBMDConst.RightBracket}";
+                        }
+                    }
+                    break;
+                case MethodConst._LeftContains:
+                    if (eDataType.SimpleString == condition.DataType)
+                    {
+                        if (IsNot)
+                        {
+                            value = $"{leftValue} {DBMDConst.Not} {DBMDConst.Like} {DBMDConst.SingleQuotes}{DBMDConst.Percent}{condition.DisplayName}{DBMDConst.SingleQuotes} ";
+                        }
+                        else
+                        {
+                            value = $"{leftValue} {DBMDConst.Like} {DBMDConst.SingleQuotes}{DBMDConst.Percent}{condition.DisplayName}{DBMDConst.SingleQuotes} ";
+                        }
+
+                    }
+                    break;
+                case MethodConst._RightContains:
+                    if (eDataType.SimpleString == condition.DataType)
+                    {
+                        if (IsNot)
+                        {
+                            value = $"{leftValue} {DBMDConst.Not} {DBMDConst.Like} {DBMDConst.SingleQuotes}{condition.DisplayName}{DBMDConst.Percent}{DBMDConst.SingleQuotes} ";
+                        }
+                        else
+                        {
+                            value = $"{leftValue} {DBMDConst.Like} {DBMDConst.SingleQuotes}{condition.DisplayName}{DBMDConst.Percent}{DBMDConst.SingleQuotes} ";
+                        }
+
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return value;
         }
     }
 }

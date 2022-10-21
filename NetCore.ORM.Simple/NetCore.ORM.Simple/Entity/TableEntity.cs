@@ -33,7 +33,7 @@ namespace NetCore.ORM.Simple.Entity
         {
             TableAtrr = table;
             ColumnAttr = column;
-            if (Check.IsNull(types) ||types.Length<=CommonConst.ZeroOrNull)
+            if (Check.IsNull(types) ||types.Length<=CommonConst.Zero)
             {
                 throw new ArgumentException(nameof(types));
             }

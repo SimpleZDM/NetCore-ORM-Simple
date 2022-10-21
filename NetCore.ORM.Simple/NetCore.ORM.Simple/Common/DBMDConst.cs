@@ -21,14 +21,14 @@ namespace NetCore.ORM.Simple.Common
         static DBMDConst()
         {
             #region init DB Main Word;
-            Insert = " INSERT ";
+            Insert = "INSERT ";
             Into = " INTO ";
             Value = " VALUE ";
             Values = " VALUES ";
             Update = "UPDATE ";
             Set = " SET ";
             Where = " WHERE ";
-            Delete = " DELETE ";
+            Delete = "DELETE ";
             From = " FROM ";
             Select = " SELECT ";
             As = " AS ";
@@ -50,6 +50,17 @@ namespace NetCore.ORM.Simple.Common
             StrNULL = " NULL ";
             On = " On ";
             Over = "Over";
+            Ascending = "ASC";
+            Descending = "DESC";
+            In = "IN";
+            Like = "Like";
+            True ="true";
+            And ="AND";
+            Or ="OR";
+            Left = "Left";
+            Right = "Right";
+            Inner = "Inner";
+            Join = "Join";
             #endregion
 
             #region sign
@@ -61,12 +72,19 @@ namespace NetCore.ORM.Simple.Common
             Equal = '=';
             DownLine = '_';
             UnSingleQuotes = '`';
+            GreaterThan = '>';
+            LessThan = '<';
+            Percent = '%';
+            SingleQuotes = '\'';
+
+
             #endregion
 
             #region method
             LAST_INSERT_ID = "LAST_INSERT_ID()";
             Scope_identity = "Scope_identity()";
             ROW_NUMBER = "ROW_NUMBER()";
+
             #endregion
 
         }
@@ -100,6 +118,17 @@ namespace NetCore.ORM.Simple.Common
         public static string StrNULL;
         public static string On;
         public static string Over;
+        public static string Ascending;
+        public static string Descending;
+        public static string In;
+        public static string Like;
+        public static string True;
+        public static string And;
+        public static string Or;
+        public static string Left;
+        public static string Right;
+        public static string Inner;
+        public static string Join;
         #endregion
 
         #region sign
@@ -119,7 +148,14 @@ namespace NetCore.ORM.Simple.Common
         public static char RightBracket;
         public static char Equal;
         public static char DownLine;
+        /// <summary>
+        /// 反单引号
+        /// </summary>
         public static char UnSingleQuotes;
+        public static char GreaterThan;
+        public static char LessThan;
+        public static char Percent;
+        public static char SingleQuotes;
         #endregion
 
         #region method

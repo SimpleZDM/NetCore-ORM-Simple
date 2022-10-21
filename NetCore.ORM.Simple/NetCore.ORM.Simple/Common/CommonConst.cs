@@ -66,7 +66,8 @@ namespace NetCore.ORM.Simple.Common
 
         private static string[] SqlMainWord;
 
-        public static int ZeroOrNull=0;
+        public static int Zero=0;
+        public static int One=1;
 
         /// <summary>
         /// 大小写字母

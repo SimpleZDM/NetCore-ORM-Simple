@@ -31,23 +31,23 @@ public static class Program
         //SimpleExpressionTest test = new SimpleExpressionTest();
         ////test.Select();
         //test.Where();
-        SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
-        MysqlTest.InsertTest();
-        MysqlTest.UpdateTest();
-        MysqlTest.DeleteTest();
-        MysqlTest.QueryTest();
+       // SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
+        //MysqlTest.InsertTest();
+        //MysqlTest.UpdateTest();
+       // MysqlTest.DeleteTest();
+        //MysqlTest.QueryTest();
 
-       // SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
-        //sqliteTest.InsertTest();
+        //SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
+        ////sqliteTest.InsertTest();
         //sqliteTest.UpdateTest();
         //sqliteTest.DeleteTest();
         //sqliteTest.QueryTest();
 
-        //SimpleSqlServiceTest sqlServcie = new SimpleSqlServiceTest();
+        SimpleSqlServiceTest sqlServcie = new SimpleSqlServiceTest();
         //sqlServcie.InsertTest();
         //sqlServcie.UpdateTest();
         //sqlServcie.DeleteTest();
-        //sqlServcie.QueryTest();
+        sqlServcie.QueryTest();
         return 0;
     }
 
