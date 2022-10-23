@@ -28,9 +28,9 @@ public static class Program
         //Console.WriteLine(typeof(List<object>).Name);
         //Console.WriteLine(typeof(object[]).Name);
 
-        //SimpleExpressionTest test = new SimpleExpressionTest();
+        SimpleExpressionTest test = new SimpleExpressionTest();
         ////test.Select();
-        //test.Where();
+        test.Where();
        // SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
         //MysqlTest.InsertTest();
         //MysqlTest.UpdateTest();
