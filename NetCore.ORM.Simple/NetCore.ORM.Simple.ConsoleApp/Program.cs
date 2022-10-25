@@ -12,7 +12,7 @@ public static class Program
 {
     public static int Main(string []args)
     {
-        //StartTast("server=49.233.33.36;database=virtualsoftplatformdb;user=root;pwd=[Txy*!14@msql*^];SSL Mode=None");
+        StartTast("server=49.233.33.36;database=virtualsoftplatformdb;user=root;pwd=[Txy*!14@msql*^];SSL Mode=None");
         Console.WriteLine();
         //object o = 1;
         //object o2 = "232";
