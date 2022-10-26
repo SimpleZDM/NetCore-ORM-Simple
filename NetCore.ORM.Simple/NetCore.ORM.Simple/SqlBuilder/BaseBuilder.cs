@@ -525,6 +525,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 if (conditions.Count > i)
                 {
                     StrValue.Append(MysqlConst.cStrSign[(int)conditions[i].SignType]);
+                    Console.WriteLine((int)conditions[i].SignType);
 
                 }
 

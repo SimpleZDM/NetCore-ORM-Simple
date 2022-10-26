@@ -152,6 +152,14 @@ namespace NetCore.ORM.Simple.ConsoleApp
 
         public void QueryTest()
         {
+            int i = 1000;
+            int j = 2000;
+            var JoinData = client.Queryable<UserEntity, RoleEntity, CompanyEntity>(
+                    (u, r, c) => new JoinInfoEntity(
+                    new JoinMapEntity(eJoinType.Inner, u.Id.Equals(i) && u.gIdColumn.Equals(Guid.Empty) && u.RoleId.Equals(r.Id) && u.Id > 10),
+                    new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
+                    )).Where(u=>u.Id>=i&&u.Id<=j).Where(u=>u.Id>1500).ToList();
+            Console.WriteLine(11);
             try
             {
 
@@ -210,12 +218,6 @@ namespace NetCore.ORM.Simple.ConsoleApp
 
                 Console.WriteLine("****************2.多表连接查询*****************");
                 Console.WriteLine($"*****************连接查询****************");
-
-                var JoinData = client.Queryable<UserEntity, RoleEntity, CompanyEntity>(
-                    (u, r, c) => new JoinInfoEntity(
-                    new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
-                    new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
-                    )).ToList();
 
                 var JoinData1 = client.Queryable<
                     UserEntity, RoleEntity, CompanyEntity>(

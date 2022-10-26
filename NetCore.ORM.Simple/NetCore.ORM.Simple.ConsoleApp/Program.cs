@@ -12,7 +12,10 @@ public static class Program
 {
     public static int Main(string []args)
     {
-        StartTast("server=49.233.33.36;database=virtualsoftplatformdb;user=root;pwd=[Txy*!14@msql*^];SSL Mode=None");
+        //Console.WriteLine(typeof(List<int>).IsArray);
+        // Console.WriteLine(typeof(Dictionary<int,int>).IsD);
+        //Console.WriteLine(typeof(int[]).IsArray);
+        //StartTast("server=49.233.33.36;database=virtualsoftplatformdb;user=root;pwd=[Txy*!14@msql*^];SSL Mode=None");
         Console.WriteLine();
         //object o = 1;
         //object o2 = "232";
@@ -29,13 +32,13 @@ public static class Program
         //Console.WriteLine(typeof(object[]).Name);
 
         //SimpleExpressionTest test = new SimpleExpressionTest();
-        ////test.Select();
+        //test.Select();
         //test.Where();
-       // SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
-        //MysqlTest.InsertTest();
+       SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
+       //MysqlTest.InsertTest();
         //MysqlTest.UpdateTest();
        // MysqlTest.DeleteTest();
-        //MysqlTest.QueryTest();
+        MysqlTest.QueryTest();
 
         //SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
         ////sqliteTest.InsertTest();

@@ -1,4 +1,6 @@
-﻿using NetCore.ORM.Simple.Visitor;
+﻿﻿using NetCore.ORM.Simple.ConsoleApp.Entity;
+using NetCore.ORM.Simple.Entity;
+using NetCore.ORM.Simple.Visitor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,26 +30,25 @@ namespace NetCore.ORM.Simple.ConsoleApp
         }
         public void Select()
         {
-            ExpressionTest<UserEntity> u = new ExpressionTest<UserEntity>();
-            u.Select(u=>new CompanyEntity{CompanyName=u.Name,Id=u.Id});
+            ExpressionTest<UserEntity, CompanyEntity, RoleEntity> u = new ExpressionTest<UserEntity,CompanyEntity,RoleEntity>();
+            u.Select((u,c,r)=> new JoinInfoEntity(
+                    new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)&&u.Id.Equals(eConditionType.Sign)),
+                    new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
+                    ));
         }
         public void Where()
         {
             
-                Console.WriteLine(typeof(Guid).Name);
-                Console.WriteLine(typeof(float).Name);
-                Console.WriteLine(typeof(Double).Name);
-                Console.WriteLine(typeof(decimal).Name);
             ExpressionTest<UserEntity> u = new ExpressionTest<UserEntity>();
-            int[] ids=new int[3] {1,2,3};
-            string str = "";
-            List<int> lids = new List<int>();
-            IEnumerable<int> ints = new List<int>();
-            
-            lids.Add(1);
-            lids.Add(2);
-            lids.Add(3);
-            u.Where(u => !lids[2].Equals(u.Id));
+            TestEntity entity = new TestEntity();
+            entity.Test = new TestEntity();
+            entity.dictionary.Add("1",1);
+            entity.dictionaryEntity.Add("1",new TestEntity() { Age=100});
+            var key = new TestEntity();
+            entity.dictionaryKeyEntity.Add(key, new TestEntity() { Age=200});
+            entity.array = new int[] { 19,22}; 
+            entity.Test.Age = 10;
+            u.Where(u => entity.dictionaryKeyEntity[key].Age>u.Age && entity.dictionaryEntity["1"].Age>u.Age&&entity.dictionary["1"] >u.Id&&entity.array[1]>u.Id&&entity.Test.Age>u.Id);
         }
 
     }
@@ -63,6 +64,22 @@ namespace NetCore.ORM.Simple.ConsoleApp
             Visitor.Start(exp);
         }
         public void Where(Expression<Func<T,bool>> exp)
+        {
+            Visitor.Start(exp);
+        }
+    }
+    public class ExpressionTest<T,T2,T3>
+    {
+        MyExpressionAnalysis Visitor;
+        public ExpressionTest()
+        {
+            Visitor = new MyExpressionAnalysis();
+        }
+        public void Select<TResult>(Expression<Func<T,T2,T3, TResult>> exp)
+        {
+            Visitor.Start(exp);
+        }
+        public void Where(Expression<Func<T, bool>> exp)
         {
             Visitor.Start(exp);
         }

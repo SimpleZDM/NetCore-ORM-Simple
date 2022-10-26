@@ -22,8 +22,6 @@ namespace NetCore.ORM.Simple.Visitor
 {
     public class ConditionVisitor : ExpressionVisitor, IExpressionVisitor
     {
-
-
         /// <summary>
         /// 当前等式
         /// </summary>
@@ -36,12 +34,16 @@ namespace NetCore.ORM.Simple.Visitor
         /// <summary>
         /// 是否经过多次映射- 根据最后一次映射数据
         /// </summary>
-        private bool IsMultipleMap;
+        private bool IsMultipleMap { get; set; }
 
         /// <summary>
         /// 当前表达式目录树中表的别称
         /// </summary>
         private Dictionary<string, int> currentTables;
+
+        private bool IsCompleteMember;
+
+        private NetCore.ORM.Simple.Entity.MemberEntity currentMember;
 
         /// <summary>
         /// 多重条件的时候
@@ -97,97 +99,62 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            if (currentTables.Count() > CommonConst.Zero)
+            switch (node.NodeType)
             {
-                #region
-                switch (node.NodeType)
-                {
-                    case ExpressionType.AndAlso:
+                case ExpressionType.AndAlso:
+                    select.MultipleBinary(node,ref currentTree, eSignType.And,ref IsComplete, (Node) =>
+                    { 
+                        base.Visit(Node);
+                    }
+                    );
+                    break;
+                case ExpressionType.Call:
+                    break;
+                case ExpressionType.GreaterThan:
+                    select.SingleBinary(node, (Node) => base.Visit(Node),ref currentTree,ref IsComplete, eSignType.GrantThan);
 
-                        select.SingleLogicBinary(node, ref currentTree, eSignType.And, ref IsComplete, (mynode, tree) =>
+                    break;
+                case ExpressionType.GreaterThanOrEqual:
+                    select.SingleBinary(node, (Node) => base.Visit(Node),ref currentTree,ref IsComplete, eSignType.GreatThanOrEqual);
+                    break;
+                case ExpressionType.LessThan:
+                    select.SingleBinary(node, (Node) => base.Visit(Node),ref currentTree,ref IsComplete, eSignType.LessThan);
+                    break;
+                case ExpressionType.LessThanOrEqual:
+                    select.SingleBinary(node, (Node) => base.Visit(Node),ref  currentTree,ref IsComplete, eSignType.LessThanOrEqual);
+                    break;
+                case ExpressionType.Equal:
+                    select.SingleBinary(node, (Node) => base.Visit(Node),ref currentTree,ref IsComplete, eSignType.Equal);
+                    break;
+                case ExpressionType.NotEqual:
+                    select.SingleBinary(node, (Node) => base.Visit(Node),ref currentTree,ref IsComplete, eSignType.NotEqual);
+                    break;
+                case ExpressionType.OrElse:
+                    select.MultipleBinary(node,ref currentTree, eSignType.Or,ref IsComplete, (Node) =>
+                    {
+                     base.Visit(Node); 
+                    });
+                    break;
+                case ExpressionType.ArrayIndex:
+                    if (Check.IsNull(currentMember))
+                    {
+                        if (IsCompleteMember)
                         {
-                            base.Visit(mynode);
-                        });
-                        break;
-                    case ExpressionType.Call:
-
-                        break;
-                    case ExpressionType.GreaterThan:
-                        SingleBinary(node, (queue) =>
-                        {
-                            currentTree.RelationCondition =
-                               new ConditionEntity(eConditionType.Sign)
-                               {
-                                   SignType = eSignType.GrantThan
-                               };
-                        });
-                        break;
-                    case ExpressionType.GreaterThanOrEqual:
-                        SingleBinary(node, (queue) =>
-                        {
-                            currentTree.RelationCondition =
-                              new ConditionEntity(eConditionType.Sign)
-                              {
-                                  SignType = eSignType.GreatThanOrEqual
-                              };
-                        });
-                        break;
-                    case ExpressionType.LessThan:
-                        SingleBinary(node, (queue) =>
-                        {
-                            currentTree.RelationCondition =
-                              new ConditionEntity(eConditionType.Sign)
-                              {
-                                  SignType = eSignType.LessThan
-                              };
-                        });
-                        break;
-                    case ExpressionType.LessThanOrEqual:
-                        SingleBinary(node, (queue) =>
-                        {
-                            currentTree.RelationCondition =
-                             new ConditionEntity(eConditionType.Sign)
-                             {
-                                 SignType = eSignType.LessThanOrEqual
-                             };
-                        });
-                        break;
-                    case ExpressionType.Equal:
-                        SingleBinary(node, (queue) =>
-                        {
-                            currentTree.RelationCondition =
-                             new ConditionEntity(eConditionType.Sign)
-                             {
-                                 SignType = eSignType.Equal
-                             };
-                        });
-                        break;
-                    case ExpressionType.NotEqual:
-                        SingleBinary(node, (queue) =>
-                        {
-                            currentTree.RelationCondition =
-                            new ConditionEntity(eConditionType.Sign)
-                            {
-                                SignType = eSignType.NotEqual
-                            };
-                        });
-                        break;
-                    case ExpressionType.OrElse:
-                        select.SingleLogicBinary(node, ref currentTree, eSignType.Or, ref IsComplete, (mynode, tree) => { base.Visit(mynode); });
-                        break;
-                    case ExpressionType.ArrayIndex:
-                        int index = 0;
-                        int.TryParse(node.Right.ToString(), out index);
-                        if (!Check.IsNull(currentTree))
-                        {
-                            currentTree.Index = index;
+                            currentMember = new Simple.Entity.MemberEntity();
+                            IsCompleteMember = false;
                         }
-                        base.Visit(node.Left);
-                        break;
-                    default:
-                        break;
-                }
-                #endregion
+
+                    }
+                    if (node.Right is ConstantExpression constant)
+                    {
+                        if (!Check.IsNull(currentMember))
+                        {
+                            currentMember.OParams = constant.Value;
+                        }
+                    }
+                    break;
+                default:
+                    break;
             }
             return node;
         }
@@ -198,27 +165,17 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            if (Check.IsNull(currentTree))
-            {
-                currentTree = select.CreateTreeConditon();
-                currentTree.LeftCondition = new ConditionEntity(eConditionType.Constant);
-                currentTree.LeftCondition.DisplayName = $"{node.Value}";
-                IsComplete = true;
-                return node;
-            }
-            if (select.VisitConstant(ref currentTree, node))
-            {
-                base.VisitConstant(node);
-                IsComplete = true;
-                return node;
-            }
-            return base.VisitConstant(node);
+            select.VisitConstant(currentTree, node);
+            base.VisitConstant(node);
+            return node;
 
         }
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            select.VisitMethod(ref currentTree, node);
-            return base.VisitMethodCall(node);
+            base.VisitMethodCall(node);
+            select.VisitMethod(ref currentTree, node,ref IsCompleteMember,ref currentMember);
+            IsComplete = true;
+            return node;
         }
 
         /// <summary>
@@ -228,10 +185,6 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            if (!currentTables.ContainsKey(node.Name))
-            {
-                currentTables.Add(node.Name, currentTables.Count());
-            }
             return base.VisitParameter(node);
         }
         protected override Expression VisitUnary(UnaryExpression node)
@@ -420,38 +373,18 @@ namespace NetCore.ORM.Simple.Visitor
         }
         protected override Expression VisitMember(MemberExpression node)
         {
-
-            PropertyInfo Prop = null;
             string PropName = node.Member.Name;
-            string TableName;
-            if (currentTables.Count > CommonConst.Zero)
+            if ((node.Expression is ParameterExpression Parameter) && currentTables.ContainsKey(Parameter.Name))
             {
-                var Map = select.MapFirstOrDefault(m => m.PropName.Equals(PropName));
-                if (!Check.IsNull(Map))
-                {
-                    CreateCondition(Map, node.Type, eConditionType.ColumnName);
-                }
-                else if (!Check.IsNull(node.Expression) && currentTables.ContainsKey(node.Expression.ToString()))
-                {
-                    int index = currentTables[node.Expression.ToString()];
-                    Prop = select.GetPropertyType(index, node.Member.Name);
-                    TableName = select.GetTableName(index);
-                    if (!Check.IsNull(Prop))
-                    {
-                        PropName = select.GetColumnName(index, node.Member.Name);
-                        CreateCondition(TableName, PropName, node.Type, eConditionType.ColumnName);
-                    }
-                }
-                select.VisitMember(ref currentTree, node.Member);
-                if (Check.IsNull(currentTree.RightCondition))
-                {
-                    ConditionEntity condition = null;
-                    select.SetConstMember(node, ref condition);
-                    currentTree.RightCondition = condition;
-                }
-                base.VisitMember(node);
+                int Index = currentTables[Parameter.Name];
+                currentTree.LeftCondition=select.GetCondition(PropName, Index, node.Type);
             }
-            IsComplete = true;
+            else
+            {
+                select.VisitMember(currentTree, node.Member, IsCompleteMember, currentMember);
+            }
+            IsCompleteMember = true;
+            base.VisitMember(node);
             return node;
         }
 
@@ -469,93 +402,6 @@ namespace NetCore.ORM.Simple.Visitor
         {
             return node;
         }
-        /// <summary>
-        /// 解析条件表达式大于小于等于
-        /// </summary>
-        /// <param name="node"></param>
-        /// <param name="action"></param>
-        private void SingleBinary(BinaryExpression node, Action<Queue<string>> action)
-        {
-            if (Check.IsNull(currentTree))
-            {
-                currentTree = select.CreateTreeConditon();
-            }
-            if (node.Left is MemberExpression leftMember)
-            {
-                currentTree.LeftCondition = new ConditionEntity(eConditionType.ColumnName);
-                currentTree.LeftCondition.PropertyType = leftMember.Type;
-                GetMemberValue(leftMember, currentTree.LeftCondition);
-            }
-            else if (node.Left is ConstantExpression leftConstant)
-            {
-                currentTree.LeftCondition = new ConditionEntity(eConditionType.Constant);
-                select.GetConstantValue(leftConstant, currentTree.LeftCondition);
-            }
-            if (!Check.IsNull(action))
-            {
-                action.Invoke(null);
-            }
-            if (node.Right is ConstantExpression rightConstant)
-            {
-                currentTree.RightCondition = new ConditionEntity(eConditionType.Constant);
-                select.GetConstantValue(rightConstant, currentTree.RightCondition);
 
-            }
-            else if (node.Right is MemberExpression rightMember)
-            {
-                currentTree.RightCondition = new ConditionEntity(eConditionType.ColumnName);
-                GetMemberValue(rightMember, currentTree.RightCondition);
-            }
-            IsComplete = true;
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="member"></param>
-        /// <param name="condition"></param>
-        /// <returns></returns>
-        private void GetMemberValue(MemberExpression member, ConditionEntity condition)
-        {
-            int index = -1; //!Check.IsNull(member.Expression)? currentTables[member.Expression.ToString()]:-1;
-            if (Check.IsNull(member.Expression))
-            {
-            }
-            else if (currentTables.ContainsKey(member.Expression.ToString()))
-            {
-                index = currentTables[member.Expression.ToString()];
-
-            }
-            else
-            {
-                VisitMember(member);
-                return;
-            }
-            if (!select.GetMemberValue(member, ref condition, index, IsMultipleMap))
-            {
-                VisitMember(member);
-            }
-
-
-        }
-        private void CreateCondition(string TableName, string ColumnName, Type type, eConditionType conditionType)
-        {
-            if (!Check.IsNull(currentTree))
-            {
-                currentTree.LeftCondition = new ConditionEntity(conditionType);
-                currentTree.LeftCondition.DisplayName = $"{TableName}.{ColumnName}";
-                currentTree.LeftCondition.PropertyType = type;
-            }
-        }
-        private void CreateCondition(MapEntity Map, Type type, eConditionType conditionType)
-        {
-            if (!Check.IsNull(currentTree))
-            {
-                currentTree.LeftCondition = new ConditionEntity(conditionType);
-                currentTree.LeftCondition.DisplayName = $"{Map.TableName}.{Map.ColumnName}";
-                currentTree.LeftCondition.PropertyType = type;
-            }
-        }
     }
 }
