@@ -55,7 +55,7 @@ namespace NetCore.ORM.Simple.Common
             In = "IN";
             Like = "Like";
             True ="true";
-            And ="AND";
+            And =" AND ";
             Or =" OR ";
             Left = "Left";
             Right = "Right";

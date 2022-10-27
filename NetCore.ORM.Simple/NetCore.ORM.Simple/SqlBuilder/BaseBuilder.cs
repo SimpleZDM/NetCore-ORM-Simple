@@ -454,63 +454,40 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 string leftValue = string.Empty;
                 string rightValue = string.Empty;
                 ConditionEntity currentConditon = null;
-                switch (treeConditions[i].LeftCondition.ConditionType)
+               
+                    leftValue = SetCondition(treeConditions[i].LeftCondition, sqlEntity,i);
+                if (Check.IsNullOrEmpty(leftValue))
                 {
-                    case eConditionType.ColumnName:
-                        leftValue = $" {treeConditions[i].LeftCondition.DisplayName} ";
-                        if (Check.IsNull(treeConditions[i].RightCondition))
-                        {
-                            break;
-                        }
-                        if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
-                        {
-                            rightValue = GetRandomParaName(i);
-                            GetConditionValue(treeConditions[i].RightCondition, sqlEntity, rightValue);
-                            currentConditon = treeConditions[i].RightCondition;
-                        }
-                        else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
-                        {
-                            //非常量
-                            rightValue = $" {treeConditions[i].RightCondition.DisplayName}";
-                        }
-                        break;
-                    case eConditionType.Constant:
-                        if (Check.IsNull(treeConditions[i].RelationCondition))
-                        {
-                            if (treeConditions[i].IsNot)
-                            {
-                                leftValue = GetRandomParaName(i);
-                            }
-                            else
-                            {
-                                leftValue = $"{treeConditions[i].LeftCondition.DisplayName}";
-                            }
-                        }
-                        else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.Constant))
-                        {
-                            leftValue = GetRandomParaName(i);
-                            sqlEntity.AddParameter(DbType, leftValue, treeConditions[i].LeftCondition.DisplayName);
+                    leftValue = SetCondition(treeConditions[i].RightCondition, sqlEntity, i);
+                    if (!Check.IsNullOrEmpty(leftValue))
+                    {
+                        currentConditon = treeConditions[i].RightCondition;
+                    }
 
-                            rightValue = GetRandomParaName(i);
-                            sqlEntity.AddParameter(DbType, rightValue, treeConditions[i].RightCondition.DisplayName);
-                        }
-                        else if (treeConditions[i].RightCondition.ConditionType.Equals(eConditionType.ColumnName))
-                        {
-                            rightValue = GetRandomParaName(i);
-                            GetConditionValue(treeConditions[i].LeftCondition, sqlEntity, rightValue);
-                            currentConditon = treeConditions[i].LeftCondition;
-                            leftValue = $" {treeConditions[i].RightCondition.DisplayName} ";
-                        }
-                        break;
-                    default:
-                        break;
                 }
+                else
+                {
+                    rightValue = SetCondition(treeConditions[i].RightCondition, sqlEntity, i);
+                    if (!Check.IsNullOrEmpty(leftValue))
+                    {
+                        currentConditon = treeConditions[i].RightCondition;
+                    }
+                }
+                
                 if (Check.IsNull(treeConditions[i].RelationCondition))
                 {
-                    StrValue.Append($" {DBMDConst.LeftBracket}{leftValue}{DBMDConst.RightBracket} ");
+                    if (treeConditions[i].RightCondition.DisplayName.ToLower().Contains(DBMDConst.True))
+                    {
+                        StrValue.Append($" {DBMDConst.LeftBracket}{CommonConst.One}{DBMDConst.Equal}{CommonConst.One}{DBMDConst.RightBracket} ");
+                    }
+                    else
+                    {
+                        StrValue.Append($" {DBMDConst.LeftBracket}{leftValue}{DBMDConst.RightBracket} ");
+                    }
                 }
                 else if (treeConditions[i].RelationCondition.ConditionType.Equals(eConditionType.Method))
                 {
+                   
                     StrValue.Append(MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue, currentConditon, treeConditions[i].IsNot));
                 }
                 else
@@ -525,13 +502,13 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 if (conditions.Count > i)
                 {
                     StrValue.Append(MysqlConst.cStrSign[(int)conditions[i].SignType]);
-                    Console.WriteLine((int)conditions[i].SignType);
-
                 }
 
             }
             sqlEntity.StrSqlValue.Append(StrValue.ToString());
         }
+
+
 
         /// <summary>
         /// 拼接分页
@@ -609,7 +586,53 @@ namespace NetCore.ORM.Simple.SqlBuilder
             sql.StrSqlValue.Append($"{GetColName(pKey)}{DBMDConst.Equal}{ParamName}");
             sql.StrSqlValue.Append(DBMDConst.Semicolon);
         }
-
+        /// <summary>
+        /// 返回conditon name 或者 返回@参数
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="Index"></param>
+        /// <param name=""></param>
+        /// <returns></returns>
+        protected string SetCondition(ConditionEntity condition,SqlBase sql,int Index)
+        {
+            string value = null;
+            if (Check.IsNull(condition))
+            {
+                return value;
+            }
+            switch (condition.ConditionType)
+            {
+                case eConditionType.Sign:
+                    break;
+                case eConditionType.Method:
+                    break;
+                case eConditionType.ColumnName:
+                    value = condition.DisplayName;
+                    break;
+                case eConditionType.Constant:
+                    value=GetRandomParaName(Index);
+                    if (!Check.IsNullOrEmpty(condition.DisplayName))
+                    {
+                        
+                        sql.AddParameter(DbType,value,condition.DisplayName);
+                    }
+                    else
+                    {
+                        if (!Check.IsNull(condition.Value))
+                        {
+                            // sql.AddParameter(DbType,value,condition.DisplayName);
+                            GetConditionValue(condition,sql,value,Index);
+                            value=condition.DisplayName;
+                        }
+                    }
+                    break;
+                case eConditionType.IgnoreSign:
+                    break;
+                default:
+                    break;
+            }
+            return value;
+        }
         protected string GetTableName(Type type)
         {
             return type.GetTableName(tableAtrr);
@@ -667,7 +690,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         }
 
 
-        protected virtual void GetConditionValue(ConditionEntity condition, SqlBase entity, string key)
+        protected virtual void GetConditionValue(ConditionEntity condition, SqlBase entity, string key,int Index)
         {
             StringBuilder sValue = new StringBuilder();
             if (Check.IsNull(condition))
@@ -675,7 +698,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 throw new ArgumentNullException(nameof(condition));
             }
             if (!Check.IsNullOrEmpty(condition.DisplayName))
-            {
+            {  
                 entity.AddParameter(DbType, key, condition.DisplayName);
                 return;
             }
@@ -683,7 +706,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 return;
             }
-            condition.DataType = CommonConst.GetType(condition.PropertyType);
+            condition.DataType = CommonConst.GetType(condition.Value.GetType());
             switch (condition.DataType)
             {
                 case eDataType.SimpleString:
@@ -694,18 +717,11 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 case eDataType.SimpleDouble:
                 case eDataType.SimpleDecimal:
                     sValue.Append(condition.Value);
-
                     break;
                 case eDataType.SimpleArrayString:
                 case eDataType.SimpleListString:
                 case eDataType.SimpleArrayGuid:
                 case eDataType.SimpleListGuid:
-                    foreach (var item in (dynamic)condition.Value)
-                    {
-                        sValue.Append($"{DBMDConst.SingleQuotes}{item}{DBMDConst.SingleQuotes}{DBMDConst.Comma}");
-                    }
-                    sValue.Remove(sValue.Length - 1, 1);
-                    break;
                 case eDataType.SimpleArrayInt:
                 case eDataType.SimpleArrayDouble:
                 case eDataType.SimpleArrayFloat:
@@ -716,7 +732,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 case eDataType.SimpleListDecimal:
                     foreach (var item in (dynamic)condition.Value)
                     {
-                        sValue.Append($"{item}{DBMDConst.Comma}");
+                        var keyName = GetRandomParaName(Index);
+                        entity.AddParameter(DbType, keyName, item);
+                        sValue.Append($"{keyName}{DBMDConst.Comma}");
                     }
                     sValue.Remove(sValue.Length - 1, 1);
                     break;

@@ -140,6 +140,7 @@ namespace NetCore.ORM.Simple.Visitor
                             currentMember.OParams = constant.Value;
                         }
                     }
+                    base.VisitBinary(node);
                     break;
                 default:
                     break;
@@ -159,6 +160,7 @@ namespace NetCore.ORM.Simple.Visitor
             {
 
                 CurrentJoinTable = select.GetJoinEntity(eTableType.Slave);
+                currentTree = select.GetTreeConditon();
                 switch (node.Value)
                 {
                     case eJoinType.Inner:
@@ -176,7 +178,7 @@ namespace NetCore.ORM.Simple.Visitor
             }
             else
             {
-                select.VisitConstant(currentTree,node);
+                select.VisitConstant(ref currentTree,node,ref CurrentJoinTable);
             }
             base.VisitConstant(node);
             return node;
@@ -188,10 +190,14 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            base.VisitMethodCall(node);
+            if (Check.IsNull(currentTree))
+            {
+                currentTree = select.GetTreeConditon();
+            }
             select.VisitMethod(ref currentTree,node,ref IsCompleteMember,ref currentMember);
             IsComplete = true;
             CurrentJoinTable.TreeConditions.Add(currentTree);
+            base.VisitMethodCall(node);
             return node;
         }
 
@@ -243,7 +249,7 @@ namespace NetCore.ORM.Simple.Visitor
             }
             else
             {
-                select.VisitMember(currentTree,node.Member, IsCompleteMember,currentMember);
+                select.VisitMember(ref currentTree,node.Member,ref IsCompleteMember,ref currentMember);
             }
             IsCompleteMember = true;
             base.VisitMember(node);

@@ -284,75 +284,73 @@ namespace NetCore.ORM.Simple.Entity
             }
         }
 
-        //public void CreateOrder(string PropName, int Index, eOrderOrGroupType OrderOrGroup, eOrderType OrderType)
-        //{
-        //    if (OrderInfos.Any(info =>
-        //    info.PropName.Equals(PropName) ||
-        //    (PropName.Contains("key") && PropName.Replace("key", "").Equals(info.PropName))
-        //    ))
-        //    {
-        //        var order = OrderInfos.Where(info => info.PropName.Equals(PropName) ||
-        //                   (PropName.Contains("key") && PropName.Replace("key", "")
-        //                   .Equals(info.PropName))).FirstOrDefault();
-        //        switch (OrderOrGroup)
-        //        {
-        //            case eOrderOrGroupType.OrderBy:
-        //                order.IsOrderBy = true;
-        //                order.OrderType = OrderType;
-        //                break;
-        //            case eOrderOrGroupType.GroupBy:
-        //                order.IsGroupBy = true;
-        //                break;
-        //            default:
-        //                break;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        OrderByEntity order = new OrderByEntity();
-        //        PropertyInfo Prop = null;
-        //        switch (OrderOrGroup)
-        //        {
-        //            case eOrderOrGroupType.OrderBy:
-        //                order.IsOrderBy = true;
-        //                order.OrderType = OrderType;
-        //                order.OrderSoft = OrderInfos.Where(o => o.IsOrderBy).Count() > 0 ? OrderInfos.Where(o => o.IsOrderBy).Max(o => o.OrderSoft) + 1 : 0;
-        //                break;
-        //            case eOrderOrGroupType.GroupBy:
-        //                order.IsGroupBy = true;
-        //                order.GroupSoft = OrderInfos.Where(g => g.IsGroupBy).Count() > 0 ? OrderInfos.Where(o => o.IsGroupBy).Max(o => o.GroupSoft) + 1 : 0;
-        //                break;
-        //            default:
-        //                break;
-        //        }
-        //        if (MapInfos.Where(m => m.PropName.Equals(PropName)).Count() == 1)
-        //        {
-        //            var map = MapFirstOrDefault(m => m.PropName.Equals(PropName));
-        //            if (!Check.IsNull(map))
-        //            {
-        //                order.TableName = map.TableName;
-        //                order.ColumnName = map.ColumnName;
-        //            }
+        public void CreateOrder(string PropName, int Index, eOrderOrGroupType OrderOrGroup, eOrderType OrderType)
+        {
+            if (OrderInfos.Any(info =>
+            info.PropName.Equals(PropName) ||
+            (PropName.Contains("key") && PropName.Replace("key", "").Equals(info.PropName))
+            ))
+            {
+                var order = OrderInfos.Where(info => info.PropName.Equals(PropName) ||
+                           (PropName.Contains("key") && PropName.Replace("key", "")
+                           .Equals(info.PropName))).FirstOrDefault();
+                switch (OrderOrGroup)
+                {
+                    case eOrderOrGroupType.OrderBy:
+                        order.IsOrderBy = true;
+                        order.OrderType = OrderType;
+                        break;
+                    case eOrderOrGroupType.GroupBy:
+                        order.IsGroupBy = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                OrderByEntity order = new OrderByEntity();
+                PropertyInfo Prop = null;
+                switch (OrderOrGroup)
+                {
+                    case eOrderOrGroupType.OrderBy:
+                        order.IsOrderBy = true;
+                        order.OrderType = OrderType;
+                        order.OrderSoft = OrderInfos.Where(o => o.IsOrderBy).Count() > 0 ? OrderInfos.Where(o => o.IsOrderBy).Max(o => o.OrderSoft) + 1 : 0;
+                        break;
+                    case eOrderOrGroupType.GroupBy:
+                        order.IsGroupBy = true;
+                        order.GroupSoft = OrderInfos.Where(g => g.IsGroupBy).Count() > 0 ? OrderInfos.Where(o => o.IsGroupBy).Max(o => o.GroupSoft) + 1 : 0;
+                        break;
+                    default:
+                        break;
+                }
+                if (MapInfos.Where(m => m.PropName.Equals(PropName)).Count() == 1)
+                {
+                    var map = MapFirstOrDefault(m => m.PropName.Equals(PropName));
+                    if (!Check.IsNull(map))
+                    {
+                        order.TableName = map.TableName;
+                        order.ColumnName = map.ColumnName;
+                    }
+                }
+                else
+                {
+                    if (Index >= 0)
+                    {
+                        Prop = GetPropertyType(Index, PropName);
+                        order.TableName = Table.GetTableName(GetEntityType(Index));
+                        order.PropName = Prop.Name;
+                        order.ColumnName = Table.GetColName(Prop);
+                    }
 
-        //        }
-        //        else
-        //        {
-        //            if (Index >= 0)
-        //            {
-        //                Prop = GetPropertyType(Index, PropName);
-        //                order.TableName = Table.GetTableName(GetEntityType(Index));
-        //                order.PropName = Prop.Name;
-        //                order.ColumnName = Table.GetColName(Prop);
-        //            }
-
-
-        //        }
-        //        OrderInfos.Add(order);
-        //    }
+                }
+                OrderInfos.Add(order);
+            }
 
 
 
-        //}
+        }
 
         public void CreateLastType<TResult>(int start, int end)
         {
@@ -404,6 +402,10 @@ namespace NetCore.ORM.Simple.Entity
             if (IsComplete)
             {
                 currentTree = GetTreeConditon();
+                if (Check.IsNull(currentJoin))
+                {
+                    TreeConditions.Add(currentTree);
+                }
                 IsComplete = false;
             }
             currentTree.LeftBracket.Add(eSignType.LeftBracket);
@@ -422,6 +424,10 @@ namespace NetCore.ORM.Simple.Entity
             if (IsComplete)
             {
                 currentTree = GetTreeConditon();
+                if (Check.IsNull(currentJoin))
+                {
+                    TreeConditions.Add(currentTree);
+                }
                 IsComplete = false;
             }
             currentTree.LeftBracket.Add(eSignType.LeftBracket);
@@ -444,6 +450,10 @@ namespace NetCore.ORM.Simple.Entity
             if (Check.IsNull(currentTree))
             {
                 currentTree = GetTreeConditon();
+                if (Check.IsNull(currentJoin))
+                {
+                    TreeConditions.Add(currentTree);
+                }
             }
             Visitor(node.Left);
 
@@ -457,90 +467,25 @@ namespace NetCore.ORM.Simple.Entity
 
                 currentJoin.TreeConditions.Add(currentTree);
             }
-            else
-            {
-                TreeConditions.Add(currentTree);
-            }
             IsComplete = true;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="member"></param>
-        /// <param name="condition"></param>
-        /// <returns></returns>
-        //public bool GetMemberValue(MemberExpression member, ref ConditionEntity condition, int Index, bool IsMultipleMap)
-        //{
-        //    string mName = string.Empty;
-        //    if (!Check.IsNull(member))
-        //    {
-        //        if (SetConstMember(member, ref condition))
-        //        {
-        //            return true;
-        //        }
-        //        if (IsMultipleMap)
-        //        {
-        //            var map = MapInfos.Where((map) => map.PropName.Equals(member.Member.Name)).ToArray();
 
-        //            if (!Check.IsNull(map) && map.Count() == 1)
-        //            {
-        //                condition.DisplayName = $"{map[0].TableName}.{map[0].ColumnName}";
-        //                return true;
-        //            }
-        //            else
-        //            {
-        //                return false;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            if (Table.TableNames.Length > CommonConst.Zero)
-        //            {
-        //                if (!Check.IsNull(member.Expression))
-        //                {
-        //                    condition.DisplayName = $"{GetTableName(Index)}.{member.Member.Name}";
-        //                }
-        //                else
-        //                {
-        //                    SetConstMember(member, ref condition);
-        //                }
-
-        //            }
-        //            else
-        //            {
-        //                condition.DisplayName = member.Member.Name;
-        //            }
-        //        }
-        //    }
-        //    return true;
-        //}
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="constant"></param>
-        ///// <param name="condition"></param>
-        ///// <returns></returns>
-        //public void GetConstantValue(ConstantExpression constant, ConditionEntity condition)
-        //{
-        //    string mName = string.Empty;
-        //    if (!Check.IsNull(constant))
-        //    {
-
-        //        if (constant.Type == typeof(string))
-        //        {
-        //            condition.DisplayName = $"'{constant.Value}'";
-        //        }
-        //        else
-        //        {
-        //            condition.DisplayName = $"{constant.Value}";
-        //        }
-        //    }
-        //}
-
-        public bool VisitConstant(TreeConditionEntity currentTree, ConstantExpression node)
+        public void VisitConstant(ref TreeConditionEntity currentTree, ConstantExpression node)
         {
-
+            JoinTableEntity joinTable = null;
+            VisitConstant(ref currentTree,node,ref joinTable);
+        }
+        public bool VisitConstant(ref TreeConditionEntity currentTree,ConstantExpression node,ref JoinTableEntity joinTable)
+        {
+            if (Check.IsNull(currentTree)) 
+            {
+                currentTree = GetTreeConditon();
+                if (Check.IsNull(joinTable))
+                {
+                    TreeConditions.Add(currentTree);
+                }
+            }
             if (Check.IsNull(currentTree.RightCondition))
             {
                 currentTree.RightCondition = GetCondition(eConditionType.Constant);
@@ -587,6 +532,11 @@ namespace NetCore.ORM.Simple.Entity
                     if (meber.Member is FieldInfo f)
                     {
                         value = f.GetValue(node.Value);
+                        if (!Check.IsNull(meber.OParams))
+                        {
+                            value = ((dynamic)value)[(dynamic)meber.OParams];
+                        }
+                       
                     }
                     while (Check.IsNullOrEmpty<Stack<MemberEntity>, MemberEntity>(currentTree.LeftCondition.Members))
                     {
@@ -641,14 +591,21 @@ namespace NetCore.ORM.Simple.Entity
                             }
                         }
                     }
-                    currentTree.RightCondition.DisplayName = value.ToString();
+                    if (value.GetType().IsValueType)
+                    {
+                        currentTree.RightCondition.DisplayName = value.ToString();
+                    }
+                    else
+                    {
+                        currentTree.RightCondition.Value = value;
+                    }
                 }
 
             }
 
         }
 
-        public void VisitMember(TreeConditionEntity currentTree, MemberInfo member,bool IsCompleteMember, MemberEntity currentMember)
+        public void VisitMember(ref TreeConditionEntity currentTree,MemberInfo member,ref bool IsCompleteMember,ref MemberEntity currentMember)
         {
             if (Check.IsNull(currentTree.LeftCondition))
             {
@@ -657,13 +614,14 @@ namespace NetCore.ORM.Simple.Entity
             currentTree.RightCondition = SetConstMember(member);
             if (Check.IsNull(currentTree.RightCondition))
             {
-                if (IsCompleteMember)
-                {
-                    IsCompleteMember = false;
-                    currentMember = new MemberEntity();
+               
+                    
+                    if (Check.IsNull(currentMember))
+                    {
+                        currentMember = new MemberEntity();
+                    }
                     currentMember.Member = member;
                     currentTree.LeftCondition.Members.Push(currentMember);
-                }
             }
         }
         public ConditionEntity SetConstMember(MemberInfo member)

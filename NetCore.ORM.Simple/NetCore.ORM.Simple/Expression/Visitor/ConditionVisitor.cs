@@ -58,6 +58,7 @@ namespace NetCore.ORM.Simple.Visitor
             currentTables = new Dictionary<string, int>();
             IsComplete = true;
             IsMultipleMap = true;
+            IsCompleteMember = true;
             firstConditionIndex = 0;
         }
 
@@ -152,6 +153,7 @@ namespace NetCore.ORM.Simple.Visitor
                             currentMember.OParams = constant.Value;
                         }
                     }
+                    base.VisitBinary(node);
                     break;
                 default:
                     break;
@@ -165,16 +167,27 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            select.VisitConstant(currentTree, node);
+            select.VisitConstant(ref currentTree, node);
+
             base.VisitConstant(node);
+
             return node;
 
         }
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            base.VisitMethodCall(node);
+
+            if (Check.IsNull(currentTree))
+            {
+                currentTree = select.GetTreeConditon();
+                select.TreeConditions.Add(currentTree);
+            } 
+            
             select.VisitMethod(ref currentTree, node,ref IsCompleteMember,ref currentMember);
             IsComplete = true;
+            IsCompleteMember = true;
+            base.VisitMethodCall(node);
+            
             return node;
         }
 
@@ -381,7 +394,7 @@ namespace NetCore.ORM.Simple.Visitor
             }
             else
             {
-                select.VisitMember(currentTree, node.Member, IsCompleteMember, currentMember);
+                select.VisitMember(ref currentTree, node.Member,ref IsCompleteMember,ref currentMember);
             }
             IsCompleteMember = true;
             base.VisitMember(node);

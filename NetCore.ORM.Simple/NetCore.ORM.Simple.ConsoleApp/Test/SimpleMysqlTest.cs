@@ -154,12 +154,11 @@ namespace NetCore.ORM.Simple.ConsoleApp
         {
             int i = 1000;
             int j = 2000;
-            var JoinData = client.Queryable<UserEntity, RoleEntity, CompanyEntity>(
-                    (u, r, c) => new JoinInfoEntity(
-                    new JoinMapEntity(eJoinType.Inner, u.Id.Equals(i) && u.gIdColumn.Equals(Guid.Empty) && u.RoleId.Equals(r.Id) && u.Id > 10),
-                    new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
-                    )).Where(u=>u.Id>=i&&u.Id<=j).Where(u=>u.Id>1500).ToList();
-            Console.WriteLine(11);
+            //var JoinData = client.Queryable<UserEntity, RoleEntity, CompanyEntity>(
+            //        (u, r, c) => new JoinInfoEntity(
+            //        new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
+            //        new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
+            //        )).GroupBy((u,r,c)=>new {u.Id}).Where(u=>u.Id>=i&&u.Id<=j).Where(u=>u.Id>1500).ToList();
             try
             {
 
@@ -182,9 +181,9 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 c.Count();
                 ids.Count();
                 c.Add(new ViewEntity() { RoleId = 1816 });
-                UserEntity user = client.Queryable<UserEntity>().Where(u => c[0].RoleId.Equals(u.Id) && u.Name.Contains(str)).FirstOrDefault();
-                List<UserEntity> left = client.Queryable<UserEntity>().Where(u => u.Name.LeftContains(str)).ToList();
-                List<UserEntity> user1 = client.Queryable<UserEntity>().Where(u => u.Id.Equals(dic[1816]) && u.Id.Equals(ids[0]) || Check.IsNullOrEmpty(u.Name) || lids[1].Equals(u.Id)).ToList();
+                //UserEntity user = client.Queryable<UserEntity>().Where(u => c[0].RoleId.Equals(u.Id) && u.Name.Contains(str)).FirstOrDefault();
+                //List<UserEntity> left = client.Queryable<UserEntity>().Where(u => u.Name.LeftContains(str)).ToList();
+                List<UserEntity> user1 = client.Queryable<UserEntity>().Where(u =>u.Id.Equals(ids[0])).ToList();
                 List<UserEntity> user2 = client.Queryable<UserEntity>().Where(u => lids[1].Equals(u.Id)).ToList();
                 List<UserEntity> user3 = client.Queryable<UserEntity>().Where(u => ids.Contains(u.Id)).ToList();
                 List<UserEntity> user4 = client.Queryable<UserEntity>().Where(u => lids.Contains(u.Id)).ToList();
@@ -210,7 +209,9 @@ namespace NetCore.ORM.Simple.ConsoleApp
                     Where(user => user.Id > min && user.Id <= max).
                     GroupBy(u => new { u.CompanyId }).Where(u => u.Id > 100).ToList();
                 //排序
-                var order = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderBy(u => new { u.Id }).ToList();
+                var order = client.Queryable<UserEntity>().Where(user => user.Id >
+                min && user.Id <= max).OrderBy(u => new { u.Id }).ToList();
+
                 var orderDesce = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderByDescending(u => new { u.Id }).ToList();
 
                 Console.WriteLine($"*****************是否有数据:{any}****************");

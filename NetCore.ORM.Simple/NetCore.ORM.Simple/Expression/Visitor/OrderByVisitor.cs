@@ -72,13 +72,13 @@ namespace NetCore.ORM.Simple.Visitor
         }
         protected override Expression VisitMember(MemberExpression node)
         {
-            //int Index = -1;
-            //if (currentTables.ContainsKey(node.Expression.ToString()))
-            //{
-            //    Index = currentTables[node.Expression.ToString()];
-            //}
-            //string PropName = node.Member.Name;
-            //select.CreateOrder(PropName,Index,OrderOrGroup,OrderType);
+            int Index = -1;
+            if (currentTables.ContainsKey(node.Expression.ToString()))
+            {
+                Index = currentTables[node.Expression.ToString()];
+            }
+            string PropName = node.Member.Name;
+            select.CreateOrder(PropName, Index, OrderOrGroup, OrderType);
             return node;
         }
 

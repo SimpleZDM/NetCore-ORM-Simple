@@ -181,7 +181,7 @@ namespace NetCore.ORM.Simple.Common
             else if (type.Equals(typeof(string[])))
             {
                 dataType = eDataType.SimpleArrayString;
-            }else if (type.Name.Contains("[]"))
+            }else if (type.IsArray)
             {
                 dataType = eDataType.SimpleArray;
 

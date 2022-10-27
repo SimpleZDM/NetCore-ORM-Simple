@@ -16,6 +16,7 @@ public static class Program
         // Console.WriteLine(typeof(Dictionary<int,int>).IsD);
         //Console.WriteLine(typeof(int[]).IsArray);
         //StartTast("server=49.233.33.36;database=virtualsoftplatformdb;user=root;pwd=[Txy*!14@msql*^];SSL Mode=None");
+        
         Console.WriteLine();
         //object o = 1;
         //object o2 = "232";
@@ -33,18 +34,18 @@ public static class Program
 
         //SimpleExpressionTest test = new SimpleExpressionTest();
         //test.Select();
-        //test.Where();
-       SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
+       // test.Where();
+       //SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
        //MysqlTest.InsertTest();
         //MysqlTest.UpdateTest();
        // MysqlTest.DeleteTest();
-        MysqlTest.QueryTest();
+        //MysqlTest.QueryTest();
 
-        //SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
+        SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
         ////sqliteTest.InsertTest();
         //sqliteTest.UpdateTest();
         //sqliteTest.DeleteTest();
-        //sqliteTest.QueryTest();
+         sqliteTest.QueryTest();
 
         SimpleSqlServiceTest sqlServcie = new SimpleSqlServiceTest();
         //sqlServcie.InsertTest();
