@@ -34,7 +34,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
               WriteReadType = eWriteOrReadType.ReadOrWrite
           }));
 
-            client.SetAPOLog((sql, Params) =>
+            client.SetAOPLog((sql, Params) =>
             {
                 Console.WriteLine(sql);
             });

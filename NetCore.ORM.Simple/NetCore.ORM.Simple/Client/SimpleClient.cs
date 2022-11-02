@@ -68,7 +68,7 @@ namespace NetCore.ORM.Simple.Client
         /// 关于sql语句和参数
         /// </summary>
         /// <param name="action"></param>
-        public void SetAPOLog(Action<string,DbParameter[]> action)
+        public void SetAOPLog(Action<string,DbParameter[]> action)
         {
             dbDrive.AOPSqlLog = action;
         }

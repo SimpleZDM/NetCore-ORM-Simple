@@ -36,7 +36,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
               WriteReadType = eWriteOrReadType.ReadOrWrite
           }));
 
-            client.SetAPOLog((sql, Params) =>
+            client.SetAOPLog((sql, Params) =>
             {
                 Console.WriteLine(sql);
             });
@@ -176,13 +176,13 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 string[] names = new string[] { "111", "222", "333" };
                 string str = "111";
 
-                //List<UserEntity> users = client.Queryable<UserEntity>().Where(u=>ids.Contains(u.Id)&&names.Contains(u.Name)).ToList();
+                List<UserEntity> users = client.Queryable<UserEntity>().Where(u=>ids.Contains(u.Id)&&names.Contains(u.Name)).ToList();
                 List<ViewEntity> c = new List<ViewEntity>();
                 c.Count();
                 ids.Count();
                 c.Add(new ViewEntity() { RoleId = 1816 });
-                //UserEntity user = client.Queryable<UserEntity>().Where(u => c[0].RoleId.Equals(u.Id) && u.Name.Contains(str)).FirstOrDefault();
-                //List<UserEntity> left = client.Queryable<UserEntity>().Where(u => u.Name.LeftContains(str)).ToList();
+                UserEntity user = client.Queryable<UserEntity>().Where(u => c[0].RoleId.Equals(u.Id) && u.Name.Contains(str)).FirstOrDefault();
+                List<UserEntity> left = client.Queryable<UserEntity>().Where(u => u.Name.LeftContains(str)).ToList();
                 List<UserEntity> user1 = client.Queryable<UserEntity>().Where(u =>u.Id.Equals(ids[0])).ToList();
                 List<UserEntity> user2 = client.Queryable<UserEntity>().Where(u => lids[1].Equals(u.Id)).ToList();
                 List<UserEntity> user3 = client.Queryable<UserEntity>().Where(u => ids.Contains(u.Id)).ToList();

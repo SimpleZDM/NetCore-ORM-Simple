@@ -722,6 +722,22 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 case eDataType.SimpleListString:
                 case eDataType.SimpleArrayGuid:
                 case eDataType.SimpleListGuid:
+                    foreach (var item in (dynamic)condition.Value)
+                    {
+                        if (item.ToString() is string strValue)
+                        {
+                            if (strValue.Contains(DBMDConst.SingleQuotes)) 
+                            {
+                                sValue.Append($"{DBMDConst.SingleQuotes}{strValue.Replace(DBMDConst.SingleQuotes.ToString(),$"{DBMDConst.SingleQuotes}{DBMDConst.SingleQuotes}")}{DBMDConst.SingleQuotes}{DBMDConst.Comma}");
+                            }
+                            else
+                            {
+                                sValue.Append($"{DBMDConst.SingleQuotes}{strValue}{DBMDConst.SingleQuotes}{DBMDConst.Comma}");
+                            }
+                        }
+                    }
+                    sValue.Remove(sValue.Length - 1, 1);
+                    break;
                 case eDataType.SimpleArrayInt:
                 case eDataType.SimpleArrayDouble:
                 case eDataType.SimpleArrayFloat:
@@ -732,9 +748,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 case eDataType.SimpleListDecimal:
                     foreach (var item in (dynamic)condition.Value)
                     {
-                        var keyName = GetRandomParaName(Index);
-                        entity.AddParameter(DbType, keyName, item);
-                        sValue.Append($"{keyName}{DBMDConst.Comma}");
+                        sValue.Append($"{item}{DBMDConst.Comma}");
                     }
                     sValue.Remove(sValue.Length - 1, 1);
                     break;
@@ -812,6 +826,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 case MethodConst._Contains:
                     if (eDataType.SimpleString == condition.DataType)
                     {
+                        condition.DisplayName=condition.DisplayName.Replace($"{DBMDConst.SingleQuotes}",$"{DBMDConst.SingleQuotes}{DBMDConst.SingleQuotes}");
                         if (IsNot)
                         {
                             value = $"{leftValue} {DBMDConst.Not} {DBMDConst.Like} {DBMDConst.SingleQuotes}{DBMDConst.Percent}{condition.DisplayName}{DBMDConst.Percent}{DBMDConst.SingleQuotes} ";
@@ -838,6 +853,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 case MethodConst._LeftContains:
                     if (eDataType.SimpleString == condition.DataType)
                     {
+                        condition.DisplayName = condition.DisplayName.Replace($"{DBMDConst.SingleQuotes}", $"{DBMDConst.SingleQuotes}{DBMDConst.SingleQuotes}");
                         if (IsNot)
                         {
                             value = $"{leftValue} {DBMDConst.Not} {DBMDConst.Like} {DBMDConst.SingleQuotes}{DBMDConst.Percent}{condition.DisplayName}{DBMDConst.SingleQuotes} ";
@@ -852,6 +868,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 case MethodConst._RightContains:
                     if (eDataType.SimpleString == condition.DataType)
                     {
+                        condition.DisplayName = condition.DisplayName.Replace($"{DBMDConst.SingleQuotes}", $"{DBMDConst.SingleQuotes}{DBMDConst.SingleQuotes}");
                         if (IsNot)
                         {
                             value = $"{leftValue} {DBMDConst.Not} {DBMDConst.Like} {DBMDConst.SingleQuotes}{condition.DisplayName}{DBMDConst.Percent}{DBMDConst.SingleQuotes} ";

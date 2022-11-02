@@ -32,14 +32,14 @@ public static class Program
         //Console.WriteLine(typeof(List<object>).Name);
         //Console.WriteLine(typeof(object[]).Name);
 
-        //SimpleExpressionTest test = new SimpleExpressionTest();
+       // SimpleExpressionTest test = new SimpleExpressionTest();
         //test.Select();
        // test.Where();
-       //SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
+       SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
        //MysqlTest.InsertTest();
         //MysqlTest.UpdateTest();
        // MysqlTest.DeleteTest();
-        //MysqlTest.QueryTest();
+        MysqlTest.QueryTest();
 
         SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
         ////sqliteTest.InsertTest();
@@ -67,7 +67,7 @@ public static class Program
             Name = "Test"
         })
             );
-        client.SetAPOLog((sql, pars) =>
+        client.SetAOPLog((sql, pars) =>
         {
             //Console.WriteLine(sql);
             //Console.WriteLine($"Date:{DateTime.Now}\t \t sql:{sql}");
