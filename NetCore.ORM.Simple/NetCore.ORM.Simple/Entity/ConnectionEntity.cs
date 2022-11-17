@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NetCore.ORM.Simple.Entity;
 
 /*********************************************************
- * 命名空间 NetCore.ORM.Simple.Entity
+ * 命名空间 NetCore.ORM.Simple
  * 接口名称 ConnectionEntity
  * 开发人员：-nhy
  * 创建时间：2022/9/15 17:28:43
@@ -13,7 +9,7 @@ using System.Threading.Tasks;
  * 更改历史：
  * 
  * *******************************************************/
-namespace NetCore.ORM.Simple.Entity
+namespace NetCore.ORM.Simple
 {
     public class ConnectionEntity
     {

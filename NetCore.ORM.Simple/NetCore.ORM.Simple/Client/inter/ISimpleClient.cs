@@ -17,7 +17,7 @@ using System.Threading.Tasks;
  * 更改历史：
  * 
  * *******************************************************/
-namespace NetCore.ORM.Simple.Client
+namespace NetCore.ORM.Simple
 {
     public interface ISimpleClient
     {

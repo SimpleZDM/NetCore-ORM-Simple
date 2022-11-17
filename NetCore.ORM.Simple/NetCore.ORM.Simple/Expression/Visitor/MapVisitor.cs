@@ -192,7 +192,7 @@ namespace NetCore.ORM.Simple.Visitor
                 if (!Check.IsNull(prop))
                 {
                     PropName = prop.Name;
-                    TableName = select.GetTableName(currentTables[Parameter.Name]);
+                    TableName = select.GetAsTableName(currentTables[Parameter.Name]);
                 }
             }
             if (IsAgain)

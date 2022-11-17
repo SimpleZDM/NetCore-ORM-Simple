@@ -16,6 +16,9 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Entity
 {
+    /// <summary>
+    /// 收集表达式中的变量
+    /// </summary>
     public class MemberEntity
     {
         public MemberInfo Member { get { return member; } set { member = value; } }

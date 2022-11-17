@@ -420,7 +420,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     else
                     {
                         sqlEntity.StrSqlValue.Append($" {MysqlConst.StrJoins[(int)join.JoinType]}" +
-                            $" {join.DisplayName} {DBMDConst.On} ");
+                            $" {join.DisplayName} {DBMDConst.As} {join.AsName} {DBMDConst.On} ");
                         LinkConditions(join.Conditions, join.TreeConditions, sqlEntity);
                     }
                 }

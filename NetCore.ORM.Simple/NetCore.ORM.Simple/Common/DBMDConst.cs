@@ -76,6 +76,7 @@ namespace NetCore.ORM.Simple.Common
             LessThan = '<';
             Percent = '%';
             SingleQuotes = '\'';
+            Dot = '.';
 
 
             #endregion
@@ -156,6 +157,7 @@ namespace NetCore.ORM.Simple.Common
         public static char LessThan;
         public static char Percent;
         public static char SingleQuotes;
+        public static char Dot;
         #endregion
 
         #region method

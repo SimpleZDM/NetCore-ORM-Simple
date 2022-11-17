@@ -17,6 +17,9 @@ using NetCore.ORM.Simple.Common;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Entity
 {
+    /// <summary>
+    /// 收集链接查询中涉及到的表
+    /// </summary>
     public class TableEntity
     {
         /// <summary>
@@ -24,6 +27,9 @@ namespace NetCore.ORM.Simple.Entity
         /// value-table的名称
         /// </summary>
         public Dictionary<string,NameEntity> DicTable { get { return dicTable; } private set { dicTable = value; } }
+        /// <summary>
+        /// table 中包含表的实际名称
+        /// </summary>
         public string[] TableNames { get { return tableNames; } private set { tableNames = value; } }
 
         public Type TableAtrr { get { return tableAtrr; } private set { tableAtrr = value; } }
@@ -47,8 +53,6 @@ namespace NetCore.ORM.Simple.Entity
         }
         private Dictionary<string, NameEntity> dicTable;
         private string[] tableNames;
-        private int count = 0;
-        private string currentName;
         /// <summary>
         /// 
         /// </summary>
@@ -67,13 +71,15 @@ namespace NetCore.ORM.Simple.Entity
             if (DicTable.ContainsKey(newEity.DisplayNmae))
             {
                 var entity=DicTable[newEity.DisplayNmae];
-               
-                TableNames[index] = $"{newEity.DisplayNmae}{CommonConst.Letters[entity.Count]}";
+             
+                    newEity.AsName=$"{newEity.DisplayNmae}{CommonConst.Letters[entity.Count]}";
+                    TableNames[index] = newEity.AsName;
                 entity.Count++;
             }
             else
             {
                 TableNames[index]=newEity.DisplayNmae;
+                newEity.AsName = newEity.DisplayNmae;
             }
             DicTable.Add(TableNames[index],newEity);
         }
@@ -82,6 +88,7 @@ namespace NetCore.ORM.Simple.Entity
         {
             return type.GetTableName(tableAtrr);
         }
+       
         public string GetColName(PropertyInfo Prop)
         {
             return Prop.GetColName(columnAttr);
@@ -106,5 +113,16 @@ namespace NetCore.ORM.Simple.Entity
 
         private Type tableAtrr;
         private Type columnAttr;
+        /// <summary>
+        /// 获取表的真实名称
+        /// </summary>
+        public NameEntity GetTableName(int index)
+        {
+            if (index>=TableNames.Length)
+            {
+                throw new Exception("超出索引界限!");
+            }
+            return DicTable[TableNames[index]];
+        }
     }
 }

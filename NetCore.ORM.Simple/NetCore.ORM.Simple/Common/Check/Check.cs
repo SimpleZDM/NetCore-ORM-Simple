@@ -28,14 +28,14 @@ namespace NetCore.ORM.Simple.Common
 
         public static bool IsNullOrEmpty<T>(this T[]datas)
         {
-            if (datas==null&&datas.Count()==0)
+            if (datas==null||datas.Count()==0)
             {
                 return true;
             }return false;
         }
         public static bool IsNullOrEmpty<T>(this List<T> datas)
         {
-            if (datas == null && datas.Count() == 0)
+            if (datas == null || datas.Count() == 0)
             {
                 return true;
             }
@@ -44,7 +44,7 @@ namespace NetCore.ORM.Simple.Common
 
         public static bool IsNullOrEmpty<T,Value>(this T datas)where T : IEnumerable<Value>
         {
-            if (datas == null && datas.Count() == 0)
+            if (datas == null || datas.Count() == 0)
             {
                 return true;
             }

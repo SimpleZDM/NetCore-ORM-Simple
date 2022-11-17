@@ -17,6 +17,9 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Entity
 {
+    /// <summary>
+    /// 收集查询信息
+    /// </summary>
     public class QueryEntity : SqlBase
     {
         public QueryEntity()

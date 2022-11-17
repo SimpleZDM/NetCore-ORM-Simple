@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetCore.ORM.Simple.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -40,6 +41,15 @@ namespace NetCore.ORM.Simple.Entity
         /// 将一些值进行保存
         /// </summary>
         public object Value { get { return val; } set { val = value; } }
+
+        public void SetDisplayName(string TableName,string PropName)
+        {
+            if (Check.IsNullOrEmpty(TableName)||Check.IsNullOrEmpty(PropName))
+            {
+                throw new Exception("未找到属性名称或者表名称!");
+            }
+            DisplayName=$"{TableName}{DBMDConst.Dot}{PropName}";
+        }
 
 
 

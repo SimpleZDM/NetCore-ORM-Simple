@@ -1,12 +1,6 @@
 ﻿using NetCore.ORM.Simple.Common;
-using NetCore.ORM.Simple.Visitor;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.Entity
@@ -19,6 +13,9 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Entity
 {
+    /// <summary>
+    /// 记录select语句的信息和解析
+    /// </summary>
     public class SelectEntity
     {
         public SelectEntity(Type tableAttr, Type columnAttr, params Type[] types)
@@ -52,7 +49,19 @@ namespace NetCore.ORM.Simple.Entity
         {
             if (Table.TableNames.Length > index)
             {
-                return Table.GetTableName(Table.DicTable[Table.TableNames[index]].ClassType);
+                //Table.GetTableName(Table.DicTable[Table.TableNames[index]].ClassType);
+                var nameEntity =Table.GetTableName(index);
+                return nameEntity.DisplayNmae;
+            }
+            throw new Exception("表不存在!");
+        }
+        public string GetAsTableName(int index)
+        {
+            if (Table.TableNames.Length > index)
+            {
+                //Table.GetTableName(Table.DicTable[Table.TableNames[index]].ClassType);
+                var nameEntity = Table.GetTableName(index);
+                return nameEntity.AsName;
             }
             throw new Exception("表不存在!");
         }
@@ -168,12 +177,13 @@ namespace NetCore.ORM.Simple.Entity
             string mName = string.Empty;
             if (Table.TableNames.Length > index)
             {
-                condition.DisplayName = $"{GetTableName(index)}.{memberName}";
+                condition.SetDisplayName(GetAsTableName(index), memberName);///$"{}.{}";
                 if (!JoinInfos.ContainsKey(Table.TableNames[index]))
                 {
-                    Join.AsName = Table.TableNames[index];
-                    Join.DisplayName = Table.DicTable[Join.AsName].DisplayNmae;//表的名称
-                    JoinInfos.Add(Join.DisplayName, Join);
+                    var nameEntity = Table.GetTableName(index);
+                    Join.AsName = nameEntity.AsName;
+                    Join.DisplayName = nameEntity.DisplayNmae;//表的名称
+                    JoinInfos.Add(Join.AsName, Join);
                     return true;
                 }
             }
@@ -216,29 +226,26 @@ namespace NetCore.ORM.Simple.Entity
         /// <returns></returns>
         public ConditionEntity GetCondition(string PropName,int Index,Type type)
         {
-            ConditionEntity conditon = null;
+            ConditionEntity conditon = GetCondition(eConditionType.ColumnName); 
+
             var maps = mapInfos.Where(m=>m.PropName.Equals(PropName)).ToArray();
+
             if (!Check.IsNullOrEmpty(maps)&&maps.Count()==1)
             {
-                conditon = GetCondition(eConditionType.ColumnName); 
-                conditon.DisplayName = $"{maps[0].TableName}.{maps[0].ColumnName}";
-                conditon.PropertyType = type;
+                conditon.SetDisplayName(maps[0].TableName, maps[0].ColumnName);
             }
             else  if (Index>=0 &&Index<table.TableNames.Length)
             {
                 
                     var Prop = GetPropertyType(Index,PropName);
-                    var TableName =GetTableName(Index);
+                    var TableName =GetAsTableName(Index);
                     if (!Check.IsNull(Prop))
                     {
                         PropName = GetColumnName(Index, PropName);
-                        conditon.DisplayName = $"{TableName}{PropName}";
+                        conditon.SetDisplayName(TableName,PropName);
                     }
             }
-            if (!Check.IsNull(conditon))
-            {
-                conditon.PropertyType=type;
-            }
+            conditon.PropertyType=type;
             return conditon;
         }
         public void CreateCondition(ConditionEntity condition)
@@ -332,6 +339,7 @@ namespace NetCore.ORM.Simple.Entity
                     {
                         order.TableName = map.TableName;
                         order.ColumnName = map.ColumnName;
+                        order.PropName = map.PropName;
                     }
                 }
                 else
@@ -339,7 +347,7 @@ namespace NetCore.ORM.Simple.Entity
                     if (Index >= 0)
                     {
                         Prop = GetPropertyType(Index, PropName);
-                        order.TableName = Table.GetTableName(GetEntityType(Index));
+                        order.TableName =GetAsTableName(Index);
                         order.PropName = Prop.Name;
                         order.ColumnName = Table.GetColName(Prop);
                     }
@@ -538,7 +546,7 @@ namespace NetCore.ORM.Simple.Entity
                         }
                        
                     }
-                    while (Check.IsNullOrEmpty<Stack<MemberEntity>, MemberEntity>(currentTree.LeftCondition.Members))
+                    while (!Check.IsNullOrEmpty<Stack<MemberEntity>, MemberEntity>(currentTree.LeftCondition.Members))
                     {
                         MemberEntity m = currentTree.LeftCondition.Members.Pop();
                         if (m.Member is FieldInfo field)
@@ -605,7 +613,7 @@ namespace NetCore.ORM.Simple.Entity
 
         }
 
-        public void VisitMember(ref TreeConditionEntity currentTree,MemberInfo member,ref bool IsCompleteMember,ref MemberEntity currentMember)
+        public void VisitMember(ref TreeConditionEntity currentTree,MemberInfo member,ref bool IsCompleteMember,MemberEntity currentMember)
         {
             if (Check.IsNull(currentTree.LeftCondition))
             {
@@ -702,26 +710,12 @@ namespace NetCore.ORM.Simple.Entity
                         currentMember.OParams = call.Arguments[0];
                         IsCompleteMember = false;
                     }
-                    //if (call.Arguments[0].GetType() == typeof(int) && int.TryParse(call.Arguments[0].ToString(),out value))
-                    //{
-                    //    currentTree.Index = value;
-                    //}
-                    //else
-                    //{
-                    //    currentTree.Key = call.Arguments[0].ToString();
-                    //}
+                 
 
                 }
                 if (node.Arguments[0] is ConstantExpression constant)
                 {
-                    //if (content.Value.GetType()==typeof(int)&&int.TryParse(content.Value.ToString(),out value))
-                    //{
-                    //    currentTree.Index = value;
-                    //}
-                    //else
-                    //{
-                    //    currentTree.Key = content.Value.ToString();
-                    //}
+                   
                     if (IsCompleteMember)
                     {
                         currentMember = new MemberEntity();

@@ -10,4 +10,9 @@
     <ProjectReference Include="..\NetCore.ORM.Simple\NetCore.ORM.Simple.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="生产测试环境\Entity\EntityDto\hardware\" />
+    <Folder Include="生产测试环境\Entity\EntityView\hard\" />
+  </ItemGroup>
+
 </Project>

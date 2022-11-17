@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NetCore.ORM.Simple.Entity;
+﻿using NetCore.ORM.Simple.Entity;
 using NetCore.ORM.Simple.SqlBuilder;
 
 /*********************************************************
- * 命名空间 NetCore.ORM.Simple.Client
+ * 命名空间 NetCore.ORM.Simple
  * 接口名称 SimpleCommand
  * 开发人员：-nhy
  * 创建时间：2022/9/21 14:14:19
@@ -15,7 +10,7 @@ using NetCore.ORM.Simple.SqlBuilder;
  * 更改历史：
  * 
  * *******************************************************/
-namespace NetCore.ORM.Simple.Client
+namespace NetCore.ORM.Simple
 {
     public class SimpleCommand<TEntity>:ISimpleCommand<TEntity>where TEntity : class
     {

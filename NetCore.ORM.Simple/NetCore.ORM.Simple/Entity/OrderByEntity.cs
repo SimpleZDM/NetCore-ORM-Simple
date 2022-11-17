@@ -15,6 +15,9 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Entity
 {
+    /// <summary>
+    /// 收集分组与排序信息
+    /// </summary>
     public class OrderByEntity
     {
         public OrderByEntity()

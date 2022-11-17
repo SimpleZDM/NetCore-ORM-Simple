@@ -1,13 +1,9 @@
 ﻿using Microsoft.Data.Sqlite;
 using MySql.Data.MySqlClient;
 using NetCore.ORM.Simple.Common;
-using System;
-using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.Entity

@@ -15,6 +15,9 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Entity
 {
+    /// <summary>
+    /// 收集配置过的表链接信息
+    /// </summary>
     public class JoinTableEntity
     {
         

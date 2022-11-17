@@ -1,4 +1,4 @@
-﻿using NetCore.ORM.Simple.Client;
+﻿using NetCore.ORM.Simple;
 using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
 using System;
@@ -38,7 +38,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
             {
                 Console.WriteLine(sql);
             });
-            client.SetAttr(typeof(MyTableAttrbute), typeof(MyColumnAttrbute));
+            client.SetAttr(typeof(MyTableAttrbute),typeof(MyColumnAttrbute));
             // var data=client.Queryable<MatchLog>().Take(10).ToList();
         }
         /// <summary>
@@ -167,7 +167,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 lids.Add(1816);
                 dic.Add(1816, 1816);
                 dic.Add(1817, 1817);
-                string[] names = new string[] { "111", "222", "333" };
+                string[] names = new string[] { "11'1", "222", "333" };
                 string str = "111";
 
                 //List<UserEntity> users = client.Queryable<UserEntity>().Where(u=>ids.Contains(u.Id)&&names.Contains(u.Name)).ToList();
@@ -258,8 +258,8 @@ namespace NetCore.ORM.Simple.ConsoleApp
                   Select((v) => new GroupEntity()
                   {
                       Count = v.Count(),
-                      FirstOrDefaultName = v.FirstOrDefault(s => s.UserName),
-                      Max = v.Max(s => s.RoleId)
+                      //FirstOrDefaultName = v.FirstOrDefault(s => s.UserName),
+                     // Max = v.Max(s => s.RoleId)
                   }).ToList();
 
                 var orderBy = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) => new JoinInfoEntity(

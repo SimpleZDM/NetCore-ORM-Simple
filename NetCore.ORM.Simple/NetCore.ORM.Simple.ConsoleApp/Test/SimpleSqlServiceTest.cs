@@ -1,5 +1,4 @@
-﻿using NetCore.ORM.Simple.Client;
-using NetCore.ORM.Simple.Common;
+﻿using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
 using System;
 using System.Collections.Generic;

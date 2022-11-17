@@ -16,6 +16,9 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Entity
 {
+    /// <summary>
+    /// 链接基本配置
+    /// </summary>
     public class JoinMapEntity
     {
         public eJoinType JoinType { get { return joinType; } set { joinType = value; } }

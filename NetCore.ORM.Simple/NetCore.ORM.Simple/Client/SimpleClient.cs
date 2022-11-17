@@ -1,12 +1,5 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
+﻿using System.Data.Common;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using NetCore.ORM.Simple.Entity;
 using NetCore.ORM.Simple.Queryable;
 using NetCore.ORM.Simple.SqlBuilder;
@@ -14,7 +7,7 @@ using NetCore.ORM.Simple.Visitor;
 
 
 /*********************************************************
- * 命名空间 NetCore.ORM.Simple.Client
+ * 命名空间 NetCore.ORM.Simple
  * 接口名称 SimpleClient
  * 开发人员：-nhy
  * 创建时间：2022/9/20 10:31:37
@@ -22,7 +15,7 @@ using NetCore.ORM.Simple.Visitor;
  * 更改历史：
  * 
  * *******************************************************/
-namespace NetCore.ORM.Simple.Client
+namespace NetCore.ORM.Simple
 {
     public class SimpleClient:ISimpleClient
     {

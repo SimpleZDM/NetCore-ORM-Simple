@@ -394,7 +394,7 @@ namespace NetCore.ORM.Simple.Visitor
             }
             else
             {
-                select.VisitMember(ref currentTree, node.Member,ref IsCompleteMember,ref currentMember);
+                select.VisitMember(ref currentTree, node.Member,ref IsCompleteMember, currentMember);
             }
             IsCompleteMember = true;
             base.VisitMember(node);

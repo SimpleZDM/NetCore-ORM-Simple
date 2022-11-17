@@ -1,10 +1,5 @@
-﻿using NetCore.ORM.Simple.Entity;
-using NetCore.ORM.Simple.Visitor;
-using System.Linq.Expressions;
-using NetCore.ORM.Simple.SqlBuilder;
-using NetCore.ORM.Simple.Queryable;
-using NetCore.ORM.Simple.Client;
-using NetCore.ORM.Simple.Common;
+﻿using MDT.VirtualSoftPlatform.Entity;
+using NetCore.ORM.Simple.Entity;
 using System.Diagnostics;
 
 namespace NetCore.ORM.Simple.ConsoleApp;
@@ -12,12 +7,23 @@ public static class Program
 {
     public static int Main(string []args)
     {
+        ProductTest productTest = new ProductTest();
+        productTest.StartTest1(new MissionDetailParameter
+        {
+            ClassID = Guid.Parse("08da0008-e513-4291-8e5d-abbcce797617"),
+            UserID = Guid.Parse("f906b8ad-2f57-4236-90bd-08b7acc428d2")
+        });
+        productTest.StartTest(new MissionDetailParameter
+        {
+            ClassID = Guid.Parse("08da0008-e513-4291-8e5d-abbcce797617"),
+            UserID = Guid.Parse("f906b8ad-2f57-4236-90bd-08b7acc428d2")
+        });
         //Console.WriteLine(typeof(List<int>).IsArray);
         // Console.WriteLine(typeof(Dictionary<int,int>).IsD);
         //Console.WriteLine(typeof(int[]).IsArray);
         //StartTast("server=49.233.33.36;database=virtualsoftplatformdb;user=root;pwd=[Txy*!14@msql*^];SSL Mode=None");
-        
-        Console.WriteLine();
+
+        //Console.WriteLine();
         //object o = 1;
         //object o2 = "232";
         //object o3 = 1.1;
@@ -32,26 +38,26 @@ public static class Program
         //Console.WriteLine(typeof(List<object>).Name);
         //Console.WriteLine(typeof(object[]).Name);
 
-       // SimpleExpressionTest test = new SimpleExpressionTest();
+        // SimpleExpressionTest test = new SimpleExpressionTest();
         //test.Select();
-       // test.Where();
-       SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
-       //MysqlTest.InsertTest();
+        // test.Where();
+        //SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
+        //MysqlTest.InsertTest();
         //MysqlTest.UpdateTest();
-       // MysqlTest.DeleteTest();
-        MysqlTest.QueryTest();
+        // MysqlTest.DeleteTest();
+        //MysqlTest.QueryTest();
 
-        SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
-        ////sqliteTest.InsertTest();
+        //SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
+        //sqliteTest.InsertTest();
         //sqliteTest.UpdateTest();
         //sqliteTest.DeleteTest();
-         sqliteTest.QueryTest();
+        //sqliteTest.QueryTest();
 
-        SimpleSqlServiceTest sqlServcie = new SimpleSqlServiceTest();
+        //SimpleSqlServiceTest sqlServcie = new SimpleSqlServiceTest();
         //sqlServcie.InsertTest();
         //sqlServcie.UpdateTest();
         //sqlServcie.DeleteTest();
-        sqlServcie.QueryTest();
+        //sqlServcie.QueryTest();
         return 0;
     }
 

@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 /*********************************************************
- * 命名空间 NetCore.ORM.Simple.ConsoleApp.Test
+ * 命名空间 NetCore.ORM.Simple.ConsoleApp
  * 接口名称 SimpleExpressionTest
  * 开发人员：-nhy
  * 创建时间：2022/10/17 10:41:08

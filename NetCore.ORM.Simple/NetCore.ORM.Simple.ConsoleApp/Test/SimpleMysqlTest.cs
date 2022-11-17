@@ -1,5 +1,4 @@
-﻿using NetCore.ORM.Simple.Client;
-using NetCore.ORM.Simple.Entity;
+﻿using NetCore.ORM.Simple.Entity;
 using NetCore.ORM.Simple.Common;
 using System;
 using System.Collections.Generic;
@@ -260,8 +259,8 @@ namespace NetCore.ORM.Simple.ConsoleApp
                   Select((v) => new GroupEntity()
                   {
                       Count = v.Count(),
-                      FirstOrDefaultName = v.FirstOrDefault(s => s.UserName),
-                      Max = v.Max(s => s.RoleId)
+                      //FirstOrDefaultName = v.FirstOrDefault(s => s.UserName),
+                      //Max = v.Max(s => s.RoleId)
                   }).ToList();
 
                 var orderBy = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) => new JoinInfoEntity(
