@@ -25,7 +25,9 @@ namespace NetCore.ORM.Simple.Entity
     public enum eWriteOrReadType
     {
         Read=0,
-        ReadOrWrite=1,
+        Write=1,
+        ReadOrWrite=2,
+        
     }
 
     public enum eJoinType

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 /*********************************************************
- * 命名空间 NetCore.ORM.Simple.Client
+ * 命名空间 NetCore.ORM.Simple
  * 接口名称 ISimpleCommand
  * 开发人员：-nhy
  * 创建时间：2022/9/21 14:15:06
@@ -13,7 +13,7 @@ using System.Threading.Tasks;
  * 更改历史：
  * 
  * *******************************************************/
-namespace NetCore.ORM.Simple.Client
+namespace NetCore.ORM.Simple
 {
     public interface ISimpleCommand<TEntity>
     {

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace NetCore.ORM.Simple.Entity
 {
     /// <summary>
-    /// 映射数据
+    /// 收集查询返回的字段信息
     /// </summary>
     public class MapEntity
     {

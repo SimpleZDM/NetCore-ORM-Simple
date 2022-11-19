@@ -55,8 +55,8 @@ namespace NetCore.ORM.Simple.Common
             In = "IN";
             Like = "Like";
             True ="true";
-            And ="AND";
-            Or ="OR";
+            And =" AND ";
+            Or =" OR ";
             Left = "Left";
             Right = "Right";
             Inner = "Inner";
@@ -76,6 +76,7 @@ namespace NetCore.ORM.Simple.Common
             LessThan = '<';
             Percent = '%';
             SingleQuotes = '\'';
+            Dot = '.';
 
 
             #endregion
@@ -156,6 +157,7 @@ namespace NetCore.ORM.Simple.Common
         public static char LessThan;
         public static char Percent;
         public static char SingleQuotes;
+        public static char Dot;
         #endregion
 
         #region method

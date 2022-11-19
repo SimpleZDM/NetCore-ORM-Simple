@@ -32,8 +32,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
               $"{DBMDConst.GreaterThan}{DBMDConst.Equal}",
               $"{DBMDConst.LessThan}{DBMDConst.Equal}",
               DBMDConst.GreaterThan.ToString(),
-              DBMDConst.LessThan.ToString(),
-              DBMDConst.Or,DBMDConst.And,
+              DBMDConst.LessThan.ToString()
+              ,DBMDConst.And,DBMDConst.Or,
               $"{DBMDConst.LessThan}{DBMDConst.GreaterThan}" };
         }
         /// <summary>

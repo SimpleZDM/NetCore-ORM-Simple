@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.Entity
@@ -15,6 +11,9 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Entity
 {
+    /// <summary>
+    /// 记录等式
+    /// </summary>
     public class TreeConditionEntity
     {
         public TreeConditionEntity()

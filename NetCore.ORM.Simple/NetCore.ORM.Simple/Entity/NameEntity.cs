@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.Entity
@@ -15,6 +11,9 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Entity
 {
+    /// <summary>
+    /// 收集表的名称与别称
+    /// </summary>
     public class NameEntity
     {
         public NameEntity()
@@ -25,6 +24,8 @@ namespace NetCore.ORM.Simple.Entity
         /// 类的实际名称
         /// </summary>
         public string DisplayNmae { get { return name; } set { name = value; } }
+
+        public string AsName { get { return asName; } set { asName = value; } }
         /// <summary>
         /// 数量
         /// </summary>
@@ -33,5 +34,6 @@ namespace NetCore.ORM.Simple.Entity
         private string name;
         private int count;
         private Type classType;
+        private string asName;
     }
 }

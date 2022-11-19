@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetCore.ORM.Simple.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -21,7 +22,7 @@ namespace NetCore.ORM.Simple.Entity
         public ConditionEntity(eConditionType type)
         {
             ConditionType = type;
-            ConstFieldType = new List<FieldInfo>();
+            Members = new Stack<MemberEntity>();
         }
         public string DisplayName { get { return displayName; } set { displayName = value; } }
         /// <summary>
@@ -34,23 +35,29 @@ namespace NetCore.ORM.Simple.Entity
         public eSignType SignType { get { return signType; } set { signType = value; } }
         public eDataType DataType { get { return dataType; } set { dataType = value; } }
 
+        public Stack<MemberEntity> Members { get { return members; } set { members = value; } }
         public Type PropertyType { get { return propertyType; } set { propertyType = value; } }
-        public PropertyInfo ConstPropType { get { return constType; } set { constType = value; } }
-        public List<FieldInfo> ConstFieldType { get { return constFieldType; } set { constFieldType = value; } }
-
         /// <summary>
         /// 将一些值进行保存
         /// </summary>
         public object Value { get { return val; } set { val = value; } }
+
+        public void SetDisplayName(string TableName,string PropName)
+        {
+            if (Check.IsNullOrEmpty(TableName)||Check.IsNullOrEmpty(PropName))
+            {
+                throw new Exception("未找到属性名称或者表名称!");
+            }
+            DisplayName=$"{TableName}{DBMDConst.Dot}{PropName}";
+        }
 
 
 
         private string displayName;
         private eConditionType conditionType;
         private eSignType signType;
+        private Stack<MemberEntity> members;
         private Type propertyType;
-        private PropertyInfo constType;
-        private List<FieldInfo> constFieldType;
         private object val;
         private eDataType dataType;
     }

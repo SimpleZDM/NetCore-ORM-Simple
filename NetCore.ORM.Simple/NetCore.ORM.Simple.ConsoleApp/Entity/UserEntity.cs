@@ -56,8 +56,8 @@ namespace NetCore.ORM.Simple.ConsoleApp
     {
         public int Count { get; set; }
         public int RoleId { get; set; }
-        public string FirstOrDefaultName { get; set; }
-        public int Max { get; set; }
+        public string UserName { get; set; }
+        public decimal Grade { get; set; }
     }
     [TableName("missiondetailtable")]
     public class MissionDetailEntity

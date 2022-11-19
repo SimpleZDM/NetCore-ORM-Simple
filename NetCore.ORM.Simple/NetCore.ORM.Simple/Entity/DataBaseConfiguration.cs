@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 /*********************************************************
- * 命名空间 NetCore.ORM.Simple.Entity
+ * 命名空间 NetCore.ORM.Simple
  * 接口名称 DataBaseConfiguration
  * 开发人员：-nhy
  * 创建时间：2022/9/15 17:27:07
@@ -16,6 +16,9 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Entity
 {
+    /// <summary>
+    /// 数据库链接基本配置
+    /// </summary>
     public class DataBaseConfiguration
     {
         /// <summary>

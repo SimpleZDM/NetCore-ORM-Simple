@@ -23,4 +23,8 @@ namespace NetCore.ORM.Simple.ConsoleApp.Entity
         public List<TestEntity> list { get; set; }
         public int[] array { get; set; }
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 7fa562bd3062f87f02ed1cd3306129ee312242d4

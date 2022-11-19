@@ -17,7 +17,7 @@ using System.Threading.Tasks;
  * 更改历史：
  * 
  * *******************************************************/
-namespace NetCore.ORM.Simple.Client
+namespace NetCore.ORM.Simple
 {
     public interface ISimpleClient
     {
@@ -75,7 +75,7 @@ namespace NetCore.ORM.Simple.Client
 
         public int SaveChange();
 
-        public void SetAPOLog(Action<string,DbParameter[]> action);
+        public void SetAOPLog(Action<string,DbParameter[]> action);
 
         public void SetAttr(Type Table = null, Type Column = null);
 

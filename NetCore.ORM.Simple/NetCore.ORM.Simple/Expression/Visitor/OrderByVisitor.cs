@@ -78,7 +78,7 @@ namespace NetCore.ORM.Simple.Visitor
                 Index = currentTables[node.Expression.ToString()];
             }
             string PropName = node.Member.Name;
-            select.CreateOrder(PropName,Index,OrderOrGroup,OrderType);
+            select.CreateOrder(PropName, Index, OrderOrGroup, OrderType);
             return node;
         }
 

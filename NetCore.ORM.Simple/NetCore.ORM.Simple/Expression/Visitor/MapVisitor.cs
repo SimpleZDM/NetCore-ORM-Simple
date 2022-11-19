@@ -90,137 +90,6 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override Expression VisitBinary(BinaryExpression node)
         {
-
-            if (currentTables.Count() > 0)
-            {
-                #region
-                switch (node.NodeType)
-                {
-                    case ExpressionType.AndAlso:
-                        SingleLogicBinary(node, (queue) => { queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.And]); });
-                        break;
-                    case ExpressionType.Call:
-                        Console.WriteLine("call");
-                        break;
-                    case ExpressionType.GreaterThan:
-                        SingleBinary(node, (queue) => { queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.GrantThan]); });
-                        break;
-                    case ExpressionType.GreaterThanOrEqual:
-                        SingleBinary(node, (queue) => { queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.GreatThanOrEqual]); });
-                        break;
-                    case ExpressionType.LessThan:
-                        SingleBinary(node, (queue) => { queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.LessThan]); });
-                        break;
-                    case ExpressionType.LessThanOrEqual:
-                        SingleBinary(node, (queue) => { queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.LessThanOrEqual]); });
-                        break;
-                    case ExpressionType.Equal:
-                        SingleBinary(node, (queue) => { queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.Equal]); });
-                        break;
-                    case ExpressionType.NotEqual:
-                        SingleBinary(node, (queue) => { queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.NotEqual]); });
-                        break;
-                    case ExpressionType.OrElse:
-                        SingleLogicBinary(node, (queue) => { queue.Enqueue(SimpleConst.cStrSign[(int)eSignType.Or]); });
-                        break;
-                    case ExpressionType.Parameter:
-                        break;
-                    case ExpressionType.Power:
-                        break;
-                    case ExpressionType.Quote:
-                        break;
-                    case ExpressionType.RightShift:
-                        break;
-                    case ExpressionType.Subtract:
-                        break;
-                    case ExpressionType.SubtractChecked:
-                        break;
-                    case ExpressionType.TypeAs:
-                        break;
-                    case ExpressionType.TypeIs:
-                        break;
-                    case ExpressionType.Assign:
-                        break;
-                    case ExpressionType.Block:
-                        break;
-                    case ExpressionType.DebugInfo:
-                        break;
-                    case ExpressionType.Decrement:
-                        break;
-                    case ExpressionType.Dynamic:
-                        break;
-                    case ExpressionType.Default:
-                        break;
-                    case ExpressionType.Extension:
-                        break;
-                    case ExpressionType.Goto:
-                        break;
-                    case ExpressionType.Increment:
-                        break;
-                    case ExpressionType.Index:
-                        break;
-                    case ExpressionType.Label:
-                        break;
-                    case ExpressionType.RuntimeVariables:
-                        break;
-                    case ExpressionType.Loop:
-                        break;
-                    case ExpressionType.Switch:
-                        break;
-                    case ExpressionType.Throw:
-                        break;
-                    case ExpressionType.Try:
-                        break;
-                    case ExpressionType.Unbox:
-                        break;
-                    case ExpressionType.AddAssign:
-                        break;
-                    case ExpressionType.AndAssign:
-                        break;
-                    case ExpressionType.DivideAssign:
-                        break;
-                    case ExpressionType.ExclusiveOrAssign:
-                        break;
-                    case ExpressionType.LeftShiftAssign:
-                        break;
-                    case ExpressionType.ModuloAssign:
-                        break;
-                    case ExpressionType.MultiplyAssign:
-                        break;
-                    case ExpressionType.OrAssign:
-                        break;
-                    case ExpressionType.PowerAssign:
-                        break;
-                    case ExpressionType.RightShiftAssign:
-                        break;
-                    case ExpressionType.MultiplyAssignChecked:
-                        break;
-                    case ExpressionType.SubtractAssignChecked:
-                        break;
-                    case ExpressionType.PreIncrementAssign:
-                        break;
-                    case ExpressionType.PreDecrementAssign:
-                        break;
-                    case ExpressionType.PostIncrementAssign:
-                        break;
-                    case ExpressionType.PostDecrementAssign:
-                        break;
-                    case ExpressionType.TypeEqual:
-                        break;
-                    case ExpressionType.UnaryPlus:
-
-                        break;
-                    case ExpressionType.OnesComplement:
-                        break;
-                    case ExpressionType.IsTrue:
-                        break;
-                    case ExpressionType.IsFalse:
-                        break;
-                    default:
-                        break;
-                }
-                #endregion
-            }
             return node;
         }
 
@@ -288,10 +157,7 @@ namespace NetCore.ORM.Simple.Visitor
 
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            if (!currentTables.ContainsKey(node.Name))
-            {
-                currentTables.Add(node.Name, currentTables.Count());
-            }
+            
             return base.VisitParameter(node);
         }
 
@@ -312,29 +178,27 @@ namespace NetCore.ORM.Simple.Visitor
         protected override Expression VisitMember(MemberExpression node)
         {
             base.VisitMember(node);
+            string PropName = node.Member.Name;
             if (node.Member.Name.Equals("Key"))
             {
                 return node;
             }
-            string PropName = node.Member.Name;
+            
             PropertyInfo prop = null;
-            if (currentTables.ContainsKey(node.Expression.ToString()))
+            string TableName=null;
+            if ((node.Expression is ParameterExpression Parameter) && currentTables.ContainsKey(Parameter.Name))
             {
-                prop = select.GetPropertyType(currentTables[node.Expression.ToString()], PropName);
+                prop = select.GetPropertyType(currentTables[Parameter.Name],PropName); 
                 if (!Check.IsNull(prop))
                 {
                     PropName = prop.Name;
+                    TableName = select.GetAsTableName(currentTables[Parameter.Name]);
                 }
             }
-
             if (IsAgain)
             {
-                currentmapInfo = select.MapFirstOrDefault(m => m.PropName.Equals(PropName));
-                if (!Check.IsNullOrEmpty(CurrentMethodName))
-                {
-                    currentmapInfo.MethodName = CurrentMethodName;
-                    CurrentMethodName = string.Empty;
-                }
+                currentmapInfo = select.MapFirstOrDefault(m =>
+                 m.PropName.Equals(PropName));
                 if (!Check.IsNull(currentmapInfo))
                 {
                     currentmapInfo.IsNeed = true;
@@ -380,53 +244,6 @@ namespace NetCore.ORM.Simple.Visitor
         {
             return base.VisitNewArray(node);
         }
-
-        /// <summary>
-        /// 条件表达式大于小于等于
-        /// </summary>
-        /// <param name="node"></param>
-        /// <param name="action"></param>
-        private void SingleBinary(BinaryExpression node, Action<Queue<string>> action)
-        {
-            if (node.Left is MemberExpression member)
-            {
-                string mName = string.Empty;
-
-                if (currentTables.ContainsKey(member.Expression.ToString()))
-                {
-
-                    mName = $"{select.GetTableName(currentTables[member.Expression.ToString()])}.{member.Member.Name}";
-                }
-                else
-                {
-                    mName = member.Member.Name;
-                }
-
-            }
-            if (!Check.IsNull(action))
-            {
-                action.Invoke(null);
-            }
-            if (node.Right is ConstantExpression constant)
-            {
-            }
-        }
-
-        /// <summary>
-        /// 或与非
-        /// </summary>
-        /// <param name="node"></param>
-        /// <param name="action"></param>
-        private void SingleLogicBinary(BinaryExpression node, Action<Queue<string>> action)
-        {
-            base.Visit(node.Left);
-            if (!Check.IsNull(action))
-            {
-                action.Invoke(null);
-            }
-            base.Visit(node.Right);
-        }
-
         public void CreateMap(string Params, string PropName)
         {
             var index = currentTables[Params];
