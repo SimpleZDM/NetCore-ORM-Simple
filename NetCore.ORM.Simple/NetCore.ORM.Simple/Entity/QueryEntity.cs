@@ -28,6 +28,7 @@ namespace NetCore.ORM.Simple.Entity
             DyToMap = new List<dynamic>();
             PageSize = 0;
             PageNumber = 1;
+            DbCommandType = eDbCommandType.Query;
         }
 
         /// <summary>
@@ -80,6 +81,8 @@ namespace NetCore.ORM.Simple.Entity
         /// 最后一个是否是匿名对象
         /// </summary>
         public bool LastAnonymity { get { return lastAnonymity; } set { lastAnonymity = value; } }
+
+       
 
         public TResult GetResult<TResult>(params object[] objs)
         {
@@ -137,7 +140,6 @@ namespace NetCore.ORM.Simple.Entity
             return null;
 
         }
-
 
 
 

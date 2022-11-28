@@ -7,17 +7,17 @@ public static class Program
 {
     public static int Main(string []args)
     {
-        ProductTest productTest = new ProductTest();
-        productTest.StartTest1(new MissionDetailParameter
-        {
-            ClassID = Guid.Parse("08da0008-e513-4291-8e5d-abbcce797617"),
-            UserID = Guid.Parse("f906b8ad-2f57-4236-90bd-08b7acc428d2")
-        });
-        productTest.StartTest(new MissionDetailParameter
-        {
-            ClassID = Guid.Parse("08da0008-e513-4291-8e5d-abbcce797617"),
-            UserID = Guid.Parse("f906b8ad-2f57-4236-90bd-08b7acc428d2")
-        });
+        //ProductTest productTest = new ProductTest();
+        //productTest.StartTest1(new MissionDetailParameter
+        //{
+        //    ClassID = Guid.Parse("08da0008-e513-4291-8e5d-abbcce797617"),
+        //    UserID = Guid.Parse("f906b8ad-2f57-4236-90bd-08b7acc428d2")
+        //});
+        //productTest.StartTest(new MissionDetailParameter
+        //{
+        //    ClassID = Guid.Parse("08da0008-e513-4291-8e5d-abbcce797617"),
+        //    UserID = Guid.Parse("f906b8ad-2f57-4236-90bd-08b7acc428d2")
+        //});
         //Console.WriteLine(typeof(List<int>).IsArray);
         // Console.WriteLine(typeof(Dictionary<int,int>).IsD);
         //Console.WriteLine(typeof(int[]).IsArray);
@@ -41,10 +41,11 @@ public static class Program
         // SimpleExpressionTest test = new SimpleExpressionTest();
         //test.Select();
         // test.Where();
-        //SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
+        SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
+        MysqlTest.MoreQuerTest();
         //MysqlTest.InsertTest();
         //MysqlTest.UpdateTest();
-        // MysqlTest.DeleteTest();
+        //MysqlTest.DeleteTest();
         //MysqlTest.QueryTest();
 
         //SimpleSqliteTest sqliteTest = new SimpleSqliteTest();

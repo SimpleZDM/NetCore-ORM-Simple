@@ -1,12 +1,7 @@
 ﻿using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
-using System;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple
@@ -21,41 +16,68 @@ namespace NetCore.ORM.Simple
 {
     public class BaseDBDrive
     {
-        protected DbDataReader dataRead;
-        protected string connectStr;
-        protected bool isBeginTransaction;
-        protected DbConnection connection;
-        protected DataBaseConfiguration configuration;
-        protected DbTransaction transaction;
-        protected DbCommand command;
-        protected Type tableAtrr;
-        protected Type columnAttr;
-
-        public string ConnectStr
-        {
-            get { return connectStr; }
-            set
-            {
-                if (isBeginTransaction)
-                {
-                    throw new ArgumentNullException("事务已经开启,清先完成事务再进行数据库的切换!");
-                }
-                connectStr = value;
-                connection.ConnectionString = connectStr;
-            }
-        }
-
-        protected Action<string, DbParameter[]> aopSqlLog;
-        public Action<string, DbParameter[]> AOPSqlLog { get { return aopSqlLog; } set { aopSqlLog = value; } }
         public BaseDBDrive(DataBaseConfiguration cfg)
         {
             configuration = cfg;
-            if (Check.IsNullOrEmpty(configuration.CurrentConnectInfo.ConnectStr))
-            {
-                throw new ArgumentNullException(CommonConst.GetErrorInfo(ErrorType.ConnectionStrIsNull));
-            }
             isBeginTransaction = false;
+            drives = new Dictionary<string, DBDriveEntity>();
         }
+        public void AddConnection(string key,DBDriveEntity entity)
+        {
+            if (drives.ContainsKey(key))
+            {
+                throw new Exception("请给链接字符串配置去不同的名称!");
+            }
+            drives.Add(key,entity);
+        }
+
+        public void SetCurrentConnection(eDbCommandType commandType)
+        {
+            if (configuration.RwSplit && commandType==eDbCommandType.Query)
+            {
+              var config = configuration.GetConnection(commandType);
+                if (drives.ContainsKey(config.Name))
+                {
+                    currentConnection = drives[config.Name];
+                }
+                else
+                {
+                    currentConnection = new DBDriveEntity(config);
+                    AddConnection(config.Name, currentConnection);
+                }
+
+            }else if (Check.IsNull(currentConnection))
+            {
+                var config=configuration.GetConnection(commandType);
+                currentConnection = new DBDriveEntity(config);
+                AddConnection(config.Name, currentConnection);
+            }
+        }
+        protected Dictionary<string, DBDriveEntity> drives;
+        protected string connectStr;
+        protected bool isBeginTransaction;
+        protected DataBaseConfiguration configuration;
+        protected DBDriveEntity currentConnection;
+        protected Type tableAtrr;
+        protected Type columnAttr;
+
+        //public string ConnectStr
+        //{
+        //    get { return connectStr; }
+        //    set
+        //    {
+        //        if (isBeginTransaction)
+        //        {
+        //            throw new ArgumentNullException("事务已经开启,清先完成事务再进行数据库的切换!");
+        //        }
+        //        connectStr = value;
+        //        connection.ConnectionString = connectStr;
+        //    }
+        //}
+
+        protected Action<string, DbParameter[]> aopSqlLog;
+        public Action<string, DbParameter[]> AOPSqlLog { get { return aopSqlLog; } set { aopSqlLog = value; } }
+        
 
         public  void BeginTransaction()
         {
@@ -68,7 +90,7 @@ namespace NetCore.ORM.Simple
             {
                 Open();
             }
-            transaction = connection.BeginTransaction();
+            currentConnection.Transaction=currentConnection.Connection.BeginTransaction();
             isBeginTransaction = true;
         }
         public async Task BeginTransactionAsync()
@@ -82,7 +104,7 @@ namespace NetCore.ORM.Simple
             {
                 Open();
             }
-            transaction =await connection.BeginTransactionAsync();
+            currentConnection.Transaction = await currentConnection.Connection.BeginTransactionAsync();
             isBeginTransaction = true;
         }
         public void Commit()
@@ -91,9 +113,9 @@ namespace NetCore.ORM.Simple
             {
                 return;
             }
-            transaction.Commit();
+            currentConnection.Transaction.Commit();
             isBeginTransaction = false;
-            transaction.Dispose();
+            currentConnection.Transaction.Dispose();
         }
         public async Task CommitAsync()
         {
@@ -101,9 +123,9 @@ namespace NetCore.ORM.Simple
             {
                 return;
             }
-            await transaction.CommitAsync();
+            await currentConnection.Transaction.CommitAsync();
             isBeginTransaction = false;
-            await transaction.DisposeAsync();
+            await currentConnection.Transaction.DisposeAsync();
         }
 
         public void RollBack()
@@ -112,9 +134,9 @@ namespace NetCore.ORM.Simple
             {
                 return;
             }
-            transaction.Rollback();
+            currentConnection.Transaction.Rollback();
             isBeginTransaction = false;
-            transaction.Dispose();
+            currentConnection.Transaction.Dispose();
         }
         public async Task RollBackAsync()
         {
@@ -122,34 +144,35 @@ namespace NetCore.ORM.Simple
             {
                 return;
             }
-            await transaction.RollbackAsync();
+            await currentConnection.Transaction.RollbackAsync();
             isBeginTransaction = false;
-            await transaction.DisposeAsync();
+            await currentConnection.Transaction.DisposeAsync();
         }
         public void Dispose()
         {
-            if (!Check.IsNull(connection))
+            if (!Check.IsNull(currentConnection.Connection))
             {
-                if (connection.State != System.Data.ConnectionState.Closed)
+        
+                if (currentConnection.Connection.State != System.Data.ConnectionState.Closed)
                 {
-                    connection.Close();
+                    currentConnection.Connection.Close();
                 }
-                connection.Dispose();
+                currentConnection.Connection.Dispose();
             }
 
-            if (!Check.IsNull(command))
+            if (!Check.IsNull(currentConnection.Command))
             {
-                command.Dispose();
+                currentConnection.Command.Dispose();
             }
 
-            if (!Check.IsNull(dataRead))
+            if (!Check.IsNull(currentConnection.DataRead))
             {
-                dataRead.Dispose();
+                currentConnection.DataRead.Dispose();
             }
 
-            if (!Check.IsNull(transaction))
+            if (!Check.IsNull(currentConnection.Transaction))
             {
-                transaction.Dispose();
+                currentConnection.Transaction.Dispose();
             }
         }
         protected Dictionary<string, PropertyInfo> GetPropMapNames(PropertyInfo[] Props)
@@ -171,7 +194,7 @@ namespace NetCore.ORM.Simple
         /// 
         protected IEnumerable<TResult> MapData<TResult>()
         {
-            if (Check.IsNull(dataRead))
+            if (Check.IsNull(currentConnection.DataRead))
             {
                 return null;
             }
@@ -186,17 +209,16 @@ namespace NetCore.ORM.Simple
                 }
             }
             List<TResult> data = new List<TResult>();
-            while (dataRead.Read())
+            while (currentConnection.DataRead.Read())
             {
                 TResult tresult = (TResult)Activator.CreateInstance(type);
-                for (int i = 0; i < dataRead.FieldCount; i++)
+                for (int i = 0; i < currentConnection.DataRead.FieldCount; i++)
                 {
-                    string key = dataRead.GetName(i);
+                    string key = currentConnection.DataRead.GetName(i);
                     if (MapProps.ContainsKey(key))
                     {
                         var Prop = MapProps[key];
-                        Prop.SetPropValue(tresult, dataRead[i]);
-                        //Prop.SetValue(tresult,dataRead[i]);
+                        Prop.SetPropValue(tresult,currentConnection.DataRead[i]);
                     }
                 }
                 data.Add(tresult);
@@ -205,7 +227,7 @@ namespace NetCore.ORM.Simple
         }
         protected IEnumerable<TResult> MapData<TResult>(QueryEntity entity)
         {
-            if (Check.IsNull(dataRead))
+            if (Check.IsNull(currentConnection.DataRead))
             {
                 return null;
             }
@@ -233,7 +255,7 @@ namespace NetCore.ORM.Simple
         }
         protected TResult MapDataFirstOrDefault<TResult>(QueryEntity entity)
         {
-            if (Check.IsNull(dataRead))
+            if (Check.IsNull(currentConnection.DataRead))
             {
                 return default(TResult);
             }
@@ -293,14 +315,14 @@ namespace NetCore.ORM.Simple
                 throw new Exception();
             }
             List<TResult> data = new List<TResult>();
-            while (dataRead.Read())
+            while (currentConnection.DataRead.Read())
             {
                 object obj = Activator.CreateInstance(type);
 
                 foreach (var item in entity.MapInfos.Where(m => m.IsNeed))
                 {
                     var Prop = type.GetProperty(item.PropName);
-                    Prop.SetPropValue(obj, dataRead[item.AsColumnName]);
+                    Prop.SetPropValue(obj,currentConnection.DataRead[item.AsColumnName]);
                 }
                 data.Add(entity.GetResult<TResult>(obj));
                 if (IsFirst)
@@ -326,7 +348,7 @@ namespace NetCore.ORM.Simple
                 dicobjs.Add(item.Key, obj);
             }
             List<TResult> data = new List<TResult>();
-            while (dataRead.Read())
+            while (currentConnection.DataRead.Read())
             {
 
                 foreach (var item in dicobjs.Keys)
@@ -336,7 +358,7 @@ namespace NetCore.ORM.Simple
                 foreach (var item in entity.MapInfos.Where(m => m.IsNeed))
                 {
                     var Prop = entity.LastType[item.ClassName].GetProperty(item.PropName);
-                    Prop.SetPropValue(dicobjs[item.ClassName], dataRead[item.AsColumnName]);
+                    Prop.SetPropValue(dicobjs[item.ClassName],currentConnection.DataRead[item.AsColumnName]);
                 }
                 data.Add(entity.GetResult<TResult>(dicobjs.Values.ToArray()));
                 if (IsFirst)
@@ -357,7 +379,7 @@ namespace NetCore.ORM.Simple
         protected TResult ReadDataFirstOrDefault<TResult>(QueryEntity entity, Dictionary<string, PropertyInfo> PropMapNames)
         {
             TResult tResult = default(TResult);
-            while (dataRead.Read())
+            while (currentConnection.DataRead.Read())
             {
                 tResult = Activator.CreateInstance<TResult>();
 
@@ -365,7 +387,7 @@ namespace NetCore.ORM.Simple
                 {
                     if (PropMapNames.ContainsKey(item.PropName))
                     {
-                        PropMapNames[item.PropName].SetPropValue(tResult, dataRead[item.AsColumnName]);
+                        PropMapNames[item.PropName].SetPropValue(tResult,currentConnection.DataRead[item.AsColumnName]);
                     }
                 }
                 break;
@@ -383,7 +405,7 @@ namespace NetCore.ORM.Simple
         protected IEnumerable<TResult> ReadData<TResult>(QueryEntity entity, Dictionary<string, PropertyInfo> PropMapNames)
         {
             List<TResult> data = new List<TResult>();
-            while (dataRead.Read())
+            while (currentConnection.DataRead.Read())
             {
                 TResult tresult = Activator.CreateInstance<TResult>();
 
@@ -391,7 +413,7 @@ namespace NetCore.ORM.Simple
                 {
                     if (PropMapNames.ContainsKey(item.PropName))
                     {
-                        PropMapNames[item.PropName].SetPropValue(tresult, dataRead[item.AsColumnName]);
+                        PropMapNames[item.PropName].SetPropValue(tresult,currentConnection.DataRead[item.AsColumnName]);
                     }
                 }
                 data.Add(tresult);
@@ -404,19 +426,20 @@ namespace NetCore.ORM.Simple
         #region command
         protected void Excute(QueryEntity entity, Action action)
         {
+
             if (Check.IsNull(action))
             {
                 throw new ArgumentNullException(nameof(action));
             }
-            command.CommandText = entity.StrSqlValue.ToString();
+            currentConnection.Command.CommandText = entity.StrSqlValue.ToString();
 
             if (!Check.IsNull(entity.DbParams) && entity.DbParams.Count > 0)
             {
-                if (command.Parameters.Count > 0)
+                if (currentConnection.Command.Parameters.Count > 0)
                 {
-                    command.Parameters.Clear();
+                    currentConnection.Command.Parameters.Clear();
                 }
-                command.Parameters.AddRange(entity.DbParams.ToArray());
+                currentConnection.Command.Parameters.AddRange(entity.DbParams.ToArray());
             }
             if (!Check.IsNull(AOPSqlLog))
             {
@@ -424,7 +447,7 @@ namespace NetCore.ORM.Simple
             }
             action();
 
-            if (configuration.CurrentConnectInfo.IsAutoClose)
+            if (configuration.ConnectMapName[currentConnection.Name].IsAutoClose)
             {
                 Close();
             }
@@ -444,15 +467,15 @@ namespace NetCore.ORM.Simple
             {
                 throw new ArgumentNullException(nameof(action));
             }
-            command.CommandText = entity.StrSqlValue.ToString();
+            currentConnection.Command.CommandText = entity.StrSqlValue.ToString();
 
-            if (!Check.IsNull(entity.DbParams) && entity.DbParams.Count > 0)
+            if (!Check.IsNullOrEmpty(entity.DbParams))
             {
-                if (command.Parameters.Count > 0)
+                if (currentConnection.Command.Parameters.Count > 0)
                 {
-                    command.Parameters.Clear();
+                    currentConnection.Command.Parameters.Clear();
                 }
-                command.Parameters.AddRange(entity.DbParams.ToArray());
+                currentConnection.Command.Parameters.AddRange(entity.DbParams.ToArray());
             }
 
             if (!Check.IsNull(AOPSqlLog))
@@ -461,7 +484,7 @@ namespace NetCore.ORM.Simple
             }
             action();
 
-            if (configuration.CurrentConnectInfo.IsAutoClose && !isBeginTransaction)
+            if (configuration.ConnectMapName[currentConnection.Name].IsAutoClose && !isBeginTransaction)
             {
                 Close();
             }
@@ -481,26 +504,26 @@ namespace NetCore.ORM.Simple
         protected virtual  void Open()
         {
            
-            if (connection.State == System.Data.ConnectionState.Broken)
+            if (currentConnection.Connection.State == System.Data.ConnectionState.Broken)
             {
-                connection.Close();
-                connection.Open();
+                currentConnection.Connection.Close();
+                currentConnection.Connection.Open();
             }
-            if (connection.State == System.Data.ConnectionState.Closed)
+            if (currentConnection.Connection.State == System.Data.ConnectionState.Closed)
             {
-                connection.Open();
+                currentConnection.Connection.Open();
             }
 
-            if (!Check.IsNull(dataRead) && !dataRead.IsClosed)
+            if (!Check.IsNull(currentConnection.DataRead) && !currentConnection.DataRead.IsClosed)
             {
-                dataRead.Close();
+                currentConnection.DataRead.Close();
             }
         }
         protected virtual bool IsOpenConnect()
         {
-            if (!Check.IsNull(connection))
+            if (!Check.IsNull(currentConnection.Connection))
             {
-                if (connection.State == System.Data.ConnectionState.Open)
+                if (currentConnection.Connection.State == System.Data.ConnectionState.Open)
                 {
                     return true;
                 }
@@ -509,16 +532,16 @@ namespace NetCore.ORM.Simple
         }
         protected void Close()
         {
-            if (!Check.IsNull(dataRead))
+            if (!Check.IsNull(currentConnection.DataRead))
             {
-                dataRead.Close();
+                currentConnection.DataRead.Close();
             }
         }
         protected void CloseConnection()
         {
-            if (!Check.IsNull(connection))
+            if (!Check.IsNull(currentConnection.Connection))
             {
-                connection.Close();
+                currentConnection.Connection.Close();
             }
         }
         #endregion
@@ -574,7 +597,7 @@ namespace NetCore.ORM.Simple
             IEnumerable<TResult> data = null;
             await ExcuteAsync(entity, async () =>
             {
-                dataRead = await command.ExecuteReaderAsync();
+                currentConnection.DataRead = await currentConnection.Command.ExecuteReaderAsync();
                 data = MapData<TResult>();
             });
             return data;
@@ -593,7 +616,7 @@ namespace NetCore.ORM.Simple
             await ExcuteAsync(entity, async () =>
             {
 
-                dataRead = await command.ExecuteReaderAsync();
+                currentConnection.DataRead = await currentConnection.Command.ExecuteReaderAsync();
                 data = MapData<TResult>(entity);
 
             });
@@ -604,7 +627,7 @@ namespace NetCore.ORM.Simple
             IEnumerable<TResult> data = null;
             Excute(entity, () =>
             {
-                dataRead = command.ExecuteReader();
+                currentConnection.DataRead = currentConnection.Command.ExecuteReader();
                 data = MapData<TResult>(entity);
             });
             return data;
@@ -614,7 +637,7 @@ namespace NetCore.ORM.Simple
             TResult data = default(TResult);
             Excute(entity, () =>
             {
-                dataRead = command.ExecuteReader();
+                currentConnection.DataRead = currentConnection.Command.ExecuteReader();
                 data = MapDataFirstOrDefault<TResult>(entity);
             });
             return data;
@@ -624,7 +647,7 @@ namespace NetCore.ORM.Simple
             TResult data = default(TResult);
             await ExcuteAsync(entity, async () =>
             {
-                dataRead = await command.ExecuteReaderAsync();
+                currentConnection.DataRead = await currentConnection.Command.ExecuteReaderAsync();
                 data = MapDataFirstOrDefault<TResult>(entity);
             });
             return data;
@@ -634,10 +657,10 @@ namespace NetCore.ORM.Simple
             int value = 0;
             Excute(entity, () =>
             {
-                dataRead = command.ExecuteReader();
-                while (dataRead.Read())
+                currentConnection.DataRead = currentConnection.Command.ExecuteReader();
+                while (currentConnection.DataRead.Read())
                 {
-                    string strValue = dataRead[CommonConst.StrDataCount].ToString();
+                    string strValue = currentConnection.DataRead[CommonConst.StrDataCount].ToString();
                     int.TryParse(strValue, out value);
                 }
             });
@@ -648,10 +671,10 @@ namespace NetCore.ORM.Simple
             int value = 0;
             await ExcuteAsync(entity, async () =>
             {
-                dataRead = await command.ExecuteReaderAsync();
-                while (dataRead.Read())
+                currentConnection.DataRead = await currentConnection.Command.ExecuteReaderAsync();
+                while (currentConnection.DataRead.Read())
                 {
-                    string strValue = dataRead[CommonConst.StrDataCount].ToString();
+                    string strValue = currentConnection.DataRead[CommonConst.StrDataCount].ToString();
                     int.TryParse(strValue, out value);
                 }
             });
@@ -670,7 +693,7 @@ namespace NetCore.ORM.Simple
             int result = 0;
             await ExcuteAsync(entity, async () =>
             {
-                result = await command.ExecuteNonQueryAsync();
+                result = await currentConnection.Command.ExecuteNonQueryAsync();
             });
             return result;
         }
@@ -679,7 +702,7 @@ namespace NetCore.ORM.Simple
             int result = 0;
             Excute(entity, () =>
             {
-                result = command.ExecuteNonQuery();
+                result = currentConnection.Command.ExecuteNonQuery();
             });
             return result;
         }
@@ -689,14 +712,14 @@ namespace NetCore.ORM.Simple
             TEntity Entity = null;
             await ExcuteAsync(entity, async () =>
             {
-                int result = await command.ExecuteNonQueryAsync();
+                int result = await currentConnection.Command.ExecuteNonQueryAsync();
                 if (result == 0)
                 {
                     return;
                 }
-                command.CommandText = query;
-                command.Parameters.Clear();
-                dataRead = await command.ExecuteReaderAsync();
+                currentConnection.Command.CommandText = query;
+                currentConnection.Command.Parameters.Clear();
+                currentConnection.DataRead = await currentConnection.Command.ExecuteReaderAsync();
                 Entity = MapData<TEntity>().FirstOrDefault();
             });
             return Entity;
@@ -707,14 +730,14 @@ namespace NetCore.ORM.Simple
 
             Excute(entity, () =>
             {
-                int result = command.ExecuteNonQuery();
+                int result = currentConnection.Command.ExecuteNonQuery();
                 if (result == 0)
                 {
                     return;
                 }
-                command.CommandText = query;
-                command.Parameters.Clear();
-                dataRead = command.ExecuteReader();
+                currentConnection.Command.CommandText = query;
+                currentConnection.Command.Parameters.Clear();
+                currentConnection.DataRead = currentConnection.Command.ExecuteReader();
                 Entity = MapData<TEntity>().FirstOrDefault();
             });
             return Entity;
@@ -736,7 +759,7 @@ namespace NetCore.ORM.Simple
                 {
                     Excute(sqlCommand[current], () =>
                     {
-                        result += command.ExecuteNonQuery();
+                        result += currentConnection.Command.ExecuteNonQuery();
                     });
                     count = 0;
                     current = i;
@@ -767,7 +790,7 @@ namespace NetCore.ORM.Simple
                     {
                         await ExcuteAsync(sqlCommand[current], async () =>
                         {
-                            result += await command.ExecuteNonQueryAsync();
+                            result += await currentConnection.Command.ExecuteNonQueryAsync();
                         });
                         count = 0;
                         current = i;

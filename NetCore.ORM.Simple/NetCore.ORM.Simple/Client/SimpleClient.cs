@@ -43,6 +43,8 @@ namespace NetCore.ORM.Simple
         private Type TableAttr;
 
         private Type ColumnAttr;
+        private eDBType dbType;
+
         /// <summary>
         /// 更新或者插入数据的量
         /// </summary>
@@ -50,9 +52,11 @@ namespace NetCore.ORM.Simple
         public SimpleClient(DataBaseConfiguration _configuration)
         {
             configuration=_configuration;
-            builder = new Builder(configuration.CurrentConnectInfo.DBType);
+            var currentContion = configuration.GetConnection();
+            dbType=currentContion.DBType;
+            builder = new Builder(dbType);
             sqls = new List<SqlCommandEntity>();
-            dbDrive = new DBDrive(configuration);
+            dbDrive = new DBDrive(configuration,currentContion);
             changeOffset = 0;
         }
         #endregion
@@ -81,7 +85,7 @@ namespace NetCore.ORM.Simple
             var sql=builder.GetInsert(entity, changeOffset);
             sqls.Add(sql);
             sql.DbCommandType = eDbCommandType.Insert;
-            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,configuration.CurrentConnectInfo.DBType,sql,sqls,dbDrive);
+            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,dbType,sql,sqls,dbDrive);
             changeOffset++;
             return command;
         }
@@ -90,7 +94,7 @@ namespace NetCore.ORM.Simple
             var sql = builder.GetInsert(entitys,changeOffset);
             sql.DbCommandType = eDbCommandType.Insert;
             sqls.Add(sql);
-            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, configuration.CurrentConnectInfo.DBType, sql, sqls, dbDrive);
+            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,dbType, sql, sqls, dbDrive);
             changeOffset = entitys.Count()+ changeOffset;
             return command;
         }
@@ -98,14 +102,14 @@ namespace NetCore.ORM.Simple
         {
             var sql = builder.GetUpdate(entity,changeOffset);
             sql.DbCommandType = eDbCommandType.Update;
-            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, configuration.CurrentConnectInfo.DBType, sql, sqls, dbDrive);
+            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,dbType, sql, sqls, dbDrive);
             changeOffset++;
             return command;
         }
         public ISimpleCommand<TEntity> Update<TEntity>(List<TEntity> entitys) where TEntity : class, new()
         {
             var sql = builder.GetUpdate(entitys,changeOffset);
-            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, configuration.CurrentConnectInfo.DBType, sql, sqls, dbDrive);
+            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,dbType,sql, sqls, dbDrive);
             changeOffset = entitys.Count()+ changeOffset;
             return command;
         }
@@ -119,7 +123,7 @@ namespace NetCore.ORM.Simple
             var sql = builder.GetDelete(type, select.Conditions, select.TreeConditions);
             sql.DbCommandType = eDbCommandType.Delete;
             sqls.Add(sql);
-            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, configuration.CurrentConnectInfo.DBType, sql, sqls, dbDrive);
+            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,dbType, sql, sqls, dbDrive);
             return command;
         }
         public ISimpleCommand<TEntity> Delete<TEntity>(TEntity entity) where TEntity : class, new()
@@ -127,7 +131,7 @@ namespace NetCore.ORM.Simple
             var sql = builder.GetDelete(entity,changeOffset);
             sql.DbCommandType = eDbCommandType.Delete;
             sqls.Add(sql);
-            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, configuration.CurrentConnectInfo.DBType, sql, sqls, dbDrive);
+            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,dbType, sql, sqls, dbDrive);
             changeOffset++;
             return command;
         }

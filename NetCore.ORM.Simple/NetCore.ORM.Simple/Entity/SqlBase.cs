@@ -31,15 +31,22 @@ namespace NetCore.ORM.Simple.Entity
         /// </summary>
         public StringBuilder StrSqlValue { get { return strSqlValue; } set { strSqlValue = value; } }
         /// <summary>
-        /// 参数化
+        /// 参数
         /// </summary>
         public List<DbParameter> DbParams { get { return dbParams; } private set {  dbParams = value; } }
 
         /// <summary>
-        /// 语句的类型
+        /// 语句的类型 添加 删除 查询 更新
         /// </summary>
         public eDbCommandType DbCommandType { get { return dbCommandType; } set { dbCommandType = value; } }
 
+        /// <summary>
+        /// 添加参数
+        /// </summary>
+        /// <param name="DbType"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <exception cref="Exception"></exception>
         public void AddParameter(eDBType DbType, string key, object value)
         {
             if (Check.IsNullOrEmpty(key))

@@ -30,11 +30,9 @@ namespace NetCore.ORM.Simple
         /// <param name="connect"></param>
         /// <exception cref="ArgumentNullException"></exception>
         /// 
-        public MysqlDrive(DataBaseConfiguration cfg) : base(cfg)
+        public MysqlDrive(DataBaseConfiguration cfg,ConnectionEntity conntionConfig) : base(cfg)
         {
-            connection = new MySqlConnection(cfg.CurrentConnectInfo.ConnectStr);
-            command = new MySqlCommand();
-            command.Connection = connection;
+            currentConnection = new DBDriveEntity(conntionConfig);
         }
 
         /// <summary>
@@ -43,11 +41,11 @@ namespace NetCore.ORM.Simple
         /// <typeparam name="TResult"></typeparam>
         /// <param name="sql"></param>
         /// <returns></returns>
-        public override async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params)
-        {
-            Open();
-            return await base.ReadAsync<TResult>(sql,Params);
-        }
+        //public override async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params)
+        //{
+        //    Open();
+        //    return await base.ReadAsync<TResult>(sql,Params);
+        //}
         /// <summary>
         /// 
         /// </summary>
@@ -57,37 +55,37 @@ namespace NetCore.ORM.Simple
         /// <returns></returns>
         public override async Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
         {
-            Open();
+            Open(entity);
             return await base.ReadAsync<TResult>(entity);
         }
         public override IEnumerable<TResult> Read<TResult>(QueryEntity entity)
         {
-            Open();
+            Open(entity);
             return base.Read<TResult>(entity);
         }
         public override TResult ReadFirstOrDefault<TResult>(QueryEntity entity)
         {
-            Open();
+            Open(entity);
             return base.ReadFirstOrDefault<TResult>(entity);
         }
         public override async Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity)
         {
-            Open();
+            Open(entity);
             return await base.ReadFirstOrDefaultAsync<TResult>(entity);
         }
         public override int ReadCount(QueryEntity entity)
         {
-            Open();
+            Open(entity);
             return base.ReadCount(entity);
         }
         public override async Task<int> ReadCountAsync(QueryEntity entity)
         {
-            Open();
+            Open(entity);
             return await base.ReadCountAsync(entity);
         }
         public override async Task<bool> ReadAnyAsync(QueryEntity entity)
         {
-            Open();
+            Open(entity);
             return await ReadCountAsync(entity) > CommonConst.Zero;
         }
         public override bool ReadAny(QueryEntity entity)
@@ -98,23 +96,23 @@ namespace NetCore.ORM.Simple
 
         public override async Task<int> ExcuteAsync(SqlCommandEntity entity)
         {
-            Open();
+            Open(entity);
             return await base.ExcuteAsync(entity);
         }
         public override int Excute(SqlCommandEntity entity)
         {
-            Open();
+            Open(entity);
             return base.Excute(entity);
         }
 
         public override async Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
         {
-            Open();
+            Open(entity);
             return await base.ExcuteAsync<TEntity>(entity,query);
         }
         public override TEntity Excute<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
         {
-            Open();
+            Open(entity);
             return base.Excute<TEntity>(entity, query);
         }
         public async Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand)
@@ -135,7 +133,7 @@ namespace NetCore.ORM.Simple
                     {
                         await ExcuteAsync(sqlCommand[current], async () =>
                         {
-                            result += await command.ExecuteNonQueryAsync();
+                            result += await currentConnection.Command.ExecuteNonQueryAsync();
                         });
                         count = 0;
                         current = i;
@@ -151,7 +149,11 @@ namespace NetCore.ORM.Simple
         }
         public int Excute(SqlCommandEntity[] sqlCommand)
         {
-            Open();
+            if (sqlCommand.Count() <= 0)
+            {
+                return 0;
+            }
+            Open(sqlCommand[0]);
             return base.Excute(sqlCommand,MysqlConst.INSERTMAXCOUNT);
         }
 
@@ -159,31 +161,12 @@ namespace NetCore.ORM.Simple
         /// <summary>
         /// 打开数据库连接
         /// </summary>
-        protected override void Open()
+        protected  void Open(SqlBase entity)
         {
-            if (Check.IsNull(connection))
-            {
-                if (Check.IsNullOrEmpty(configuration.CurrentConnectInfo.ConnectStr))
-                {
-                    throw new ArgumentException(CommonConst.GetErrorInfo(ErrorType.ConnectionStrIsNull));
-                }
-                connection = new MySqlConnection(configuration.CurrentConnectInfo.ConnectStr);
-            }
+            SetCurrentConnection(entity.DbCommandType);
             base.Open();
         }
 
-        protected override bool IsOpenConnect()
-        {
-            if (!Check.IsNull(connection))
-            {
-                if (connection.State == System.Data.ConnectionState.Open)
-                {
-                    return true;
-                }
-            }
-            Open();
-            return false;
-        }
         public override void SetAttr(Type Table = null, Type Column = null)
         {
             base.SetAttr(Table, Column);

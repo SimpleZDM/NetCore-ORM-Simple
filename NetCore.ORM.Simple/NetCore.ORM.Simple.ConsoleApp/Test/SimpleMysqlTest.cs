@@ -22,17 +22,42 @@ namespace NetCore.ORM.Simple.ConsoleApp
         ISimpleClient client;
         public SimpleMysqlTest()
         {
-            string strLocalhost = "server=localhost;database=testdb;user=root;pwd=123456;Allow Zero Datetime=true;Convert Zero Datetime=True;";
+            string MastStr = "server=localhost;database=testdb;user=root;pwd=123456;Allow Zero Datetime=true;Convert Zero Datetime=True;";
+            string db1 = "server=localhost;database=testdb1;user=root;pwd=123456;Allow Zero Datetime=true;Convert Zero Datetime=True;";
+            string db2 = "server=localhost;database=testdb2;user=root;pwd=123456;Allow Zero Datetime=true;Convert Zero Datetime=True;";
+            string db3 = "server=localhost;database=testdb3;user=root;pwd=123456;Allow Zero Datetime=true;Convert Zero Datetime=True;";
             string StrService = "server=49.233.33.36;database=virtualsoftplatformdb;user=root;pwd=[Txy*!14@msql*^];SSL Mode=None";
             client = new SimpleClient(
-          new DataBaseConfiguration(false,
-          new ConnectionEntity(strLocalhost)
+          new DataBaseConfiguration(true,
+          new ConnectionEntity(MastStr)
           {
               IsAutoClose = true,
               DBType = eDBType.Mysql,
-              Name = "test1",
-              ReadWeight = 5,
-              WriteReadType = eWriteOrReadType.ReadOrWrite
+              Name = "master",
+              WriteReadType = eWriteOrReadType.Write
+          }, new (db1)
+          {
+              IsAutoClose = true,
+              DBType = eDBType.Mysql,
+              Name = "db1",
+              ReadWeight = 1,
+              WriteReadType = eWriteOrReadType.Read
+          },
+          new(db2)
+          {
+              IsAutoClose = true,
+              DBType = eDBType.Mysql,
+              Name = "db2",
+              ReadWeight = 3,
+              WriteReadType = eWriteOrReadType.Read
+          },
+          new(db3)
+          {
+              IsAutoClose = true,
+              DBType = eDBType.Mysql,
+              Name = "db3",
+              ReadWeight = 6,
+              WriteReadType = eWriteOrReadType.Read
           }));
 
             client.SetAOPLog((sql, Params) =>
@@ -175,14 +200,14 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 string[] names = new string[] { "111", "222", "333" };
                 string str = "111";
 
-                List<UserEntity> users = client.Queryable<UserEntity>().Where(u=>ids.Contains(u.Id)&&names.Contains(u.Name)).ToList();
+                List<UserEntity> users = client.Queryable<UserEntity>().Where(u => ids.Contains(u.Id) && names.Contains(u.Name)).ToList();
                 List<ViewEntity> c = new List<ViewEntity>();
                 c.Count();
                 ids.Count();
                 c.Add(new ViewEntity() { RoleId = 1816 });
                 UserEntity user = client.Queryable<UserEntity>().Where(u => c[0].RoleId.Equals(u.Id) && u.Name.Contains(str)).FirstOrDefault();
                 List<UserEntity> left = client.Queryable<UserEntity>().Where(u => u.Name.LeftContains(str)).ToList();
-                List<UserEntity> user1 = client.Queryable<UserEntity>().Where(u =>u.Id.Equals(ids[0])).ToList();
+                List<UserEntity> user1 = client.Queryable<UserEntity>().Where(u => u.Id.Equals(ids[0])).ToList();
                 List<UserEntity> user2 = client.Queryable<UserEntity>().Where(u => lids[1].Equals(u.Id)).ToList();
                 List<UserEntity> user3 = client.Queryable<UserEntity>().Where(u => ids.Contains(u.Id)).ToList();
                 List<UserEntity> user4 = client.Queryable<UserEntity>().Where(u => lids.Contains(u.Id)).ToList();
@@ -277,6 +302,46 @@ namespace NetCore.ORM.Simple.ConsoleApp
             {
                 Console.WriteLine(ex.Message);
             }
+        }
+        /// <summary>
+        /// 读写分离 负载均衡
+        /// </summary>
+        public void MoreQuerTest()
+        {
+            var master = 0;
+            var db1 = 0;
+            var db2 = 0;
+            var db3 = 0;
+
+            UserEntity iuser = new UserEntity();
+            iuser.Name = "插入小明";
+            iuser = client.Insert(iuser).ReturnEntity();
+            iuser.Name = "更新小明";
+            var result = client.Update(iuser).SaveChange();
+
+            for (int i = 0; i < 100; i++)
+            {
+                var user=client.Queryable<UserEntity>().Where(u=>u.Id.Equals(1)).First();
+                if (user!=null)
+                {
+                    if (user.RoleId==1)
+                    {
+                        db1++;
+                    }else if (user.RoleId==2)
+                    {
+                        db2++;
+                    }
+                    else if (user.RoleId == 3)
+                    {
+                        db3++;
+                    }
+                    else if (user.RoleId == 0)
+                    {
+                        master++;
+                    }
+                }
+            }
+            Console.WriteLine($"db1={db1}\n db2={db2}\n db3={db3} \n master={master}");
         }
     }
 }

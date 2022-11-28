@@ -1,11 +1,6 @@
 ﻿using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
-using System;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.DBDrive
@@ -24,30 +19,13 @@ namespace NetCore.ORM.Simple
         /// <summary>
         /// 
         /// </summary>
-        IDBDrive mysqlDrive { get; set; }
-        IDBDrive sqlServicelDrive { get; set; }
-        IDBDrive sqliteDrive { get; set; }
+        IDBDrive databaseDrive { get; set; }
         /// <summary>
         /// 
         /// </summary>
         DataBaseConfiguration configuration { get; set; }
         public Action<string, DbParameter[]> AOPSqlLog { get { return aopSqlLog; } 
-               set {
-                switch (configuration.CurrentConnectInfo.DBType)
-                {
-                    case eDBType.Mysql:
-                        mysqlDrive.AOPSqlLog= value;
-                        break;
-                    case eDBType.SqlService:
-                        sqlServicelDrive.AOPSqlLog = value;
-                        break;
-                    case eDBType.Sqlite:
-                        sqliteDrive.AOPSqlLog = value;
-                        break;
-                    default:
-                        break;
-                }
-            }}
+               set {databaseDrive.AOPSqlLog= value;}}
         private Action<string, DbParameter[]> aopSqlLog;
 
 
@@ -55,33 +33,29 @@ namespace NetCore.ORM.Simple
         /// 
         /// </summary>
         /// <param name="cfg"></param>
-        public DBDrive(DataBaseConfiguration cfg)
+        public DBDrive(DataBaseConfiguration cfg,ConnectionEntity currentConnection)
         {
             configuration = cfg;
-            switch (cfg.CurrentConnectInfo.DBType)
+            switch (currentConnection.DBType)
             {
                 case eDBType.Mysql:
-                    mysqlDrive = new MysqlDrive(configuration);
+                    databaseDrive = new MysqlDrive(configuration,currentConnection);
                     break;
                 case eDBType.SqlService:
-                    sqlServicelDrive = new SqlServiceDrive(configuration);
+                    databaseDrive = new SqlServiceDrive(configuration,currentConnection);
                     break;
                 case eDBType.Sqlite:
-                    sqliteDrive = new SqliteDrive(configuration);
+                    databaseDrive = new SqliteDrive(configuration,currentConnection);
                     break;
                 default:
                     break;
             }
-           
+
         }
 
         public void SetAttr(Type Table = null, Type Column = null)
         {
-            MatchDBDrive(
-                () => { mysqlDrive.SetAttr(Table,Column);},
-                () => { sqlServicelDrive.SetAttr(Table,Column);},
-                () => { sqliteDrive.SetAttr(Table,Column);}
-                );
+            databaseDrive.SetAttr(Table, Column);
         }
         /// <summary>
         /// 
@@ -89,19 +63,14 @@ namespace NetCore.ORM.Simple
         /// <returns></returns>
         public async Task CommitAsync()
         {
-            await MatchDBDrive(
-                () => mysqlDrive.CommitAsync(),
-                () => sqlServicelDrive.CommitAsync(),
-                () => sqliteDrive.CommitAsync()
-                );
+
+            await databaseDrive.CommitAsync();
+                
         }
         public void Commit()
         {
-             MatchDBDrive(
-                () => mysqlDrive.Commit(),
-                () => sqlServicelDrive.Commit(),
-                () => sqliteDrive.Commit()
-                );
+            databaseDrive.Commit();
+                
         }
         /// <summary>
         /// 
@@ -109,19 +78,11 @@ namespace NetCore.ORM.Simple
         /// <returns></returns>
         public async Task RollBackAsync()
         {
-              await MatchDBDrive(
-                     () =>mysqlDrive.RollBackAsync(),
-                    () => sqlServicelDrive.RollBackAsync(),
-                    () => sqliteDrive.RollBackAsync()
-                  );
+            await databaseDrive.RollBackAsync();
         }
         public void RollBack()
         {
-               MatchDBDrive(
-                () => mysqlDrive.RollBack(),
-                () => sqlServicelDrive.RollBack(),
-                () => sqliteDrive.RollBack()
-               );
+            databaseDrive.RollBack();
         }
         /// <summary>
         /// 
@@ -129,19 +90,11 @@ namespace NetCore.ORM.Simple
         /// <returns></returns>
         public async Task BeginTransactionAsync()
         {
-            await MatchDBDrive(
-                () => mysqlDrive.BeginTransactionAsync(),
-                () => sqlServicelDrive.BeginTransactionAsync(),
-                () => sqliteDrive.BeginTransactionAsync()
-               );
+            await databaseDrive.BeginTransactionAsync();
         }
         public void BeginTransaction()
         {
-             MatchDBDrive(
-                () => mysqlDrive.BeginTransaction(),
-                () => sqlServicelDrive.BeginTransaction(),
-                () => sqliteDrive.BeginTransaction()
-               );
+            databaseDrive.BeginTransaction();
         }
         /// <summary>
         /// 
@@ -150,35 +103,21 @@ namespace NetCore.ORM.Simple
         /// <returns></returns>
         public async Task<int> ExcuteAsync(SqlCommandEntity entity)
         {
-            return await MatchDBDrive(
-                () => mysqlDrive.ExcuteAsync(entity),
-                () => sqlServicelDrive.ExcuteAsync(entity),
-                () => sqliteDrive.ExcuteAsync(entity)
-               );;
+
+            return await databaseDrive.ExcuteAsync(entity);
+                
         }
         public int Excute(SqlCommandEntity entity)
         {
-            return MatchDBDrive(
-                () => mysqlDrive.Excute(entity),
-                () => sqlServicelDrive.Excute(entity),
-                () => sqliteDrive.Excute(entity)
-               );
+            return databaseDrive.Excute(entity);
         }
         public async Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand)
         {
-            return await MatchDBDrive(
-                () => mysqlDrive.ExcuteAsync(sqlCommand),
-                () => sqlServicelDrive.ExcuteAsync(sqlCommand),
-                () => sqliteDrive.ExcuteAsync(sqlCommand)
-               );
+            return await databaseDrive.ExcuteAsync(sqlCommand);
         }
         public int Excute(SqlCommandEntity[] sqlCommand)
         {
-            return  MatchDBDrive(
-                () => mysqlDrive.Excute(sqlCommand),
-                () => sqlServicelDrive.Excute(sqlCommand),
-                () => sqliteDrive.Excute(sqlCommand)
-               );
+            return databaseDrive.Excute(sqlCommand);
         }
         /// <summary>
         /// 
@@ -195,11 +134,7 @@ namespace NetCore.ORM.Simple
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
         {
-            return await MatchDBDrive(
-                () => mysqlDrive.ReadAsync<TResult>(entity),
-                () => sqlServicelDrive.ReadAsync<TResult>(entity),
-                () => sqliteDrive.ReadAsync<TResult>(entity)
-               );
+            return await databaseDrive.ReadAsync<TResult>(entity);
         }
         /// <summary>
         /// 
@@ -210,19 +145,11 @@ namespace NetCore.ORM.Simple
         /// <returns></returns>
         public async Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity,string query) where TEntity : class
         {
-            return await MatchDBDrive(
-                () => mysqlDrive.ExcuteAsync<TEntity>(entity, query),
-                () => sqlServicelDrive.ExcuteAsync<TEntity>(entity, query),
-                () => sqliteDrive.ExcuteAsync<TEntity>(entity, query)
-               ) ;
+            return await databaseDrive.ExcuteAsync<TEntity>(entity, query);
         }
         public  TEntity Excute<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
         {
-            return  MatchDBDrive(
-                () => mysqlDrive.Excute<TEntity>(entity, query),
-                () => sqlServicelDrive.Excute<TEntity>(entity, query),
-                () => sqliteDrive.Excute<TEntity>(entity, query)
-               );
+            return databaseDrive.Excute<TEntity>(entity, query);
         }
         /// <summary>
         /// 
@@ -233,133 +160,48 @@ namespace NetCore.ORM.Simple
         /// <returns></returns>
         public async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params)
         {
-           return await MatchDBDrive(
-               () => mysqlDrive.ReadAsync<TResult>(sql,Params),
-               () => sqlServicelDrive.ReadAsync<TResult>(sql,Params),
-               () => sqliteDrive.ReadAsync<TResult>(sql,Params)
-               );
+            return await databaseDrive.ReadAsync<TResult>(sql, Params);
         }
        
       
 
         public IEnumerable<TResult> Read<TResult>(QueryEntity entity)
         {
-            return  MatchDBDrive(
-                       () => mysqlDrive.Read<TResult>(entity),
-                       () => sqlServicelDrive.Read<TResult>(entity),
-                       () => sqliteDrive.Read<TResult>(entity)
-                    );
+            return databaseDrive.Read<TResult>(entity);
+                  
         }
 
         public TResult ReadFirstOrDefault<TResult>(QueryEntity entity)
         {
-            return MatchDBDrive(
-                       () => mysqlDrive.ReadFirstOrDefault<TResult>(entity),
-                       () => sqlServicelDrive.ReadFirstOrDefault<TResult>(entity),
-                       () => sqliteDrive.ReadFirstOrDefault<TResult>(entity)
-                    );
+            return databaseDrive.ReadFirstOrDefault<TResult>(entity);
         }
 
         public async Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity) 
         {
-            return await MatchDBDrive(
-                       () => mysqlDrive.ReadFirstOrDefaultAsync<TResult>(entity),
-                       () => sqlServicelDrive.ReadFirstOrDefaultAsync<TResult>(entity),
-                       () => sqliteDrive.ReadFirstOrDefaultAsync<TResult>(entity)
-                       
-                    );
+            return await databaseDrive.ReadFirstOrDefaultAsync<TResult>(entity);
+                     
         }
 
         public int ReadCount(QueryEntity entity)
         {
-            return  MatchDBDrive(
-                       () => mysqlDrive.ReadCount(entity),
-                       () => sqlServicelDrive.ReadCount(entity),
-                       () => sqliteDrive.ReadCount(entity)
-                    );
+            return databaseDrive.ReadCount(entity);
+                    
         }
 
         public async Task<int> ReadCountAsync(QueryEntity entity)
         {
-            return await MatchDBDriveAsync(
-                      () => mysqlDrive.ReadCountAsync(entity),
-                      () => sqlServicelDrive.ReadCountAsync(entity),
-                      () => sqliteDrive.ReadCountAsync(entity)
-                   ) ;
+            return await databaseDrive.ReadCountAsync(entity);
+                      
         }
 
         public async Task<bool> ReadAnyAsync(QueryEntity entity)
         {
-             return await MatchDBDriveAsync(
-                      () => mysqlDrive.ReadAnyAsync(entity),
-                      () => sqlServicelDrive.ReadAnyAsync(entity),
-                      () => sqliteDrive.ReadAnyAsync(entity)
-                   );
+            return await databaseDrive.ReadAnyAsync(entity);
         }
 
         public  bool ReadAny(QueryEntity entity)
         {
-            return  MatchDBDrive(
-                      () => mysqlDrive.ReadAny(entity),
-                      () => sqlServicelDrive.ReadAny(entity),
-                      () => sqliteDrive.ReadAny(entity)
-                   );
+            return  databaseDrive.ReadAny(entity);
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        private async Task<TResult> MatchDBDriveAsync<TResult>(params Func<Task<TResult>>[] funcs)
-        {
-            if (!Check.IsNull(funcs))
-            {
-                if ((int)configuration.CurrentConnectInfo.DBType < funcs.Length)
-                {
-                    return await funcs[(int)configuration.CurrentConnectInfo.DBType].Invoke();
-                }
-            }
-            return default(TResult);
-
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="funcs"></param>
-        /// <returns></returns>
-
-        private async Task MatchDBDriveAsync(params Func<Task>[] funcs)
-        {
-            if (!Check.IsNull(funcs))
-            {
-                if ((int)configuration.CurrentConnectInfo.DBType < funcs.Length)
-                {
-                    await funcs[(int)configuration.CurrentConnectInfo.DBType].Invoke();
-                }
-            }
-        }
-
-        private TResult MatchDBDrive<TResult>(params Func<TResult>[] funcs)
-        {
-            if (!Check.IsNull(funcs))
-            {
-                if ((int)configuration.CurrentConnectInfo.DBType < funcs.Length)
-                {
-                    return funcs[(int)configuration.CurrentConnectInfo.DBType].Invoke();
-                }
-            }
-            return default(TResult);
-        }
-
-        private void MatchDBDrive(params Action[] funcs)
-        {
-            if (!Check.IsNull(funcs))
-            {
-                if ((int)configuration.CurrentConnectInfo.DBType < funcs.Length)
-                {
-                     funcs[(int)configuration.CurrentConnectInfo.DBType].Invoke();
-                }
-            }
-        }
-
-
     }
 }

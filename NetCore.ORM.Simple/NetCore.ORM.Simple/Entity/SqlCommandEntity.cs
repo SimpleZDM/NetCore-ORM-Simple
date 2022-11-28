@@ -16,7 +16,10 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Entity
 {
-    public class SqlCommandEntity:SqlBase
+    public class SqlCommandEntity : SqlBase
     {
+        public SqlCommandEntity()
+        {
+        }
     }
 }

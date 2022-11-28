@@ -24,44 +24,65 @@ namespace NetCore.ORM.Simple.Entity
         /// <summary>
         /// 数据库连接的字典集合
         /// </summary>
-        public Dictionary<string,ConnectionEntity> ConnectMapName { get { return connectMapName; } set { connectMapName = value; } }
+        public Dictionary<string, ConnectionEntity> ConnectMapName { get { return connectMapName; } set { connectMapName = value; } }
 
-        public ConnectionEntity CurrentConnectInfo { get {
-                if (RwSplit)
-                {
-                    int rNumber = new Random().Next(int.MinValue, int.MaxValue);
-                    int rang = rNumber % rwWight;
-                    var connect = ConnectMapName.Where(c => c.Value.Start <= rang && c.Value.End > rang).FirstOrDefault();
-                    return connect.Value;
-                }
-                return currentConnectInfo; } private set { currentConnectInfo = value; } }
         /// <summary>
-        /// 设置连接名称将更新连接字符串
+        /// 获取链接字符串
+        /// 查询,存在多个从库将根据权重返回链接字符串
         /// </summary>
-        public string CurrentUseConnectName
+        /// <returns></returns>
+        public ConnectionEntity GetConnection(eDbCommandType commandType = eDbCommandType.Insert)
         {
-            get
-            {
-                return currentUseConnectName;
-            }
-            private set
-            {
-                currentUseConnectName = value;
-                if (!ConnectMapName.ContainsKey(currentUseConnectName))
-                {
-                    throw new Exception("未添加该名称的数据连接字符串!");
-                }
-                currentUseConnectStr = ConnectMapName[currentUseConnectName].ConnectStr;
-            }
+            return GetRandomConnection(commandType);
         }
-      
+        /// <summary>
+        /// 返回一个链接数据链接信息的名称
+        /// </summary>
+        /// <param name="commandType"></param>
+        /// <returns></returns>
+        public string GetConnectionKey(eDbCommandType commandType)
+        {
+            var conection = GetRandomConnection(commandType);
+            if (Check.IsNull(conection))
+            {
+                return null;
+            }
+            return conection.Name;
+        }
+        private ConnectionEntity GetRandomConnection(eDbCommandType commandType)
+        {
+            ConnectionEntity connection=null;
+            if (RwSplit && commandType == eDbCommandType.Query)
+            {
+                int rNumber = new Random().Next(0,int.MaxValue);
+                int rang = rNumber % (rwWight-1);
+                connection = ConnectMapName.Where(c =>
+                (c.Value.WriteReadType == eWriteOrReadType.ReadOrWrite ||
+                c.Value.WriteReadType == eWriteOrReadType.Read)
+                && c.Value.Start <= rang && c.Value.End > rang).FirstOrDefault().Value;
+
+            }
+            else if (commandType != eDbCommandType.Query)
+            {
+                connection = ConnectMapName.Where(
+                           c => c.Value.WriteReadType == eWriteOrReadType.Write ||
+                           c.Value.WriteReadType == eWriteOrReadType.ReadOrWrite).
+                           FirstOrDefault().Value;
+            }
+            else if(Check.IsNull(connection))
+            {
+                connection = ConnectMapName. FirstOrDefault().Value;
+            }
+            return connection;
+        }
+
         /// <summary>
         /// 是否支持读写分离
         /// </summary>
         public bool RwSplit { get { return rwSplit; } set { rwSplit = value; } }
 
 
-        public DataBaseConfiguration(bool rwSplit=false, params ConnectionEntity[] connections)
+        public DataBaseConfiguration(bool rwSplit = false, params ConnectionEntity[] connections)
         {
             if (Check.IsNull(connections))
             {
@@ -74,24 +95,30 @@ namespace NetCore.ORM.Simple.Entity
             foreach (var connection in connections)
             {
                 AddConnect(connection);
-                if (rwWight == 0)
+
+                switch (connection.WriteReadType)
                 {
-                    CurrentUseConnectName = connection.Name;
-                    CurrentConnectInfo = connection;
+                    case eWriteOrReadType.Read:
+                    case eWriteOrReadType.ReadOrWrite:
+                        connection.Start = rwWight;
+                        rwWight += connection.ReadWeight;
+                        connection.End = rwWight;
+                        break;
+                    case eWriteOrReadType.Write:
+                    default:
+                        break;
                 }
-                connection.Start = rwWight;
-                rwWight += connection.ReadWeight;
-                connection.End = rwWight;
-                
+
+
             }
         }
 
         private Dictionary<string, ConnectionEntity> connectMapName;
         private string currentUseConnectName;
-        private string currentUseConnectStr; 
+        private string currentUseConnectStr;
         private ConnectionEntity currentConnectInfo;
         private bool rwSplit;
-       
+
         /// <summary>
         /// 读的总权重值
         /// </summary>
@@ -110,10 +137,12 @@ namespace NetCore.ORM.Simple.Entity
             {
                 throw new Exception("error:connections.ConnectStr is null!");
             }
-            if (!ConnectMapName.ContainsKey(connections.Name))
+
+            if (ConnectMapName.ContainsKey(connections.Name))
             {
-                ConnectMapName.Add(connections.Name, connections);
+                throw new Exception("error:Name of database connection string is repetition");
             }
+            ConnectMapName.Add(connections.Name, connections);
         }
 
     }
