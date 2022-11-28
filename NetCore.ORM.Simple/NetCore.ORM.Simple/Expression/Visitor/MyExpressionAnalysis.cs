@@ -128,11 +128,6 @@ namespace NetCore.ORM.Simple.Visitor
                             currentMember.oParams = constant.Value;
 
                         }
-<<<<<<< HEAD
-                        
-=======
-
->>>>>>> 7fa562bd3062f87f02ed1cd3306129ee312242d4
                     }
                     break;
                 case ExpressionType.Call:
@@ -324,7 +319,6 @@ namespace NetCore.ORM.Simple.Visitor
             //Console.WriteLine(obj1.GetType());
             //Console.WriteLine(obj2.GetType());
             //Console.WriteLine(obj3.GetType());
-<<<<<<< HEAD
             object value = null;
             if (members.Count != 0)
             {
@@ -386,7 +380,6 @@ namespace NetCore.ORM.Simple.Visitor
                     }
                 }
             }
-=======
             if (node.Type.IsEnum)
             {
                 Console.WriteLine(node.Value);
@@ -419,7 +412,7 @@ namespace NetCore.ORM.Simple.Visitor
                 }
                 else
                 {
-                    object value = null;
+                     value = null;
                     if (members.Count != 0)
                     {
                         MemberEntity meber = members.Pop();
@@ -484,8 +477,6 @@ namespace NetCore.ORM.Simple.Visitor
                     }
                 }
             }
-
->>>>>>> 7fa562bd3062f87f02ed1cd3306129ee312242d4
             base.VisitConstant(node);
             return node;
         }
@@ -583,13 +574,9 @@ namespace NetCore.ORM.Simple.Visitor
         }
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-<<<<<<< HEAD
             
-            if (!Check.IsNull(node.Arguments)&&node.Arguments.Count>0)
-=======
 
             if (!Check.IsNull(node.Arguments) && node.Arguments.Count > 0)
->>>>>>> 7fa562bd3062f87f02ed1cd3306129ee312242d4
             {
                 if (node.Arguments[0] is ConstantExpression constant)
                 {

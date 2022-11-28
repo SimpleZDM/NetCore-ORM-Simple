@@ -215,13 +215,11 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 int count = client.Queryable<UserEntity>().Count();
                 ////是否存在
                 bool any = client.Queryable<UserEntity>().Any();
->>>>>>> 7fa562bd3062f87f02ed1cd3306129ee312242d4
 
                 //var first = client.Queryable<UserEntity>().First();
 
                 //var firstordefault = client.Queryable<UserEntity>().FirstOrDefault();
 
-<<<<<<< HEAD
                 ////返回匿名对象
                 //var data0 = client.Queryable<UserEntity>().Select(u => new { Name = u.Name, Id = u.Id }).ToList();
                 //var data = client.Queryable<UserEntity>().Select(u => new UserEntity { Name = u.Name, Id = u.Id }).
@@ -237,7 +235,6 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 ////排序
                 //var order = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderBy(u => new { u.Id }).ToList();
                 //var orderDesce = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderByDescending(u => new { u.Id }).ToList();
-=======
                 //返回匿名对象
                 var data0 = client.Queryable<UserEntity>().Select(u => new { Name = u.Name, Id = u.Id }).ToList();
                 var data = client.Queryable<UserEntity>().Select(u => new UserEntity { Name = u.Name, Id = u.Id }).
@@ -255,7 +252,6 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 min && user.Id <= max).OrderBy(u => new { u.Id }).ToList();
 
                 var orderDesce = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderByDescending(u => new { u.Id }).ToList();
->>>>>>> 7fa562bd3062f87f02ed1cd3306129ee312242d4
 
                 //Console.WriteLine($"*****************是否有数据:{any}****************");
                 //Console.WriteLine($"*****************总行数:{count}****************");
@@ -263,7 +259,6 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 //Console.WriteLine("****************2.多表连接查询*****************");
                 //Console.WriteLine($"*****************连接查询****************");
 
-<<<<<<< HEAD
                 //var JoinData = client.Queryable<UserEntity, RoleEntity, CompanyEntity>(
                 //    (u, r, c) => new JoinInfoEntity(
                 //    new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
@@ -284,7 +279,6 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 //       RoleName = r.DisplayName,
                 //       Id = u.Id
                 //   });
-=======
                 var JoinData1 = client.Queryable<
                     UserEntity, RoleEntity, CompanyEntity>(
                     (u, r, c) => new JoinInfoEntity(
@@ -299,7 +293,6 @@ namespace NetCore.ORM.Simple.ConsoleApp
                        RoleName = r.DisplayName,
                        Id = u.Id
                    });
->>>>>>> 7fa562bd3062f87f02ed1cd3306129ee312242d4
 
                 //JoinData1.Where(s => s.Id > 10);
 
@@ -307,7 +300,6 @@ namespace NetCore.ORM.Simple.ConsoleApp
 
                 //JoinData1.Where(s => true);
 
-<<<<<<< HEAD
                 //var data111 = JoinData1.ToList();
                 ///////连接查询分组
                 //var JoinData2 = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) => new JoinInfoEntity(
@@ -330,7 +322,6 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 //      FirstOrDefaultName = v.FirstOrDefault(s => s.UserName),
                 //      Max = v.Max(s => s.RoleId)
                 //  }).ToList();
-=======
                 var data111 = JoinData1.ToList();
                 /////连接查询分组
                 var JoinData2 = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) => new JoinInfoEntity(
@@ -353,7 +344,6 @@ namespace NetCore.ORM.Simple.ConsoleApp
                       //FirstOrDefaultName = v.FirstOrDefault(s => s.UserName),
                       //Max = v.Max(s => s.RoleId)
                   }).ToList();
->>>>>>> 7fa562bd3062f87f02ed1cd3306129ee312242d4
 
                 //var orderBy = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) => new JoinInfoEntity(
                 //   new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),

@@ -1,9 +1,6 @@
-<<<<<<< HEAD
 ﻿using NetCore.ORM.Simple.ConsoleApp.Entity;
-=======
 ﻿﻿using NetCore.ORM.Simple.ConsoleApp.Entity;
 using NetCore.ORM.Simple.Entity;
->>>>>>> 7fa562bd3062f87f02ed1cd3306129ee312242d4
 using NetCore.ORM.Simple.Visitor;
 using System;
 using System.Collections.Generic;
@@ -52,12 +49,9 @@ namespace NetCore.ORM.Simple.ConsoleApp
             entity.dictionaryKeyEntity.Add(key, new TestEntity() { Age=200});
             entity.array = new int[] { 19,22}; 
             entity.Test.Age = 10;
-<<<<<<< HEAD
             u.Where(u => entity.dictionaryKeyEntity[key].Age>u.Age && entity.dictionaryEntity["1"].Age>u.Age&&entity.dictionary["1"] >u.Id&&entity.array[1]>u.Id&&entity.Test.Age>u.Id);
-=======
             int[] array = new int[] { 1,2,34};
             u.Where(u => u.Id.Equals(array[0]) &&entity.dictionaryKeyEntity[key].Age>u.Age && entity.dictionaryEntity["1"].Age>u.Age&&entity.dictionary["1"] >u.Id&&entity.array[1]>u.Id&&entity.Test.Age>u.Id);
->>>>>>> 7fa562bd3062f87f02ed1cd3306129ee312242d4
         }
 
     }
