@@ -68,5 +68,10 @@ namespace NetCore.ORM.Simple.Common
             return default(bool);
         }
 
+        public static int DateDiff()
+        {
+            return default(int);
+        }
+
     }
 }
