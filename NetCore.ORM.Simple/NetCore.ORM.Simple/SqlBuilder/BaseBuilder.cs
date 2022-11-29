@@ -54,8 +54,22 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     return key;
                 })));
             sql.StrSqlValue.Append($"{DBMDConst.RightBracket}{DBMDConst.Semicolon}");
-
+            sql.DbCommandType = eDbCommandType.Insert;
             return sql;
+        }
+
+        public virtual SqlCommandEntity GetInsert(string sql,Dictionary<string,object> Params)
+        {
+            SqlCommandEntity sqlCommand = new SqlCommandEntity(sql);
+            if (!Check.IsNull(Params))
+            {
+                foreach (var item in Params)
+                {
+                    sqlCommand.AddParameter(DbType, item.Key, item.Value);
+                }
+            }
+            sqlCommand.DbCommandType = eDbCommandType.Insert;
+            return sqlCommand;
         }
 
         /// <summary>
@@ -80,6 +94,20 @@ namespace NetCore.ORM.Simple.SqlBuilder
             sql.DbCommandType = eDbCommandType.Update;
             sql.StrSqlValue.Append(DBMDConst.Semicolon);
             return sql;
+        }
+
+        public virtual SqlCommandEntity GetUpdate(string sql, Dictionary<string, object> Params)
+        {
+            SqlCommandEntity sqlCommand = new SqlCommandEntity(sql);
+            if (!Check.IsNull(Params))
+            {
+                foreach (var item in Params)
+                {
+                    sqlCommand.AddParameter(DbType, item.Key, item.Value);
+                }
+            }
+            sqlCommand.DbCommandType=eDbCommandType.Update;
+            return sqlCommand;
         }
         /// <summary>
         /// 
@@ -107,6 +135,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 Update(sql, keyName, tableName, pKey, data, Props, Index);
                 Index++;
             }
+            sql.DbCommandType = eDbCommandType.Update;
             return sql;
         }
 
@@ -164,6 +193,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     }
                 }
             }
+            sql.DbCommandType = eDbCommandType.Insert;
             return sql;
         }
         /// <summary>
@@ -181,6 +211,20 @@ namespace NetCore.ORM.Simple.SqlBuilder
             sql.StrSqlValue.Append($"{DBMDConst.Select} " +
                 $"{string.Join(DBMDConst.Comma, GetNoIgnore(type))} " +
                 $"{DBMDConst.From} {GetTableName(type)} ");
+        }
+
+        public virtual QueryEntity GetSelect(string sql,Dictionary<string,object> Params)
+        {
+            QueryEntity sqlCommand = new QueryEntity(sql);
+            if (!Check.IsNull(Params))
+            {
+                foreach (var item in Params)
+                {
+                    sqlCommand.AddParameter(DbType, item.Key, item.Value);
+                }
+            }
+            sqlCommand.DbCommandType = eDbCommandType.Query;
+            return sqlCommand;
         }
         /// <summary>
         /// 
@@ -309,6 +353,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             sqlCommand.StrSqlValue.Append($" {DBMDConst.Where} ");
             LinkConditions(conditions, treeConditions, sqlCommand);
             sqlCommand.StrSqlValue.Append(DBMDConst.Semicolon);
+            sqlCommand.DbCommandType = eDbCommandType.Delete;
             return sqlCommand;
         }
         /// <summary>
@@ -332,6 +377,20 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 $"{DBMDConst.Where} {DBMDConst.UnSingleQuotes}{GetColName(PropKey)}{DBMDConst.UnSingleQuotes}{DBMDConst.Equal}{key}");
             sqlCommand.AddParameter(DbType, key, PropKey.GetValue(data));
             sqlCommand.StrSqlValue.Append(DBMDConst.Semicolon);
+            sqlCommand.DbCommandType = eDbCommandType.Delete;
+            return sqlCommand;
+        }
+
+        public virtual SqlCommandEntity GetDelete(string sql,Dictionary<string,object> Params)
+        {
+            SqlCommandEntity sqlCommand = new SqlCommandEntity(sql);
+            if (!Check.IsNull(Params))
+            {
+                foreach (var item in Params)
+                {
+                    sqlCommand.AddParameter(DbType,item.Key, item.Value);
+                }
+            }
             return sqlCommand;
         }
 

@@ -1,5 +1,4 @@
 ﻿using NetCore.ORM.Simple.ConsoleApp.Entity;
-﻿﻿using NetCore.ORM.Simple.ConsoleApp.Entity;
 using NetCore.ORM.Simple.Entity;
 using NetCore.ORM.Simple.Visitor;
 using System;
@@ -33,9 +32,8 @@ namespace NetCore.ORM.Simple.ConsoleApp
         {
             ExpressionTest<UserEntity, CompanyEntity, RoleEntity> u = new ExpressionTest<UserEntity,CompanyEntity,RoleEntity>();
             u.Select((u,c,r)=> new JoinInfoEntity(
-                    new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)&&u.Id.Equals(eConditionType.Sign)),
-                    new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
-                    ));
+                    eJoinType.Inner, u.RoleId.Equals(r.Id)&&u.Id.Equals(eConditionType.Sign),
+                    eJoinType.Inner, u.CompanyId.Equals(c.Id)));
         }
         public void Where()
         {

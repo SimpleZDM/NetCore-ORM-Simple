@@ -62,18 +62,21 @@ namespace NetCore.ORM.Simple
         {
 
             ///执行完了之后
+            
             switch (currentSql.DbCommandType)
             {
                 case eDbCommandType.Insert:
                     QueryEntity GetInsertSql = new QueryEntity();
+                   
                     builder.GetLastInsert<TEntity>(GetInsertSql);
+                    sqls.Remove(currentSql);
                     return  dbDrive.Excute<TEntity>(currentSql, GetInsertSql.StrSqlValue.ToString());
                 case eDbCommandType.Update:
                     break;
                 default:
                     break;
             }
-            sqls.Remove(currentSql);
+            
 
             return default(TEntity);
         }

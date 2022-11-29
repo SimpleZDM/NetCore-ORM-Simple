@@ -47,6 +47,16 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
         public SqlCommandEntity GetDelete<TData>(TData data,int random);
 
+        public SqlCommandEntity GetInsert(string sql, Dictionary<string, object> Params);
+
+        public  SqlCommandEntity GetUpdate(string sql, Dictionary<string, object> Params);
+
+        public SqlCommandEntity GetDelete(string sql, Dictionary<string, object> Params);
+
+
+        public QueryEntity GetSelect(string sql, Dictionary<string, object> Params);
+        
+
         public void GetLastInsert<TData>(QueryEntity sql);
         public  void GetCount(SelectEntity select, QueryEntity entity);
         public  void SetAttr(Type Table = null, Type Column = null);

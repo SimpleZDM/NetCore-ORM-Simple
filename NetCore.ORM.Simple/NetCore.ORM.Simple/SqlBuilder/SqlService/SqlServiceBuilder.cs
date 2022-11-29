@@ -391,6 +391,23 @@ namespace NetCore.ORM.Simple.SqlBuilder
             return sqlCommand;
         }
 
+        public override SqlCommandEntity GetInsert(string sql,Dictionary<string, object> Params)
+        {
+            return base.GetInsert(sql,Params);
+        }
+        public override SqlCommandEntity GetUpdate(string sql, Dictionary<string, object> Params)
+        {
+            return base.GetUpdate(sql, Params);
+        }
+        public override SqlCommandEntity GetDelete(string sql, Dictionary<string, object> Params)
+        {
+            return base.GetDelete(sql, Params);
+        }
+
+        public override QueryEntity GetSelect(string sql, Dictionary<string, object> Params)
+        {
+            return base.GetSelect(sql,Params);
+        }
 
 
         /// <summary>
@@ -559,7 +576,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 return $"{colName}{DBMDConst.Equal}{GetParameterName(index, colName)}";
             })));
             sql.StrSqlValue.Append($" {DBMDConst.Where} ");
-            sql.StrSqlValue.Append($"{GetColName(pKey)}{DBMDConst.Equal}{ GetParameterName(index, keyName)}");
+            sql.StrSqlValue.Append($"{GetColName(pKey)}{DBMDConst.Equal}{GetParameterName(index, keyName)}");
             sql.StrSqlValue.Append(DBMDConst.Semicolon);
         }
 

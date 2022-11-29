@@ -61,7 +61,6 @@ namespace NetCore.ORM.Simple.Entity
 
 
 
-
         private string propName;
         private string tableName;
         private string columnName;

@@ -114,9 +114,6 @@ namespace NetCore.ORM.Simple.Entity
         }
 
         private Dictionary<string, ConnectionEntity> connectMapName;
-        private string currentUseConnectName;
-        private string currentUseConnectStr;
-        private ConnectionEntity currentConnectInfo;
         private bool rwSplit;
 
         /// <summary>

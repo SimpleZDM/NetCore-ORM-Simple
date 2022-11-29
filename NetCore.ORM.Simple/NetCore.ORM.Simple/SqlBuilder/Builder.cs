@@ -59,7 +59,23 @@ namespace NetCore.ORM.Simple.SqlBuilder
         {
             return sqlBuilder.GetInsert(datas, offset);
         }
+        public  SqlCommandEntity GetInsert(string sql, Dictionary<string, object> Params)
+        {
+            return sqlBuilder.GetInsert(sql, Params);
+        }
+        public  SqlCommandEntity GetUpdate(string sql, Dictionary<string, object> Params)
+        {
+            return sqlBuilder.GetUpdate(sql, Params);
+        }
+        public  SqlCommandEntity GetDelete(string sql, Dictionary<string, object> Params)
+        {
+            return sqlBuilder.GetDelete(sql, Params);
+        }
 
+        public  QueryEntity GetSelect(string sql, Dictionary<string, object> Params)
+        {
+            return sqlBuilder.GetSelect(sql, Params);
+        }
         /// <summary>
         /// 
         /// </summary>

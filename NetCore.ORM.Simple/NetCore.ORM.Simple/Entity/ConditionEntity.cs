@@ -50,9 +50,6 @@ namespace NetCore.ORM.Simple.Entity
             }
             DisplayName=$"{TableName}{DBMDConst.Dot}{PropName}";
         }
-
-
-
         private string displayName;
         private eConditionType conditionType;
         private eSignType signType;

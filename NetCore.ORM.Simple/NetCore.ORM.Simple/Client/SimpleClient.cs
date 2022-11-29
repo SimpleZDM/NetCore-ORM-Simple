@@ -1,5 +1,6 @@
 ﻿using System.Data.Common;
 using System.Linq.Expressions;
+using System.Xml;
 using NetCore.ORM.Simple.Entity;
 using NetCore.ORM.Simple.Queryable;
 using NetCore.ORM.Simple.SqlBuilder;
@@ -89,6 +90,14 @@ namespace NetCore.ORM.Simple
             changeOffset++;
             return command;
         }
+        public ISimpleCommand<TEntity> Insert<TEntity>(string sql,Dictionary<string,object> Params) where TEntity : class, new()
+        {   var sqlCommand = builder.GetInsert(sql,Params);
+            sqls.Add(sqlCommand);
+            sqlCommand.DbCommandType = eDbCommandType.Insert;
+            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, dbType,sqlCommand, sqls, dbDrive);
+            changeOffset++;
+            return command;
+        }
         public ISimpleCommand<TEntity> Insert<TEntity>(List<TEntity> entitys) where TEntity : class, new()
         {
             var sql = builder.GetInsert(entitys,changeOffset);
@@ -98,11 +107,19 @@ namespace NetCore.ORM.Simple
             changeOffset = entitys.Count()+ changeOffset;
             return command;
         }
+
         public ISimpleCommand<TEntity> Update<TEntity>(TEntity entity) where TEntity : class, new()
         {
             var sql = builder.GetUpdate(entity,changeOffset);
-            sql.DbCommandType = eDbCommandType.Update;
             ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,dbType, sql, sqls, dbDrive);
+            changeOffset++;
+            return command;
+        }
+
+        public ISimpleCommand<TEntity> Update<TEntity>(string sql,Dictionary<string,object> Params) where TEntity : class, new()
+        {
+            var sqlCommand = builder.GetUpdate(sql,Params);
+            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, dbType,sqlCommand, sqls, dbDrive);
             changeOffset++;
             return command;
         }
@@ -121,7 +138,6 @@ namespace NetCore.ORM.Simple
             var Visitor = new ConditionVisitor(select);
             Visitor.Modify(expression);
             var sql = builder.GetDelete(type, select.Conditions, select.TreeConditions);
-            sql.DbCommandType = eDbCommandType.Delete;
             sqls.Add(sql);
             ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,dbType, sql, sqls, dbDrive);
             return command;
@@ -129,18 +145,53 @@ namespace NetCore.ORM.Simple
         public ISimpleCommand<TEntity> Delete<TEntity>(TEntity entity) where TEntity : class, new()
         {
             var sql = builder.GetDelete(entity,changeOffset);
-            sql.DbCommandType = eDbCommandType.Delete;
             sqls.Add(sql);
             ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,dbType, sql, sqls, dbDrive);
             changeOffset++;
             return command;
         }
+
+        public ISimpleCommand<TEntity> Delete<TEntity>(string sql,Dictionary<string,object> Params) where TEntity : class, new()
+        {
+            var sqlCommand = builder.GetDelete(sql, changeOffset);
+            sqls.Add(sqlCommand);
+            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, dbType, sqlCommand, sqls, dbDrive);
+            changeOffset++;
+            return command;
+        }
+
         #endregion
 
         #region 查询部分
-        public ISimpleQueryable<T1> Queryable<T1>()where T1:class,new()
+        public IEnumerable<TEntity> Read<TEntity>(string sql,Dictionary<string,object> Params)where TEntity : class,new()
         {
-            return new SimpleQueryable<T1>(builder,dbDrive,TableAttr,ColumnAttr);
+            var Query=builder.GetSelect(sql,Params);
+            return  dbDrive.Read<TEntity>(Query);
+        }
+        public async Task<IEnumerable<TEntity>> ReadAsync<TEntity>(string sql, Dictionary<string, object> Params) where TEntity : class, new()
+        {
+            var Query = builder.GetSelect(sql, Params);
+            return await dbDrive.ReadAsync<TEntity>(Query);
+        }
+
+        public async Task<TEntity> FirstOrDefaultAsync<TEntity>(string sql, Dictionary<string, object> Params) where TEntity : class, new()
+        {
+            var Query = builder.GetSelect(sql, Params);
+            Query.PageSize = 1;
+            Query.PageNumber = 1;
+            return await dbDrive.ReadFirstOrDefaultAsync<TEntity>(Query);
+        }
+
+        public TEntity FirstOrDefault<TEntity>(string sql, Dictionary<string, object> Params) where TEntity : class, new()
+        {
+            var Query = builder.GetSelect(sql, Params);
+            Query.PageSize = 1;
+            Query.PageNumber = 1;
+            return  dbDrive.ReadFirstOrDefault<TEntity>(Query);
+        }
+        public ISimpleQueryable<T1> Queryable<T1>() where T1 : class, new()
+        {
+            return new SimpleQueryable<T1>(builder, dbDrive, TableAttr, ColumnAttr);
         }
         public ISimpleQueryable<T1,T2> Queryable<T1,T2>(Expression<Func<T1,T2,JoinInfoEntity>> expression) where T1 : class
         {

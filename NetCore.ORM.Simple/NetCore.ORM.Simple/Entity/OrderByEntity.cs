@@ -52,7 +52,6 @@ namespace NetCore.ORM.Simple.Entity
         private int orderSoft;
         private bool isGroupBy;
         private int groupSoft;
-        
         private string tableName;
         private string columnName;
         private string propName;

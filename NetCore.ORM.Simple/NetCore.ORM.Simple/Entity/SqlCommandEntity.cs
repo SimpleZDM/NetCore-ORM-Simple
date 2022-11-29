@@ -18,6 +18,10 @@ namespace NetCore.ORM.Simple.Entity
 {
     public class SqlCommandEntity : SqlBase
     {
+        public SqlCommandEntity(string sql)
+        {
+            this.StrSqlValue.Append(sql);
+        }
         public SqlCommandEntity()
         {
         }

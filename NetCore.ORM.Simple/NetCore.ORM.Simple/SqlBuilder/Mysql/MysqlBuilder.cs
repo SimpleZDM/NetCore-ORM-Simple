@@ -46,6 +46,24 @@ namespace NetCore.ORM.Simple.SqlBuilder
         {
             return base.GetInsert(datas,offset);
         }
+
+        public override SqlCommandEntity GetInsert(string sql, Dictionary<string, object> Params)
+        {
+            return base.GetInsert(sql, Params);
+        }
+        public override SqlCommandEntity GetUpdate(string sql, Dictionary<string, object> Params)
+        {
+            return base.GetUpdate(sql, Params);
+        }
+        public override SqlCommandEntity GetDelete(string sql, Dictionary<string, object> Params)
+        {
+            return base.GetDelete(sql, Params);
+        }
+
+        public override QueryEntity GetSelect(string sql, Dictionary<string, object> Params)
+        {
+            return base.GetSelect(sql, Params);
+        }
         public override void GetSelect<TData>(QueryEntity sql)
         {
              base.GetSelect<TData>(sql);

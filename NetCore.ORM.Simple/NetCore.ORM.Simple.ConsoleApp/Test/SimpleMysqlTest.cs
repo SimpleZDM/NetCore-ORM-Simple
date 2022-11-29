@@ -279,11 +279,19 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 //       RoleName = r.DisplayName,
                 //       Id = u.Id
                 //   });
+
+                //UserEntity u = new UserEntity();
+                //RoleEntity r = new RoleEntity();
+                //CompanyEntity cc = new CompanyEntity();
+                //new JoinInfoEntity(
+                //   (eJoinType.Inner, u.RoleId.Equals(r.Id)),
+                //   (eJoinType.Inner, u.CompanyId.Equals(cc.Id))
+                //   );
                 var JoinData1 = client.Queryable<
                     UserEntity, RoleEntity, CompanyEntity>(
                     (u, r, c) => new JoinInfoEntity(
-                   new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
-                   new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
+                   eJoinType.Inner,u.RoleId.Equals(r.Id),
+                   eJoinType.Inner, u.CompanyId.Equals(c.Id)
                    )).
                    Where((u, r, c) => u.Id > 10).OrderByDescending((u, r) => u.Id).
                    Select((u, r, c) => new
@@ -324,10 +332,10 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 //  }).ToList();
                 var data111 = JoinData1.ToList();
                 /////连接查询分组
-                var JoinData2 = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) => new JoinInfoEntity(
-                  new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
-                  new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
-                  )).
+                var JoinData2 = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) =>
+                new JoinInfoEntity(
+                  eJoinType.Inner, u.RoleId.Equals(r.Id),
+                  eJoinType.Inner, u.CompanyId.Equals(c.Id))).
                   Where((u, r, c) => u.Id > 10).Select((u, r, c) =>
                   new ViewEntity
                   {
@@ -399,6 +407,20 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 }
             }
             Console.WriteLine($"db1={db1}\n db2={db2}\n db3={db3} \n master={master}");
+        }
+
+        public void sqlTest()
+        {
+            Dictionary<string, object> p = new Dictionary<string, object>();
+            p.Add("@CompanyId_0",1);
+            p.Add("@Name_0", "sdf");
+            p.Add("@Description_0", "111");
+            p.Add("@RoleId_0", 1);
+            p.Add("@gIdColumn_0", Guid.Empty);
+            p.Add("@Age_0",1);
+
+           var res=client.Insert<UserEntity>("INSERT  INTO  `usertable` (`CompanyId`,`Name`,`Description`,`RoleId`,`gIdColumn`,`Age`) " +
+                "VALUE(@CompanyId_0,@Name_0,@Description_0,@RoleId_0,@gIdColumn_0,@Age_0);", p).SaveChange();
         }
     }
 }

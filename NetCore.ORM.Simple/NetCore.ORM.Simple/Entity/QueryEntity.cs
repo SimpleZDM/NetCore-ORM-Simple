@@ -24,11 +24,18 @@ namespace NetCore.ORM.Simple.Entity
     {
         public QueryEntity()
         {
-            StrSqlValue = new StringBuilder();
             DyToMap = new List<dynamic>();
             PageSize = 0;
             PageNumber = 1;
             DbCommandType = eDbCommandType.Query;
+        }
+        public QueryEntity(string sql)
+        {
+            DyToMap = new List<dynamic>();
+            PageSize = 0;
+            PageNumber = 1;
+            DbCommandType = eDbCommandType.Query;
+            StrSqlValue.Append(sql);
         }
 
         /// <summary>
@@ -82,8 +89,6 @@ namespace NetCore.ORM.Simple.Entity
         /// </summary>
         public bool LastAnonymity { get { return lastAnonymity; } set { lastAnonymity = value; } }
 
-       
-
         public TResult GetResult<TResult>(params object[] objs)
         {
             object obj = GetResult<TResult>(DyToMap[0], objs);
@@ -95,7 +100,6 @@ namespace NetCore.ORM.Simple.Entity
             }
             return (TResult)obj;
         }
-
         public object GetResult<TResult>(dynamic func, object[] objs)
         {
             try
@@ -140,7 +144,6 @@ namespace NetCore.ORM.Simple.Entity
             return null;
 
         }
-
 
 
         private MapEntity[] mapInfos;

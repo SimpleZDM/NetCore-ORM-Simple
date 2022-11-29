@@ -22,11 +22,26 @@ namespace NetCore.ORM.Simple.Entity
             RightBracket = new List<eSignType>();
             Index = -1;
         }
+        /// <summary>
+        /// 左括号
+        /// </summary>
 
         public List<eSignType> LeftBracket { get { return leftBracket; } set { leftBracket = value; } }
+        /// <summary>
+        /// 右边括号
+        /// </summary>
         public List<eSignType> RightBracket { get { return rightBracket; } set { rightBracket = value; } }
+        /// <summary>
+        /// 条件左值
+        /// </summary>
         public ConditionEntity LeftCondition { get { return left; } set { left = value; } }
+        /// <summary>
+        /// 条件右值
+        /// </summary>
         public ConditionEntity RightCondition { get { return right; } set { right = value; } }
+        /// <summary>
+        /// 关系
+        /// </summary>
         public ConditionEntity RelationCondition { get { return relation; } set { relation = value; } }
         public string Key { get { return key; } set { key = value; } }
         public int Index { get { return index; } set { index = value; } }

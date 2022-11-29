@@ -214,15 +214,15 @@ namespace NetCore.ORM.Simple.ConsoleApp
 
                 var JoinData = client.Queryable<UserEntity, RoleEntity, CompanyEntity>(
                     (u, r, c) => new JoinInfoEntity(
-                    new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
-                    new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
+                    eJoinType.Inner, u.RoleId.Equals(r.Id),
+                    eJoinType.Inner, u.CompanyId.Equals(c.Id)
                     )).ToList();
 
                 var JoinData1 = client.Queryable<
                     UserEntity, RoleEntity, CompanyEntity>(
                     (u, r, c) => new JoinInfoEntity(
-                   new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
-                   new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
+                   eJoinType.Inner, u.RoleId.Equals(r.Id),
+                   eJoinType.Inner, u.CompanyId.Equals(c.Id)
                    )).
                    Where((u, r, c) => u.Id > 10).OrderByDescending((u, r) => u.Id).
                    Select((u, r, c) => new
@@ -242,9 +242,10 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 var data111 = JoinData1.ToList();
       
 
-                var orderBy = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) => new JoinInfoEntity(
-                   new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
-                   new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
+                var orderBy = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) 
+                    => new JoinInfoEntity(
+                   eJoinType.Inner, u.RoleId.Equals(r.Id),
+                   eJoinType.Inner, u.CompanyId.Equals(c.Id)
                    )).
                    Where((u, r, c) => u.Id > 10).
                    Select((u, r, c) => new { UserName = u.Name, CompanyName = c.CompanyName, RoleName = r.DisplayName, Id = u.Id }).OrderBy(u => u.Id).ToList();

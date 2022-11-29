@@ -20,7 +20,12 @@ namespace NetCore.ORM.Simple.Entity
     /// </summary>
     public class JoinTableEntity
     {
-        
+        public JoinTableEntity()
+        {
+            TreeConditions = new List<TreeConditionEntity>();
+            Conditions = new List<ConditionEntity>();
+        }
+
         /// <summary>
         /// 表名称
         /// </summary>
@@ -46,11 +51,7 @@ namespace NetCore.ORM.Simple.Entity
         /// 连接等式的条件
         /// </summary>
         public List<ConditionEntity> Conditions { get { return conditions; } set { conditions = value; } }
-        public JoinTableEntity()
-        {
-            TreeConditions = new List<TreeConditionEntity>();
-            Conditions=new List<ConditionEntity>();
-        }
+        
         private string displayName;
         private string asName;
         private eTableType tableType;

@@ -53,10 +53,10 @@ namespace NetCore.ORM.Simple.ConsoleApp
             var query = client.Queryable<MDT.VirtualSoftPlatform.Entity.MissionDetailEntity, StudentEntity, MDT.VirtualSoftPlatform.Entity.UserEntity, MissionEntity, ProductDeviceEntity>(
               (missionDetail, student, userStudent, mission, productDevice) =>
               new NetCore.ORM.Simple.Entity.JoinInfoEntity(
-              new NetCore.ORM.Simple.Entity.JoinMapEntity(NetCore.ORM.Simple.Entity.eJoinType.Inner, student.UserID.Equals(missionDetail.UserId)),
-              new NetCore.ORM.Simple.Entity.JoinMapEntity(NetCore.ORM.Simple.Entity.eJoinType.Inner, userStudent.ID.Equals(missionDetail.UserId)),
-              new NetCore.ORM.Simple.Entity.JoinMapEntity(NetCore.ORM.Simple.Entity.eJoinType.Inner, mission.ID.Equals(missionDetail.MissionId)),
-               new NetCore.ORM.Simple.Entity.JoinMapEntity(NetCore.ORM.Simple.Entity.eJoinType.Left, productDevice.ID.Equals(missionDetail.ProductDeviceId))
+              NetCore.ORM.Simple.Entity.eJoinType.Inner, student.UserID.Equals(missionDetail.UserId),
+              NetCore.ORM.Simple.Entity.eJoinType.Inner, userStudent.ID.Equals(missionDetail.UserId),
+              NetCore.ORM.Simple.Entity.eJoinType.Inner, mission.ID.Equals(missionDetail.MissionId),
+              NetCore.ORM.Simple.Entity.eJoinType.Left, productDevice.ID.Equals(missionDetail.ProductDeviceId)
               ));
             query.Where(missionDetail=>missionDetail.StatusId==(int)eMissionStatus.Complete);
 
@@ -160,15 +160,15 @@ namespace NetCore.ORM.Simple.ConsoleApp
             var query = client.Queryable<MDT.VirtualSoftPlatform.Entity.MissionDetailEntity, DictionaryEntity, DictionaryEntity, StudentEntity, MDT.VirtualSoftPlatform.Entity.UserEntity, MissionEntity, DictionaryEntity, DictionaryEntity, ProductDeviceEntity, MDT.VirtualSoftPlatform.Entity.UserEntity>(
               (missionDetail, missionRole, status, student, userStudent, mission, groupMode, missionMode, productDevice, userTeacher) =>
               new NetCore.ORM.Simple.Entity.JoinInfoEntity(
-              new NetCore.ORM.Simple.Entity.JoinMapEntity(NetCore.ORM.Simple.Entity.eJoinType.Left, missionDetail.MissionRole.Equals(missionRole.RowID) && missionRole.MainID.Equals((int)eDictionary.missionRole)),
-              new NetCore.ORM.Simple.Entity.JoinMapEntity(NetCore.ORM.Simple.Entity.eJoinType.Inner, missionDetail.StatusId.Equals(status.RowID) && status.MainID.Equals((int)eDictionary.missionstate)),
-              new NetCore.ORM.Simple.Entity.JoinMapEntity(NetCore.ORM.Simple.Entity.eJoinType.Inner, student.UserID.Equals(missionDetail.UserId)),
-              new NetCore.ORM.Simple.Entity.JoinMapEntity(NetCore.ORM.Simple.Entity.eJoinType.Inner, userStudent.ID.Equals(missionDetail.UserId)),
-              new NetCore.ORM.Simple.Entity.JoinMapEntity(NetCore.ORM.Simple.Entity.eJoinType.Inner, mission.ID.Equals(missionDetail.MissionId)),
-              new NetCore.ORM.Simple.Entity.JoinMapEntity(NetCore.ORM.Simple.Entity.eJoinType.Inner, groupMode.RowID.Equals(mission.GroupMode) && groupMode.MainID.Equals((int)eDictionary.groupmode)),
-              new NetCore.ORM.Simple.Entity.JoinMapEntity(NetCore.ORM.Simple.Entity.eJoinType.Inner, missionMode.RowID.Equals(mission.MissionMode) && missionMode.MainID.Equals((int)eDictionary.missionmode)),
-               new NetCore.ORM.Simple.Entity.JoinMapEntity(NetCore.ORM.Simple.Entity.eJoinType.Left, productDevice.ID.Equals(missionDetail.ProductDeviceId)),
-             new NetCore.ORM.Simple.Entity.JoinMapEntity(NetCore.ORM.Simple.Entity.eJoinType.Inner, userTeacher.ID.Equals(mission.CreatorID))
+             NetCore.ORM.Simple.Entity.eJoinType.Left, missionDetail.MissionRole.Equals(missionRole.RowID) && missionRole.MainID.Equals((int)eDictionary.missionRole),
+              NetCore.ORM.Simple.Entity.eJoinType.Inner, missionDetail.StatusId.Equals(status.RowID) && status.MainID.Equals((int)eDictionary.missionstate),
+              NetCore.ORM.Simple.Entity.eJoinType.Inner, student.UserID.Equals(missionDetail.UserId),
+              NetCore.ORM.Simple.Entity.eJoinType.Inner, userStudent.ID.Equals(missionDetail.UserId),
+              NetCore.ORM.Simple.Entity.eJoinType.Inner, mission.ID.Equals(missionDetail.MissionId),
+             NetCore.ORM.Simple.Entity.eJoinType.Inner, groupMode.RowID.Equals(mission.GroupMode) && groupMode.MainID.Equals((int)eDictionary.groupmode),
+              NetCore.ORM.Simple.Entity.eJoinType.Inner, missionMode.RowID.Equals(mission.MissionMode) && missionMode.MainID.Equals((int)eDictionary.missionmode),
+               NetCore.ORM.Simple.Entity.eJoinType.Left, productDevice.ID.Equals(missionDetail.ProductDeviceId),
+             NetCore.ORM.Simple.Entity.eJoinType.Inner, userTeacher.ID.Equals(mission.CreatorID)
               ));
 
 

@@ -47,6 +47,7 @@ public static class Program
         // test.Where();
         SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
         MysqlTest.MoreQuerTest();
+        MysqlTest.sqlTest();
         //MysqlTest.InsertTest();
         //MysqlTest.UpdateTest();
         //MysqlTest.DeleteTest();
@@ -83,6 +84,8 @@ public static class Program
             //Console.WriteLine(sql);
             //Console.WriteLine($"Date:{DateTime.Now}\t \t sql:{sql}");
         });
+        int b=0;
+        JoinInfoEntity j = new JoinInfoEntity(eJoinType.Inner,b.Equals(1));
         int DataLength = 20;
         int count = 100;
         long l = 0;
