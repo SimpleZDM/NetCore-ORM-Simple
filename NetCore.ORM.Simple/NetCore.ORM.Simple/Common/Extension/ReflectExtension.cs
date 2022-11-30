@@ -164,7 +164,7 @@ namespace NetCore.ORM.Simple.Common
         {
             Type[] types = new Type[2];
             types[0] = GetType<T>();
-            types[2] = GetType<T2>();
+            types[1] = GetType<T2>();
             return types;
         }
         public static Type[] GetType<T, T2, T3>()

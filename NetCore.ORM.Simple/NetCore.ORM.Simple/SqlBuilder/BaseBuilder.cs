@@ -430,6 +430,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         {
                             mapInfos[i].AsColumnName = $"{mapInfos[i].TableName}{DBMDConst.DownLine}{mapInfos[i].ColumnName}";
                         }
+
+
                         if (Check.IsNullOrEmpty(mapInfos[i].MethodName))
                         {
                             sqlEntity.StrSqlValue.Append($" { mapInfos[i].TableName}.{mapInfos[i].ColumnName} {DBMDConst.As} {mapInfos[i].AsColumnName} ");

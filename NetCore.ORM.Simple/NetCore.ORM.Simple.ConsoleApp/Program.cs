@@ -1,5 +1,8 @@
 ﻿using MDT.VirtualSoftPlatform.Entity;
+using NetCore.ORM.Simple.ConsoleApp.构造匿名对象;
 using NetCore.ORM.Simple.Entity;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace NetCore.ORM.Simple.ConsoleApp;
@@ -7,6 +10,18 @@ public static class Program
 {
     public static int Main(string []args)
     {
+
+          //object o1 = new { UserName = 11 };
+          //var b =Activator.CreateInstance(o1.GetType());
+
+        //Anonymity anonymity = new Anonymity();
+
+        //string[] namelist = new string[] { "UserName", "UserId" };
+        //Dictionary<string, Type> dic = new Dictionary<string, Type>();
+        //dic.Add("UserName", typeof(string));
+        //dic.Add("UserId", typeof(int));
+        //var o =anonymity.Test1(dic);
+        //UserEntity u = new UserEntity();
         //ProductTest productTest = new ProductTest();
         //productTest.StartTest1(new MissionDetailParameter
         //{
@@ -46,12 +61,12 @@ public static class Program
         //test.Select();
         // test.Where();
         SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
-        MysqlTest.MoreQuerTest();
-        MysqlTest.sqlTest();
+        //MysqlTest.MoreQuerTest();
+        //MysqlTest.sqlTest();
         //MysqlTest.InsertTest();
         //MysqlTest.UpdateTest();
         //MysqlTest.DeleteTest();
-        //MysqlTest.QueryTest();
+         MysqlTest.QueryTest();
 
         //SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
         //sqliteTest.InsertTest();

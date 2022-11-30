@@ -1,5 +1,9 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Common;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using System.Xml;
 using NetCore.ORM.Simple.Entity;
 using NetCore.ORM.Simple.Queryable;

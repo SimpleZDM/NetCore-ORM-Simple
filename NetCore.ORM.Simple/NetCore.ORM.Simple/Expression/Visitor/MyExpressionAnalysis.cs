@@ -43,15 +43,9 @@ namespace NetCore.ORM.Simple.Visitor
         }
 
 
-        public ReadOnlyCollection<T> VisitAndConvert<T>(ReadOnlyCollection<T> nodes, string? callerName) where T : Expression
-        {
-            return default(ReadOnlyCollection<T>);
-        }
+        
 
-        public T? VisitAndConvert<T>(T? node, string? callerName) where T : Expression
-        {
-            return default(T);
-        }
+       
 
         protected override CatchBlock VisitCatchBlock(CatchBlock node)
         {

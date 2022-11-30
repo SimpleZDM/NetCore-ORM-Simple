@@ -1,7 +1,11 @@
 ﻿using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
+using System;
+using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple
@@ -61,19 +65,7 @@ namespace NetCore.ORM.Simple
         protected Type tableAtrr;
         protected Type columnAttr;
 
-        //public string ConnectStr
-        //{
-        //    get { return connectStr; }
-        //    set
-        //    {
-        //        if (isBeginTransaction)
-        //        {
-        //            throw new ArgumentNullException("事务已经开启,清先完成事务再进行数据库的切换!");
-        //        }
-        //        connectStr = value;
-        //        connection.ConnectionString = connectStr;
-        //    }
-        //}
+        
 
         protected Action<string, DbParameter[]> aopSqlLog;
         public Action<string, DbParameter[]> AOPSqlLog { get { return aopSqlLog; } set { aopSqlLog = value; } }
@@ -236,14 +228,15 @@ namespace NetCore.ORM.Simple
             IEnumerable<TResult> data = null;
             if (entity.LastAnonymity)
             {
-                if (entity.LastType.Count().Equals(1))
-                {
-                    data = ReadDataAnonymity<TResult>(entity);
-                }
-                else
-                {
-                    data = ReadDataAnonymitys<TResult>(entity);
-                }
+                 data = ReadDataAnonymity<TResult>(entity);
+                //if (entity.LastType.Count().Equals(1))
+                //{
+                //    data = ReadDataAnonymity<TResult>(entity);
+                //}
+                //else
+                //{
+                //    data = ReadDataAnonymitys<TResult>(entity);
+                //}
 
             }
             else
@@ -264,14 +257,15 @@ namespace NetCore.ORM.Simple
             TResult tResult = default(TResult);
             if (entity.LastAnonymity)
             {
-                if (entity.LastType.Count().Equals(1))
-                {
-                    tResult = ReadDataAnonymityFirstOrDefault<TResult>(entity);
-                }
-                else
-                {
-                    tResult = ReadDataAnonymitysFirstOrDefault<TResult>(entity);
-                }
+                tResult = ReadDataAnonymityFirstOrDefault<TResult>(entity);
+                //if (entity.LastType.Count().Equals(1))
+                //{
+                //    tResult = ReadDataAnonymityFirstOrDefault<TResult>(entity);
+                //}
+                //else
+                //{
+                //    tResult = ReadDataAnonymitysFirstOrDefault<TResult>(entity);
+                //}
 
             }
             else
@@ -288,10 +282,10 @@ namespace NetCore.ORM.Simple
         {
             return ReadDataAnonymity<TResult>(entity, true).FirstOrDefault();
         }
-        protected TResult ReadDataAnonymitysFirstOrDefault<TResult>(QueryEntity entity)
-        {
-            return ReadDataAnonymitys<TResult>(entity, true).FirstOrDefault();
-        }
+        //protected TResult ReadDataAnonymitysFirstOrDefault<TResult>(QueryEntity entity)
+        //{
+        //    return ReadDataAnonymity<TResult>(entity, true).FirstOrDefault();
+        //}
         
 
         /// <summary>
@@ -305,26 +299,29 @@ namespace NetCore.ORM.Simple
 
         protected IEnumerable<TResult> ReadDataAnonymity<TResult>(QueryEntity entity, bool IsFirst = false)
         {
-            Type type = null;
-            foreach (var item in entity.LastType)
-            {
-                type = item.Value;
-            }
-            if (Check.IsNull(type))
-            {
-                throw new Exception();
-            }
+            Type type = typeof(TResult);
+            //var o2=Activator.CreateInstance(type,"12",1);
+            //var o=Activator.CreateInstance(typeof(TResult));
+            //foreach (var item in entity.LastType)
+            //{
+            //    type = item.Value;
+            //}
+            //if (Check.IsNull(type))
+            //{
+            //    throw new Exception();
+            //}
             List<TResult> data = new List<TResult>();
             while (currentConnection.DataRead.Read())
             {
-                object obj = Activator.CreateInstance(type);
-
+                List<object> oParams = new List<object>();
+               
+               
                 foreach (var item in entity.MapInfos.Where(m => m.IsNeed))
                 {
-                    var Prop = type.GetProperty(item.PropName);
-                    Prop.SetPropValue(obj,currentConnection.DataRead[item.AsColumnName]);
+                    oParams.Add(item.PropertyType.SetPropValue(currentConnection.DataRead[item.AsColumnName]));
                 }
-                data.Add(entity.GetResult<TResult>(obj));
+                var obj=Activator.CreateInstance(type, oParams.ToArray());
+                data.Add((TResult)obj);
                 if (IsFirst)
                 {
                     break;
@@ -334,6 +331,7 @@ namespace NetCore.ORM.Simple
         }
         /// <summary>
         /// 多个对象映射成一个匿名对象
+        /// 该方法将会被弃用
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="entity"></param>

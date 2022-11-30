@@ -9,6 +9,8 @@
  * 更改历史：
  * 
  * *******************************************************/
+using System.Collections.Generic;
+
 namespace NetCore.ORM.Simple.Entity
 {
     /// <summary>

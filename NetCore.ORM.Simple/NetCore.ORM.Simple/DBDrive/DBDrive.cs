@@ -1,6 +1,9 @@
 ﻿using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
+using System;
+using System.Collections.Generic;
 using System.Data.Common;
+using System.Threading.Tasks;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.DBDrive

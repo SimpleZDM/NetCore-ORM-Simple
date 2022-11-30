@@ -1,5 +1,7 @@
 ﻿using NetCore.ORM.Simple.Entity;
 using NetCore.ORM.Simple.SqlBuilder;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple

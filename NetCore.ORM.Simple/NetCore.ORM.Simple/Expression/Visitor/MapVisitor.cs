@@ -50,6 +50,8 @@ namespace NetCore.ORM.Simple.Visitor
         /// </summary>
         private bool isAnonymity;
 
+        private int soft;
+
 
         public MapVisitor(SelectEntity Select)
         {
@@ -58,6 +60,7 @@ namespace NetCore.ORM.Simple.Visitor
             currentTables = new Dictionary<string, int>();
             select.InitMap();
             IsAgain = true;
+           
         }
         /// <summary>
         /// 修改表达式树的形式
@@ -66,6 +69,7 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         public Expression Modify(Expression expression, bool IsAnonymity = false)
         {
+            soft = 1;
             currentTables.Clear();
             isAnonymity = IsAnonymity;
             if (IsAgain)
@@ -75,7 +79,7 @@ namespace NetCore.ORM.Simple.Visitor
             }
             foreach (ParameterExpression item in ((dynamic)expression).Parameters)
             {
-                currentTables.Add(item.Name, currentTables.Count);
+                currentTables.Add(item.Name,currentTables.Count);
             }
             Visit(expression);
             currentmapInfo = null;
@@ -106,6 +110,9 @@ namespace NetCore.ORM.Simple.Visitor
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             base.VisitMethodCall(node);
+
+            
+
             if (Check.IsNull(currentmapInfo))
             {
                 currentmapInfo = new MapEntity();
@@ -116,6 +123,18 @@ namespace NetCore.ORM.Simple.Visitor
             {
                 currentmapInfo.MethodName = node.Method.Name;
             }
+            if (isAnonymity && string.IsNullOrEmpty(currentmapInfo.ColumnName))
+            {
+                currentmapInfo.Soft = soft;
+                SetPropName();
+                soft++;
+            }
+            if (isAnonymity && currentmapInfo.PropertyType!=null&&
+                select.MapInfos.Any(m => m.PropertyType!=null&& m.PropertyType.Equals(currentmapInfo.PropertyType)))
+            {
+                currentmapInfo = null;
+            }
+            
             return node;
         }
 
@@ -128,7 +147,7 @@ namespace NetCore.ORM.Simple.Visitor
         {
             return base.VisitMemberMemberBinding(node);
         }
-        protected override LabelTarget? VisitLabelTarget(LabelTarget? node)
+        protected override LabelTarget VisitLabelTarget(LabelTarget node)
         {
             return base.VisitLabelTarget(node);
         }
@@ -139,19 +158,20 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override MemberBinding VisitMemberBinding(MemberBinding node)
         {
+            currentmapInfo = new MapEntity();
             base.VisitMemberBinding(node);
-
+           
             if (!isAnonymity)
             {
                 //非匿名对象属性名称
-                if (Check.IsNull(currentmapInfo))
-                {
-                    currentmapInfo = new MapEntity();
-                    select.AddMapInfo(currentmapInfo);
-                }
                 currentmapInfo.LastPropName = node.Member.Name;
             }
+            
             currentmapInfo.PropName = node.Member.Name;
+            if (!select.MapInfos.Any(m=>m.PropName.Equals(currentmapInfo.PropName)))
+            {
+                select.AddMapInfo(currentmapInfo);
+            }
             return node;
         }
 
@@ -181,7 +201,15 @@ namespace NetCore.ORM.Simple.Visitor
             string PropName = node.Member.Name;
             if (node.Member.Name.Equals("Key"))
             {
-                return node;
+                if (select.OrderInfos.Where(g => g.IsGroupBy).Count()==1) 
+                {
+                   var group= select.OrderInfos.Where(g => g.IsGroupBy).FirstOrDefault();
+                    PropName = group.PropName;
+                }
+                else
+                {
+                    throw new Exception("不能将key直接赋值给一个对象的成员!");
+                }
             }
             
             PropertyInfo prop = null;
@@ -202,7 +230,9 @@ namespace NetCore.ORM.Simple.Visitor
                 if (!Check.IsNull(currentmapInfo))
                 {
                     currentmapInfo.IsNeed = true;
+                    currentmapInfo.Soft = soft;
                     SetPropName();
+                    soft++;
                     return node;
                 }
                 else
@@ -249,6 +279,8 @@ namespace NetCore.ORM.Simple.Visitor
             var index = currentTables[Params];
             currentmapInfo = select.CreateMapInfo(index, PropName, isAnonymity);
             select.AddMapInfo(currentmapInfo);
+            currentmapInfo.Soft = soft;
+            soft++;
             SetPropName();
 
         }
@@ -260,6 +292,7 @@ namespace NetCore.ORM.Simple.Visitor
                 if (Members.Count() > MemberCurrent)
                 {
                     currentmapInfo.PropName = Members[MemberCurrent].Name;
+                    currentmapInfo.PropertyType =((PropertyInfo)Members[MemberCurrent]).PropertyType;
                     MemberCurrent++;
                 }
             }

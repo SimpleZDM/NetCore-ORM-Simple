@@ -41,6 +41,11 @@ namespace NetCore.ORM.Simple.Entity
         /// 数据库列名称
         /// </summary>
         public string ColumnName { get { return columnName; } set { columnName = value; } }
+
+        /// <summary>
+        /// 列名称对应的属性名称
+        /// </summary>
+        public string ColumnPropertyName { get { return columnPropertyName; } set { columnPropertyName = value; } }
         /// <summary>
         /// 别名
         /// </summary>
@@ -56,8 +61,17 @@ namespace NetCore.ORM.Simple.Entity
         public bool IsNeed { get { return isNeed; } set { isNeed = value; } }
 
         public string ClassName { get { return className; } set { className = value; } }
+        /// <summary>
+        /// 实体的类型
+        /// </summary>
         public Type EntityType { get { return entityType; } set { entityType = value; } }
+
+        /// <summary>
+        /// 属性的类型
+        /// </summary>
+        public Type PropertyType { get { return propertyType; } set { propertyType = value; } }
         public bool IsKey { get { return isKey; } set { isKey = value; } }
+        public int Soft { get { return soft; } set { soft = value; } }
 
 
 
@@ -70,7 +84,10 @@ namespace NetCore.ORM.Simple.Entity
         private string methodName;
         private string lastPropName;
         private string className;
-        public Type entityType;
+        private Type entityType;
+        private Type propertyType;
+        private int soft;
+        private string columnPropertyName;
        
 
     }

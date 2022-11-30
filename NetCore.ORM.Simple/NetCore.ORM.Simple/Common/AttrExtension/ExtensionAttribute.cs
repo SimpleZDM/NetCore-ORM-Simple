@@ -88,7 +88,7 @@ namespace NetCore.ORM.Simple.Common
 
      
 
-        public static void SetPropValue(this PropertyInfo Prop, object data, object vData)
+        public static void SetPropValue(this PropertyInfo Prop,object data, object vData)
         {
             if (Check.IsNull(Prop) || Check.IsNull(data))
             {
@@ -128,6 +128,49 @@ namespace NetCore.ORM.Simple.Common
                 Guid.TryParse(vData.ToString(), out Guid value);
                 Prop.SetValue(data, value);
             }
+        }
+
+        public static object SetPropValue(this Type type,object vData)
+        {
+            if (Check.IsNull(type))
+            {
+                return null;
+            }
+            if (type == typeof(int))
+            {
+                int.TryParse(vData.ToString(), out int value);
+                return value;
+            }
+            else if (type == typeof(float))
+            {
+                float.TryParse(vData.ToString(), out float value);
+                return value;
+            }
+            else if (type == typeof(decimal))
+            {
+                decimal.TryParse(vData.ToString(), out decimal value);
+                return value;
+            }
+            else if (type == typeof(string))
+            {
+                return vData.ToString();
+            }
+            else if (type == typeof(DateTime))
+            {
+                DateTime.TryParse(vData.ToString(), out DateTime value);
+                return value;
+            }
+            else if (type == typeof(TimeSpan))
+            {
+                TimeSpan.TryParse(vData.ToString(), out TimeSpan value);
+                return value;
+            }
+            else if (type == typeof(Guid))
+            {
+                Guid.TryParse(vData.ToString(), out Guid value);
+                return value;
+            }
+            return null;
         }
 
         private static IEnumerable<PropertyInfo> GetPropertyInfos(Type type,Func<IColumn,bool> func,Type ColumnType)

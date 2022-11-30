@@ -1,8 +1,11 @@
-﻿using Microsoft.Data.Sqlite;
-using NetCore.ORM.Simple.Common;
+﻿using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
 using NetCore.ORM.Simple.SqlBuilder;
+using System;
+using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
+using System.Threading.Tasks;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.DBDrive.Sqlite
@@ -83,11 +86,6 @@ namespace NetCore.ORM.Simple
             return await base.ReadAnyAsync(entity);
         }
 
-        //public override async Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params)
-        //{
-        //    Open(entity);
-        //    return await base.ReadAsync<TResult>(sql, Params);
-        //}
 
         public override async Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity)
         {

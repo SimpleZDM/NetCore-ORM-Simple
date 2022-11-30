@@ -1,4 +1,7 @@
 ﻿using NetCore.ORM.Simple.Common;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -135,6 +138,7 @@ namespace NetCore.ORM.Simple.Entity
             MapEntity map = new MapEntity();
             map.TableName = Table.TableNames[Index];
             map.ColumnName = Table.GetColName(Prop);
+            map.PropertyType = Prop.PropertyType;
             if (!IsAnonymity)
             {
                 map.LastPropName = Prop.Name;
@@ -151,6 +155,7 @@ namespace NetCore.ORM.Simple.Entity
             foreach (var item in mapInfos)
             {
                 item.IsNeed = false;
+                item.Soft = 0;
             }
         }
 
@@ -732,7 +737,7 @@ namespace NetCore.ORM.Simple.Entity
         /// <summary>
         /// 
         /// </summary>
-        public List<MapEntity> MapInfos { get { return mapInfos; } private set { mapInfos = value; } }
+        public List<MapEntity> MapInfos { get { return mapInfos; }  set { mapInfos = value; } }
         public List<OrderByEntity> OrderInfos { get { return orderInfos; } set { orderInfos = value; } }
         /// <summary>
         /// 链接信息

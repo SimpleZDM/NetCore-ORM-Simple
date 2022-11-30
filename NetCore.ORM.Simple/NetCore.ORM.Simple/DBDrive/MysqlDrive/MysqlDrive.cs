@@ -1,14 +1,9 @@
-﻿using MySql.Data.MySqlClient;
-using NetCore.ORM.Simple.Common;
+﻿using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
 using NetCore.ORM.Simple.SqlBuilder;
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 /*********************************************************

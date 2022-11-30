@@ -1,4 +1,7 @@
 ﻿using NetCore.ORM.Simple.Entity;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 
 /*********************************************************
@@ -87,6 +90,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
              entity.LastAnonymity=select.LastAnonymity;
              entity.LastType=select.LastType;
              entity.DyToMap = select.DyToMap;
+             select.MapInfos = select.MapInfos.OrderBy(m=>m.Soft).ToList();
             sqlBuilder.GetSelect<TData>(select, entity);
 
         }

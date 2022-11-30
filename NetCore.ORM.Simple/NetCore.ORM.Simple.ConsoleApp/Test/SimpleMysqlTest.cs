@@ -176,6 +176,19 @@ namespace NetCore.ORM.Simple.ConsoleApp
 
         public void QueryTest()
         {
+
+            var myobj = new { Name = "sd", Age = 10 };
+            var type= myobj.GetType();
+            var arr=type.GetFields();
+            var arr1=type.GetProperties();
+            var o=Activator.CreateInstance(type,"d",10);
+           var fdata=client.Queryable<UserEntity,RoleEntity>
+                ((u,r)=>new JoinInfoEntity(eJoinType.Inner,u.RoleId==r.Id))
+                .GroupBy(u=>u.RoleId).Select(u=> new 
+                { Name = u.FirstOrDefault(f => f.Name),
+                    RoleId = u.Key,
+                  GID=u.FirstOrDefault(f=>f.gIdColumn)}).ToList();
+
             int i = 1000;
             int j = 2000;
             //var JoinData = client.Queryable<UserEntity, RoleEntity, CompanyEntity>(
@@ -362,6 +375,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 //Console.WriteLine($"*****************受影响行数:{result1}****************");
                 // Console.WriteLine($"*****************受影响行数:{result2}****************");
                 Console.WriteLine("****************测试结束*****************");
+                var obj = new { sdfs=1};
             }
             catch (Exception ex)
             {
