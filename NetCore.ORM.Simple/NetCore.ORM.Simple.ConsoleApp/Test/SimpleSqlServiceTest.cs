@@ -1,7 +1,9 @@
-﻿using NetCore.ORM.Simple.Common;
+﻿using MySql.Data.MySqlClient;
+using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +24,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
         ISimpleClient client;
         public SimpleSqlServiceTest()
         {
+            DataBaseConfiguration.DBDrives.Add(eDBType.SqlService, Tuple.Create(typeof(SqlConnection), typeof(SqlParameter)));
             client = new SimpleClient(
           new DataBaseConfiguration(false,
           new ConnectionEntity("Data Source = localhost;Initial Catalog = testdb;User Id = sa;Password = 123456;")

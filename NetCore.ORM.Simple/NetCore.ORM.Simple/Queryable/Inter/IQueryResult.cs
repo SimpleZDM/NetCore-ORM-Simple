@@ -19,33 +19,33 @@ namespace NetCore.ORM.Simple.Queryable
 {
     public interface IQueryResult<TResult>
     { 
-        public IQueryResult<TResult> Skip(int Number);
-        public IQueryResult<TResult> Take(int Number);
-        public IQueryResult<TResult> ToPage(int takeNumber, int skipNumber);
-        public List<TResult> ToList();
-        public Task<List<TResult>> ToListAsync();
-        public IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<TResult,TNewResult>> expression) where TNewResult : class;
-        public IQueryResult<TResult> Select(Expression<Func<TResult,TResult>> expression);
-        public IQueryResult<TResult> Where(Expression<Func<TResult,bool>>expression);
-        public IQueryResult<TResult> OrderBy<TOrder>(Expression<Func<TResult, TOrder>> expression);
-        public  IQueryResult<TResult> OrderByDescending<TOrder>(Expression<Func<TResult, TOrder>> expression);
-        public ISimpleGroupByQueryable<TResult, TGroup> GroupBy<TGroup>(Expression<Func<TResult, TGroup>> expression);
+         IQueryResult<TResult> Skip(int Number);
+         IQueryResult<TResult> Take(int Number);
+         IQueryResult<TResult> ToPage(int takeNumber, int skipNumber);
+         List<TResult> ToList();
+         Task<List<TResult>> ToListAsync();
+         IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<TResult,TNewResult>> expression) where TNewResult : class;
+         IQueryResult<TResult> Select(Expression<Func<TResult,TResult>> expression);
+         IQueryResult<TResult> Where(Expression<Func<TResult,bool>>expression);
+         IQueryResult<TResult> OrderBy<TOrder>(Expression<Func<TResult, TOrder>> expression);
+          IQueryResult<TResult> OrderByDescending<TOrder>(Expression<Func<TResult, TOrder>> expression);
+         ISimpleGroupByQueryable<TResult, TGroup> GroupBy<TGroup>(Expression<Func<TResult, TGroup>> expression);
 
-        public int Count();
+         int Count();
        
-        public bool Any();
+         bool Any();
         
-        public  Task<int> CountAsync();
+          Task<int> CountAsync();
        
-        public  Task<bool> AnyAsync();
+          Task<bool> AnyAsync();
        
-        public TResult First();
+         TResult First();
        
-        public  Task<TResult> FirstAsync();
+          Task<TResult> FirstAsync();
        
-        public TResult FirstOrDefault();
+         TResult FirstOrDefault();
        
-        public  Task<TResult> FirstOrDefaultAsync();
+          Task<TResult> FirstOrDefaultAsync();
 
 
 

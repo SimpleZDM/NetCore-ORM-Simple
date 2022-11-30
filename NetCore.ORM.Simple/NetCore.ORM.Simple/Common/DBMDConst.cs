@@ -77,6 +77,7 @@ namespace NetCore.ORM.Simple.Common
             Percent = '%';
             SingleQuotes = '\'';
             Dot = '.';
+            ExclamationMark = '!';
 
 
             #endregion
@@ -155,9 +156,24 @@ namespace NetCore.ORM.Simple.Common
         public static char UnSingleQuotes;
         public static char GreaterThan;
         public static char LessThan;
+        /// <summary>
+        /// 百分号
+        /// </summary>
         public static char Percent;
+        /// <summary>
+        /// 单引号
+        /// </summary>
         public static char SingleQuotes;
+        /// <summary>
+        /// 点
+        /// </summary>
         public static char Dot;
+        /// <summary>
+        /// 谈好
+        /// </summary>
+        public static char ExclamationMark;
+
+
         #endregion
 
         #region method

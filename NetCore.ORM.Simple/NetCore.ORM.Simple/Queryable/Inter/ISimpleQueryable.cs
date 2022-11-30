@@ -18,7 +18,7 @@ namespace NetCore.ORM.Simple.Queryable
 {
     public interface ISimpleQueryable<T>:IQueryResult<T> where T : class
     {
-        public ISimpleQueryable<T> SimpleQueryable();
+        ISimpleQueryable<T> SimpleQueryable();
         
     }
 }

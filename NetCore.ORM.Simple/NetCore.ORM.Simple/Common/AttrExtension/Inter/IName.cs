@@ -17,7 +17,7 @@ namespace NetCore.ORM.Simple.Common
 {
     public interface IName
     {
-        public string GetName();
+         string GetName();
         
     }
 }

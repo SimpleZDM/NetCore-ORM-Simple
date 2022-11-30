@@ -19,16 +19,16 @@ namespace NetCore.ORM.Simple.SqlBuilder
 {
     public interface ISqlBuilder
     {
-        public SqlCommandEntity GetInsert<TData>(TData data, int random );
+         SqlCommandEntity GetInsert<TData>(TData data, int random );
         /// <summary>
         /// 批量插入生成sql语句
         /// </summary>
         /// <typeparam name="TData"></typeparam>
         /// <param name="datas"></param>
         /// <returns></returns>
-        public SqlCommandEntity GetInsert<TData>(List<TData> datas,int offset);
-        public SqlCommandEntity GetUpdate<TData>(TData data,int random);
-        public SqlCommandEntity GetUpdate<TData>(List<TData> datas, int offset);
+         SqlCommandEntity GetInsert<TData>(List<TData> datas,int offset);
+         SqlCommandEntity GetUpdate<TData>(TData data,int random);
+         SqlCommandEntity GetUpdate<TData>(List<TData> datas, int offset);
 
 
         
@@ -41,24 +41,24 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="joinInfos">连接部分</param>
         /// <param name="condition">条件部分</param>
         /// <returns></returns>
-        public void GetSelect<TData>(SelectEntity select,QueryEntity entity);
+         void GetSelect<TData>(SelectEntity select,QueryEntity entity);
 
-        public SqlCommandEntity GetDelete(Type type, List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions);
+         SqlCommandEntity GetDelete(Type type, List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions);
 
-        public SqlCommandEntity GetDelete<TData>(TData data,int random);
+         SqlCommandEntity GetDelete<TData>(TData data,int random);
 
-        public SqlCommandEntity GetInsert(string sql, Dictionary<string, object> Params);
+         SqlCommandEntity GetInsert(string sql, Dictionary<string, object> Params);
 
-        public  SqlCommandEntity GetUpdate(string sql, Dictionary<string, object> Params);
+          SqlCommandEntity GetUpdate(string sql, Dictionary<string, object> Params);
 
-        public SqlCommandEntity GetDelete(string sql, Dictionary<string, object> Params);
+         SqlCommandEntity GetDelete(string sql, Dictionary<string, object> Params);
 
 
-        public QueryEntity GetSelect(string sql, Dictionary<string, object> Params);
+         QueryEntity GetSelect(string sql, Dictionary<string, object> Params);
         
 
-        public void GetLastInsert<TData>(QueryEntity sql);
-        public  void GetCount(SelectEntity select, QueryEntity entity);
-        public  void SetAttr(Type Table = null, Type Column = null);
+         void GetLastInsert<TData>(QueryEntity sql);
+          void GetCount(SelectEntity select, QueryEntity entity);
+          void SetAttr(Type Table = null, Type Column = null);
     }
 }

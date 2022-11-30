@@ -1,14 +1,15 @@
-﻿using System;
+﻿using NetCore.ORM.Simple.Entity;
+using NetCore.ORM.Simple.Queryable;
+using NetCore.ORM.Simple.SqlBuilder;
+using NetCore.ORM.Simple.Visitor;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using System.Xml;
-using NetCore.ORM.Simple.Entity;
-using NetCore.ORM.Simple.Queryable;
-using NetCore.ORM.Simple.SqlBuilder;
-using NetCore.ORM.Simple.Visitor;
+
 
 
 /*********************************************************
@@ -74,6 +75,7 @@ namespace NetCore.ORM.Simple
         {
             dbDrive.AOPSqlLog = action;
         }
+
 
         public void SetAttr(Type Table=null,Type Column=null)
         {

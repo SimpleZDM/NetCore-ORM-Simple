@@ -59,7 +59,7 @@ namespace NetCore.ORM.Simple.Visitor
             return node;
         }
 
-        protected override LabelTarget? VisitLabelTarget(LabelTarget? node)
+        protected override LabelTarget VisitLabelTarget(LabelTarget node)
         {
             base.VisitLabelTarget(node);
             return node;

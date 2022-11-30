@@ -27,19 +27,20 @@ namespace NetCore.ORM.Simple
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public ISimpleCommand<TEntity> Insert<TEntity>(TEntity entity) where TEntity : class, new();
-        public ISimpleCommand<TEntity> Insert<TEntity>(List<TEntity> entitys) where TEntity : class, new();
-        public ISimpleCommand<TEntity> Insert<TEntity>(string sql, Dictionary<string, object> Params) where TEntity : class, new();
+         ISimpleCommand<TEntity> Insert<TEntity>(TEntity entity) where TEntity : class, new();
+         ISimpleCommand<TEntity> Insert<TEntity>(List<TEntity> entitys) where TEntity : class, new();
+         ISimpleCommand<TEntity> Insert<TEntity>(string sql, Dictionary<string, object> Params) where TEntity : class, new();
 
         /// <summary>
         /// 更新
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="entity"></param>
-        public ISimpleCommand<TEntity> Update<TEntity>(TEntity entity) where TEntity : class, new();
-        public ISimpleCommand<TEntity> Update<TEntity>(List<TEntity> entitys) where TEntity : class, new();
+        /// 
+         ISimpleCommand<TEntity> Update<TEntity>(TEntity entity) where TEntity : class, new();
+         ISimpleCommand<TEntity> Update<TEntity>(List<TEntity> entitys) where TEntity : class, new();
 
-        public ISimpleCommand<TEntity> Update<TEntity>(string sql, Dictionary<string, object> Params) where TEntity : class, new();
+         ISimpleCommand<TEntity> Update<TEntity>(string sql, Dictionary<string, object> Params) where TEntity : class, new();
 
         /// <summary>
         /// 删除
@@ -47,9 +48,9 @@ namespace NetCore.ORM.Simple
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="expression"></param>
 
-        public ISimpleCommand<TEntity> Delete<TEntity>(Expression<Func<TEntity, bool>> expression) where TEntity : class, new();
-        public ISimpleCommand<TEntity> Delete<TEntity>(TEntity entity) where TEntity : class, new();
-        public ISimpleCommand<TEntity> Delete<TEntity>(string sql, Dictionary<string, object> Params) where TEntity : class, new();
+         ISimpleCommand<TEntity> Delete<TEntity>(Expression<Func<TEntity, bool>> expression) where TEntity : class, new();
+         ISimpleCommand<TEntity> Delete<TEntity>(TEntity entity) where TEntity : class, new();
+         ISimpleCommand<TEntity> Delete<TEntity>(string sql, Dictionary<string, object> Params) where TEntity : class, new();
 
         /// <summary>
         /// 查询
@@ -59,71 +60,71 @@ namespace NetCore.ORM.Simple
         /// 
 
 
-        public IEnumerable<TEntity> Read<TEntity>(string sql, Dictionary<string, object> Params) where TEntity : class, new();
+         IEnumerable<TEntity> Read<TEntity>(string sql, Dictionary<string, object> Params) where TEntity : class, new();
 
-        public Task<IEnumerable<TEntity>> ReadAsync<TEntity>(string sql, Dictionary<string, object> Params) where TEntity : class, new();
+         Task<IEnumerable<TEntity>> ReadAsync<TEntity>(string sql, Dictionary<string, object> Params) where TEntity : class, new();
 
-        public Task<TEntity> FirstOrDefaultAsync<TEntity>(string sql, Dictionary<string, object> Params) where TEntity : class, new();
+         Task<TEntity> FirstOrDefaultAsync<TEntity>(string sql, Dictionary<string, object> Params) where TEntity : class, new();
         
-        public TEntity FirstOrDefault<TEntity>(string sql, Dictionary<string, object> Params) where TEntity : class, new();
+         TEntity FirstOrDefault<TEntity>(string sql, Dictionary<string, object> Params) where TEntity : class, new();
         
-        public ISimpleQueryable<T1> Queryable<T1>() where T1 : class, new();
+         ISimpleQueryable<T1> Queryable<T1>() where T1 : class, new();
 
-        public ISimpleQueryable<T1, T2> Queryable<T1, T2>(Expression<Func<T1, T2, JoinInfoEntity>> expression) where T1 : class;
+         ISimpleQueryable<T1, T2> Queryable<T1, T2>(Expression<Func<T1, T2, JoinInfoEntity>> expression) where T1 : class;
 
 
-        public ISimpleQueryable<T1, T2, T3> Queryable<T1, T2, T3>(Expression<Func<T1, T2, T3, JoinInfoEntity>> expression) where T1 : class;
+         ISimpleQueryable<T1, T2, T3> Queryable<T1, T2, T3>(Expression<Func<T1, T2, T3, JoinInfoEntity>> expression) where T1 : class;
        
-        public ISimpleQueryable<T1, T2, T3, T4> Queryable<T1, T2, T3, T4>(Expression<Func<T1, T2, T3, T4, JoinInfoEntity>> expression) where T1 : class;
-        public ISimpleQueryable<T1, T2, T3, T4, T5> Queryable<T1, T2, T3, T4, T5>(Expression<Func<T1, T2, T3, T4, T5, JoinInfoEntity>> expression) where T1 : class;
+         ISimpleQueryable<T1, T2, T3, T4> Queryable<T1, T2, T3, T4>(Expression<Func<T1, T2, T3, T4, JoinInfoEntity>> expression) where T1 : class;
+         ISimpleQueryable<T1, T2, T3, T4, T5> Queryable<T1, T2, T3, T4, T5>(Expression<Func<T1, T2, T3, T4, T5, JoinInfoEntity>> expression) where T1 : class;
 
 
-        public ISimpleQueryable<T1, T2, T3, T4, T5, T6> Queryable<T1, T2, T3, T4, T5, T6>(Expression<Func<T1, T2, T3, T4, T5, T6, JoinInfoEntity>> expression) where T1 : class;
+         ISimpleQueryable<T1, T2, T3, T4, T5, T6> Queryable<T1, T2, T3, T4, T5, T6>(Expression<Func<T1, T2, T3, T4, T5, T6, JoinInfoEntity>> expression) where T1 : class;
         
-        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7> Queryable<T1, T2, T3, T4, T5, T6, T7>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, JoinInfoEntity>> expression) where T1 : class;
+         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7> Queryable<T1, T2, T3, T4, T5, T6, T7>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, JoinInfoEntity>> expression) where T1 : class;
         
-        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8> Queryable<T1, T2, T3, T4, T5, T6, T7, T8>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, JoinInfoEntity>> expression) where T1 : class;
+         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8> Queryable<T1, T2, T3, T4, T5, T6, T7, T8>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, JoinInfoEntity>> expression) where T1 : class;
         
-        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9> Queryable<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, JoinInfoEntity>> expression) where T1 : class;
+         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9> Queryable<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, JoinInfoEntity>> expression) where T1 : class;
 
 
-        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> Queryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, JoinInfoEntity>> expression) where T1 : class;
+         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> Queryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, JoinInfoEntity>> expression) where T1 : class;
        
-        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> Queryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, JoinInfoEntity>> expression) where T1 : class;
+         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> Queryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, JoinInfoEntity>> expression) where T1 : class;
         
-        public ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Queryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, JoinInfoEntity>> expression) where T1 : class;
+         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Queryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, JoinInfoEntity>> expression) where T1 : class;
 
         /// <summary>
         /// 保存
         /// </summary>
         /// <returns></returns>
-        public Task<int> SaveChangeAsync();
+         Task<int> SaveChangeAsync();
 
-        public int SaveChange();
+         int SaveChange();
 
         /// <summary>
         /// 设置
         /// </summary>
         /// <param name="action"></param>
-        public void SetAOPLog(Action<string,DbParameter[]> action);
+         void SetAOPLog(Action<string,DbParameter[]> action);
 
-        public void SetAttr(Type Table = null, Type Column = null);
+         void SetAttr(Type Table = null, Type Column = null);
         /// <summary>
         /// 事务
         /// </summary>
 
-        public void BeginTransaction();
+         void BeginTransaction();
 
-        public  Task BeginTransactionAsync();
+          Task BeginTransactionAsync();
 
-        public void Commit();
+         void Commit();
 
-        public  Task CommitAsync();
+          Task CommitAsync();
 
 
-        public void RollBack();
+         void RollBack();
 
-        public  Task RollBackAsync();
+          Task RollBackAsync();
 
         //public List<T1> GetEntity<T, T1>(T t, Expression<Func<T, T1>> expression);
 

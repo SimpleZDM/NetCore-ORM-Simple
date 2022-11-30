@@ -4,7 +4,6 @@ using NetCore.ORM.Simple.SqlBuilder;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -38,10 +37,10 @@ namespace NetCore.ORM.Simple
                 return 0;
             }
             Open(sqlCommand[0]);
-            return base.Excute(sqlCommand,SqlServiceConst.INSERTMAXCOUNT);
+            return base.Excute(sqlCommand,DataBaseConfiguration.INSERTMAXCOUNT);
         }
 
-        public override TEntity Excute<TEntity>(SqlCommandEntity entity,string query) where TEntity : class
+        public override TEntity Excute<TEntity>(SqlCommandEntity entity,string query) 
         {
             Open(entity);
            return base.Excute<TEntity>(entity, query);
@@ -60,10 +59,10 @@ namespace NetCore.ORM.Simple
                 return 0;
             }
             Open(sqlCommand[0]);
-            return await base.ExcuteAsync(sqlCommand,SqlServiceConst.INSERTMAXCOUNT);
+            return await base.ExcuteAsync(sqlCommand,DataBaseConfiguration.INSERTMAXCOUNT);
         }
 
-        public override async Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
+        public override async Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) 
         {
             Open(entity);
             return await ExcuteAsync<TEntity>(entity, query);
@@ -125,7 +124,7 @@ namespace NetCore.ORM.Simple
         /// </summary>
         protected  void Open(SqlBase entity)
         {
-            SetCurrentConnection(entity.DbCommandType);
+            SetCurrentConnection(entity.DbCommandType,isBeginTransaction);
             base.Open();
         }
     

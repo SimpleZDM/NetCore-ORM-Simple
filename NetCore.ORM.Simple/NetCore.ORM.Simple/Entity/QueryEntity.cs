@@ -1,6 +1,7 @@
 ﻿using NetCore.ORM.Simple.Common;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
@@ -24,14 +25,12 @@ namespace NetCore.ORM.Simple.Entity
     {
         public QueryEntity()
         {
-            DyToMap = new List<dynamic>();
             PageSize = 0;
             PageNumber = 1;
             DbCommandType = eDbCommandType.Query;
         }
         public QueryEntity(string sql)
         {
-            DyToMap = new List<dynamic>();
             PageSize = 0;
             PageNumber = 1;
             DbCommandType = eDbCommandType.Query;
@@ -74,13 +73,8 @@ namespace NetCore.ORM.Simple.Entity
         ///映射信息
         /// </summary>
         public MapEntity[] MapInfos { get { return mapInfos; } set { mapInfos = value; } }
-        /// <summary>
-        ///映射
-        /// </summary>
-        public List<dynamic> DyToMap { get { return dyToMap; } set { dyToMap = value; } }
 
-        public Dictionary<string, Type> LastType { get { return lastType; } set { lastType = value; } }
-
+      
 
 
         //public Type 
@@ -89,69 +83,83 @@ namespace NetCore.ORM.Simple.Entity
         /// </summary>
         public bool LastAnonymity { get { return lastAnonymity; } set { lastAnonymity = value; } }
 
-        public TResult GetResult<TResult>(params object[] objs)
-        {
-            object obj = GetResult<TResult>(DyToMap[0], objs);
+        [Obsolete]
+        /// <summary>
+        /// 方法已被弃用
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="objs"></param>
+        /// <returns></returns>
+        //public TResult GetResult<TResult>(params object[] objs)
+        //{
+        //    object obj = GetResult<TResult>(DyToMap[0], objs);
 
-            for (int i = 1; i < DyToMap.Count; i++)
-            {
+        //    for (int i = 1; i < DyToMap.Count; i++)
+        //    {
 
-                obj = DyToMap[i].Invoke(obj);
-            }
-            return (TResult)obj;
-        }
-        public object GetResult<TResult>(dynamic func, object[] objs)
-        {
-            try
-            {
-                if (lastType.Count > objs.Count())
-                {
-                    throw new Exception();
-                }
-                switch (LastType.Count)
-                {
-                    case 1:
-                        var a = func.Invoke((dynamic)objs[0]);
-                        return a;
-                    case 2:
-                        return func.Invoke((dynamic)objs[0], (dynamic)objs[1]);
-                    case 3:
-                        return func.Invoke((dynamic)objs[0], (dynamic)objs[1], (dynamic)objs[2]);
-                    case 4:
-                        return func.Invoke((dynamic)objs[0], (dynamic)objs[1], (dynamic)objs[2], (dynamic)objs[3]);
-                    case 5:
-                        return func.Invoke((dynamic)objs[0], (dynamic)objs[1], (dynamic)objs[2], (dynamic)objs[3], (dynamic)objs[4]);
-                    case 6:
-                        return func.Invoke((dynamic)objs[0], (dynamic)objs[1], (dynamic)objs[2], (dynamic)objs[3], (dynamic)objs[4], (dynamic)objs[5]);
-                    case 7:
-                        return func.Invoke((dynamic)objs[0], (dynamic)objs[1], (dynamic)objs[2], (dynamic)objs[3], (dynamic)objs[4], (dynamic)objs[5], (dynamic)objs[6]);
-                    case 8:
-                        return func.Invoke((dynamic)objs[0], (dynamic)objs[1], (dynamic)objs[2], (dynamic)objs[3], (dynamic)objs[4], (dynamic)objs[5], (dynamic)objs[6], (dynamic)objs[7]);
-                    case 9:
-                        return func.Invoke((dynamic)objs[0], (dynamic)objs[1], (dynamic)objs[2], (dynamic)objs[3], (dynamic)objs[4], (dynamic)objs[5], (dynamic)objs[6], (dynamic)objs[7], (dynamic)objs[8]);
-                    case 10:
-                        return func.Invoke((dynamic)objs[0], (dynamic)objs[1], (dynamic)objs[2], (dynamic)objs[3], (dynamic)objs[4], (dynamic)objs[5], (dynamic)objs[6], (dynamic)objs[7], (dynamic)objs[8], (dynamic)objs[9]);
-                    default:
-                        break;
-                }
-            }
-            catch (Exception)
-            {
+        //        obj = DyToMap[i].Invoke(obj);
+        //    }
+        //    return (TResult)obj;
+        //}
+        /// <summary>
+        /// 该方法已被弃用
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="func"></param>
+        /// <param name="objs"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        //[Obsolete]
+        //public object GetResult<TResult>(dynamic func, object[] objs)
+        //{
+        //    try
+        //    {
+        //        if (lastType.Count > objs.Count())
+        //        {
+        //            throw new Exception();
+        //        }
+        //        switch (LastType.Count)
+        //        {
+        //            case 1:
+        //                var a = func.Invoke((dynamic)objs[0]);
+        //                return a;
+        //            case 2:
+        //                return func.Invoke((dynamic)objs[0], (dynamic)objs[1]);
+        //            case 3:
+        //                return func.Invoke((dynamic)objs[0], (dynamic)objs[1], (dynamic)objs[2]);
+        //            case 4:
+        //                return func.Invoke((dynamic)objs[0], (dynamic)objs[1], (dynamic)objs[2], (dynamic)objs[3]);
+        //            case 5:
+        //                return func.Invoke((dynamic)objs[0], (dynamic)objs[1], (dynamic)objs[2], (dynamic)objs[3], (dynamic)objs[4]);
+        //            case 6:
+        //                return func.Invoke((dynamic)objs[0], (dynamic)objs[1], (dynamic)objs[2], (dynamic)objs[3], (dynamic)objs[4], (dynamic)objs[5]);
+        //            case 7:
+        //                return func.Invoke((dynamic)objs[0], (dynamic)objs[1], (dynamic)objs[2], (dynamic)objs[3], (dynamic)objs[4], (dynamic)objs[5], (dynamic)objs[6]);
+        //            case 8:
+        //                return func.Invoke((dynamic)objs[0], (dynamic)objs[1], (dynamic)objs[2], (dynamic)objs[3], (dynamic)objs[4], (dynamic)objs[5], (dynamic)objs[6], (dynamic)objs[7]);
+        //            case 9:
+        //                return func.Invoke((dynamic)objs[0], (dynamic)objs[1], (dynamic)objs[2], (dynamic)objs[3], (dynamic)objs[4], (dynamic)objs[5], (dynamic)objs[6], (dynamic)objs[7], (dynamic)objs[8]);
+        //            case 10:
+        //                return func.Invoke((dynamic)objs[0], (dynamic)objs[1], (dynamic)objs[2], (dynamic)objs[3], (dynamic)objs[4], (dynamic)objs[5], (dynamic)objs[6], (dynamic)objs[7], (dynamic)objs[8], (dynamic)objs[9]);
+        //            default:
+        //                break;
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
 
-                throw new Exception("分组时候不支持返回匿名对象请见谅!请返回一个固定的实体.");
-            }
+        //        throw new Exception("分组时候不支持返回匿名对象请见谅!请返回一个固定的实体.");
+        //    }
 
-            return null;
+        //    return null;
 
-        }
+        //}
 
 
         private MapEntity[] mapInfos;
         private int pageNumber;
         private int pageSize;
-        private List<dynamic> dyToMap;
         private bool lastAnonymity;
-        private Dictionary<string, Type> lastType;
 
 
     }

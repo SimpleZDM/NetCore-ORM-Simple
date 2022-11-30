@@ -1,10 +1,7 @@
-﻿using Microsoft.Data.Sqlite;
-using MySql.Data.MySqlClient;
-using NetCore.ORM.Simple.Common;
+﻿using NetCore.ORM.Simple.Common;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Text;
 
 /*********************************************************
@@ -55,25 +52,19 @@ namespace NetCore.ORM.Simple.Entity
             {
                 throw new Exception(CommonConst.GetErrorInfo(ErrorType.ParamsIsNull));
             }
-            DbParameter Parameter = null;
-            switch (DbType)
-            {
-                case eDBType.Mysql:
-                    Parameter = new MySqlParameter(key, value);
-                    break;
-                case eDBType.SqlService:
-                    Parameter= new SqlParameter(key,value);
-                    break;
-                case eDBType.Sqlite:
-                    Parameter = new SqliteParameter(key, value);
-                    break;
-                default:
-                    throw new Exception("不支持添加该类型的参数!");
-            }
+            DbParameter Parameter =DataBaseConfiguration.CreateDBParameter(DbType,key,value);
             DbParams.Add(Parameter);
         }
 
-
+        public void AddParameter(DbParameter Params)
+        {
+            if (Check.IsNull(Params))
+            {
+                throw new Exception(CommonConst.GetErrorInfo(ErrorType.ParamsIsNull));
+            }
+           
+            DbParams.Add(Params);
+        }
         private List<DbParameter> dbParams;
         private StringBuilder strSqlValue;
         private eDbCommandType dbCommandType;

@@ -23,7 +23,6 @@ namespace NetCore.ORM.Simple.Common
         {
             Anonymity = "<>f__AnonymousType";
 
-            cStrSign =new string[] { "(", ")", "=", ">=", "<=", ">", "<", "AND", "OR", "<>" };
 
             ErrorDescriptions = new string[]
                     {"错误!",
@@ -43,16 +42,18 @@ namespace NetCore.ORM.Simple.Common
                 };
             StrDataCount = "SimpleNumber";
 
-            SqlMainWord = new string[]
-            {
-                "INSERT","INTO", "VALUE","VALUES",
-                "UPDATE","SET","WHERE","DELETE",
-                "FROM","SELECT","AS","ORDER","BY",
-                "GROUP","LIMIT","TOP","SimpleTable",
-                "NoIndex","OFFSET","SkipNumber","TakeNumber",
-                "COUNT","@","SimpleNumber"
-
-            };
+            SystemDateTimeNow ="System.DateTime Now";
+            SystemDateTimeMaxValue= "System.DateTime MaxValue";
+            SystemDateTimeMinValue= "System.DateTime MinValue";
+            SystemGuidEmpty= "System.Guid Empty";
+            SystemintMaxValue= "System.int MaxValue";
+            SystemintMinValue = "System.int MinValue";
+            SystemdoubleMinValue = "System.double MinValue";
+            SystemdoubleMaxValue = "System.double MaxValue";
+            SystemfloatMaxValue = "System.float MaxValue";
+            SystemfloatMinValue = "System.float MinValue";
+            SystemdecimalMinValue = "System.decimal MinValue";
+            SystemdecimalMaxValue = "System.decimal MaxValue";
         }
         /// <summary>
         /// 判断是否是匿名对象的标记
@@ -60,11 +61,9 @@ namespace NetCore.ORM.Simple.Common
         
         private static string Anonymity;
 
-        public static string[] cStrSign;
 
         private static string[] ErrorDescriptions;
 
-        private static string[] SqlMainWord;
 
         public static int Zero=0;
         public static int One=1;
@@ -103,14 +102,7 @@ namespace NetCore.ORM.Simple.Common
             return ErrorDescriptions[0];
         }
 
-        public static string GetMainWordStr(this MainWordType type)
-        {
-            if ((int)type <= SqlMainWord.Length)
-            {
-                return SqlMainWord[(int)type];
-            }
-            return SqlMainWord[0];
-        }
+       
         public static eDataType GetType(Type type)
         {
             eDataType dataType = eDataType.NuKnow;
@@ -191,6 +183,20 @@ namespace NetCore.ORM.Simple.Common
             }
             return dataType;
         }
+
+
+        public static string SystemDateTimeNow;
+        public static string SystemDateTimeMaxValue;
+        public static string SystemDateTimeMinValue;
+        public static string SystemGuidEmpty;
+        public static string SystemintMaxValue;
+        public static string SystemintMinValue;
+        public static string SystemdoubleMinValue;
+        public static string SystemdoubleMaxValue;
+        public static string SystemfloatMaxValue;
+        public static string SystemfloatMinValue;
+        public static string SystemdecimalMinValue;
+        public static string SystemdecimalMaxValue;
     }
     public enum ErrorType
     {
@@ -202,35 +208,12 @@ namespace NetCore.ORM.Simple.Common
         ParamsIsNull
     }
 
-    public enum MainWordType
-    {
-        Insert= 0,
-        Into,
-        Value,
-        Values,
-        Update,
-        Set,
-        Where,
-        Delete,
-        From,
-        Select,
-        As,
-        Order,
-        By,
-        Group,
-        Limit,
-        Top,
-        SimpleTable,//用于sqlService 表的别名
-        NoIndex,//数据的行号
-        Offset,
-        SkipNumber,
-        TakeNumber,
-        Count,
-        AT,
-        SimpleNumber//作为count的映射值
-    }
-
+    
 
 
     
+
+
+
+
 }

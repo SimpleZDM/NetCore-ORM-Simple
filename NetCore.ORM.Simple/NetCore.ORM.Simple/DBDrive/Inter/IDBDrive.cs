@@ -19,16 +19,16 @@ namespace NetCore.ORM.Simple
 {
     public interface IDBDrive:IDisposable
     {
-        public Action<string,DbParameter[]> AOPSqlLog { get; set; }
-        public Task BeginTransactionAsync(); 
-        public void BeginTransaction(); 
-        public Task CommitAsync();
-        public void Commit();
+         Action<string,DbParameter[]> AOPSqlLog { get; set; }
+         Task BeginTransactionAsync(); 
+         void BeginTransaction(); 
+         Task CommitAsync();
+         void Commit();
 
-        public  Task RollBackAsync();
-        public  void RollBack();
+          Task RollBackAsync();
+          void RollBack();
 
-        public  Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params);
+          Task<IEnumerable<TResult>> ReadAsync<TResult>(string sql, params DbParameter[] Params);
        
         /// <summary>
         /// 
@@ -37,23 +37,23 @@ namespace NetCore.ORM.Simple
         /// <param name="sql"></param>
         /// <param name="Params"></param>
         /// <returns></returns>
-        public  Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity);
+          Task<IEnumerable<TResult>> ReadAsync<TResult>(QueryEntity entity);
         
-        public IEnumerable<TResult> Read<TResult>(QueryEntity entity) ;
+         IEnumerable<TResult> Read<TResult>(QueryEntity entity) ;
 
-        public TResult ReadFirstOrDefault<TResult>(QueryEntity entity);
+         TResult ReadFirstOrDefault<TResult>(QueryEntity entity);
         
-        public  Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity);
+         Task<TResult> ReadFirstOrDefaultAsync<TResult>(QueryEntity entity);
         
-        public int ReadCount(QueryEntity entity);
+         int ReadCount(QueryEntity entity);
        
 
-        public  Task<int> ReadCountAsync(QueryEntity entity);
+          Task<int> ReadCountAsync(QueryEntity entity);
         
 
-        public  Task<bool> ReadAnyAsync(QueryEntity entity);
+          Task<bool> ReadAnyAsync(QueryEntity entity);
         
-        public bool ReadAny(QueryEntity entity);
+         bool ReadAny(QueryEntity entity);
        
 
 
@@ -63,11 +63,11 @@ namespace NetCore.ORM.Simple
         /// <param name="sql"></param>
         /// <param name=""></param>
         /// <returns></returns>
-        public  Task<int> ExcuteAsync(SqlCommandEntity entity);
-        public  int Excute(SqlCommandEntity entity);
+          Task<int> ExcuteAsync(SqlCommandEntity entity);
+          int Excute(SqlCommandEntity entity);
 
-        public  Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand);
-        public  int Excute(SqlCommandEntity[] sqlCommand);
+          Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand);
+          int Excute(SqlCommandEntity[] sqlCommand);
 
 
         /// <summary>
@@ -77,9 +77,9 @@ namespace NetCore.ORM.Simple
         /// <param name="sql"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public  Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class;
-        public TEntity Excute<TEntity>(SqlCommandEntity entity, string query) where TEntity : class;
-        public void SetAttr(Type Table = null, Type Column = null);
+          Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class;
+         TEntity Excute<TEntity>(SqlCommandEntity entity, string query) where TEntity : class;
+         void SetAttr(Type Table = null, Type Column = null);
 
     }
 }

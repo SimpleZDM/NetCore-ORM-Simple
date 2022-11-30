@@ -17,8 +17,8 @@ namespace NetCore.ORM.Simple.Common
 {
     public interface IColumn:IName
     {
-        public bool Key { get; set; }
-        public bool AutoIncrease { get; set; }
-        public bool Ignore { get; set; }
+         bool Key { get; set; }
+         bool AutoIncrease { get; set; }
+         bool Ignore { get; set; }
     }
 }

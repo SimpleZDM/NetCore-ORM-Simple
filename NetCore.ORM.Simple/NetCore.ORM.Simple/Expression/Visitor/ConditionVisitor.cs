@@ -277,6 +277,7 @@ namespace NetCore.ORM.Simple.Visitor
                     if (!Check.IsNull(currentTree))
                     {
                         currentTree.IsNot = true;
+                        IsComplete = true;
                     }
                     break;
                 case ExpressionType.NotEqual:

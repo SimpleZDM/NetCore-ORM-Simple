@@ -11,8 +11,8 @@ public static class Program
     public static int Main(string []args)
     {
 
-          //object o1 = new { UserName = 11 };
-          //var b =Activator.CreateInstance(o1.GetType());
+        //object o1 = new { UserName = 11 };
+        //var b =Activator.CreateInstance(o1.GetType());
 
         //Anonymity anonymity = new Anonymity();
 
@@ -53,20 +53,23 @@ public static class Program
         //Console.WriteLine(typeof(List<object>).Name);
         //Console.WriteLine(typeof(object[]).Name);
 
-        SimpleExpressionTest test = new SimpleExpressionTest();
+        //SimpleExpressionTest test = new SimpleExpressionTest();
         ////test.Select();
-        test.Where();
-       // SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
+        //test.Where();
+        // SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
         // SimpleExpressionTest test = new SimpleExpressionTest();
         //test.Select();
         // test.Where();
+
         SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
-        //MysqlTest.MoreQuerTest();
-        //MysqlTest.sqlTest();
-        //MysqlTest.InsertTest();
-        //MysqlTest.UpdateTest();
-        //MysqlTest.DeleteTest();
-         MysqlTest.QueryTest();
+        MysqlTest.MoreQuerTest();
+        MysqlTest.sqlTest();
+        MysqlTest.InsertTest();
+        MysqlTest.UpdateTest();
+        MysqlTest.DeleteTest();
+        Console.WriteLine();
+        MysqlTest.QueryTest();
+        MysqlTest.Transaction();
 
         //SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
         //sqliteTest.InsertTest();

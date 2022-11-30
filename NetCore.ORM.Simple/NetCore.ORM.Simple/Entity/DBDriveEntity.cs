@@ -1,9 +1,6 @@
-﻿using Microsoft.Data.Sqlite;
-using MySql.Data.MySqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,10 +18,10 @@ namespace NetCore.ORM.Simple.Entity
 {
     public class DBDriveEntity
     {
-        public DBDriveEntity(DbConnection connection,DbCommand command,string name)
+        public DBDriveEntity(DbConnection connection, DbCommand command, string name)
         {
             Connection = connection;
-            Command=command;
+            Command = command;
             Name = name;
         }
         /// <summary>
@@ -33,27 +30,11 @@ namespace NetCore.ORM.Simple.Entity
         public string Name { get { return name; } set { name = value; } }
         public DBDriveEntity(ConnectionEntity configuration)
         {
-            switch (configuration.DBType)
-            {
-                case eDBType.Mysql:
-                    Connection = new MySqlConnection(configuration.ConnectStr);
-                    command=new MySqlCommand();
-                    command.Connection = Connection;
-                    break;
-                case eDBType.SqlService:
-                    Connection = new SqlConnection(configuration.ConnectStr);
-                    command = new SqlCommand();
-                    command.Connection = Connection;
-                    break;
-                case eDBType.Sqlite:
-                    Connection = new SqliteConnection(configuration.ConnectStr);
-                    command=new SqliteCommand();
-                    command.Connection = Connection;
-                    break;
-                default:
-                    break;
-            }
-            Name=configuration.Name;
+            Connection = DataBaseConfiguration.CreateDBConnection(configuration);
+            Command = Connection.CreateCommand();
+            Name = configuration.Name;
+            WriteOrReadType = configuration.WriteReadType;
+
         }
         /// <summary>
         /// 读取
@@ -71,12 +52,14 @@ namespace NetCore.ORM.Simple.Entity
         /// 命令
         /// </summary>
         public DbCommand Command { get { return command; } set { command = value; } }
+        public eWriteOrReadType WriteOrReadType { get { return writeOrReadType; } set { writeOrReadType = value; } }
 
         private DbDataReader dataRead;
         private DbConnection connection;
         private DbTransaction transaction;
         private DbCommand command;
         private string name;
+        private eWriteOrReadType writeOrReadType;
 
     }
 }

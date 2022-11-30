@@ -641,47 +641,77 @@ namespace NetCore.ORM.Simple.Entity
         {
 
             ConditionEntity condition=null;//new ConditionEntity(eConditionType.Constant);
-            if (member.ToString().Equals("System.DateTime.Now"))
+            if (member.ToString()==CommonConst.SystemDateTimeNow)
             {
                 condition=GetCondition(eConditionType.Constant);
                 condition.DisplayName = DateTime.Now.ToString("yyyy-MM-dd H:m:s");
                 condition.ConditionType = eConditionType.Constant;
 
             }
-            else if (member.ToString().Equals("System.DateTime.MaxValue"))
+            else if (member.ToString()==CommonConst.SystemDateTimeMaxValue)
             {
                 condition = GetCondition(eConditionType.Constant);
                 condition.DisplayName = DateTime.MaxValue.ToString("yyyy-MM-dd H:m:s");
                 condition.ConditionType = eConditionType.Constant;
             }
-            else if (member.ToString().Equals("System.DateTime.MinValue"))
+            else if (member.ToString()==CommonConst.SystemDateTimeMinValue)
             {
                 condition = GetCondition(eConditionType.Constant);
                 condition.DisplayName = DateTime.MinValue.ToString("yyyy-MM-dd H:m:s");
                 condition.ConditionType = eConditionType.Constant;
             }
-            else if (member.ToString().Equals("System.DateTime.MinValue"))
-            {
-                condition = GetCondition(eConditionType.Constant);
-                condition.DisplayName = DateTime.MinValue.ToString("yyyy-MM-dd H:m:s");
-                condition.ConditionType = eConditionType.Constant;
-            }
-            else if (member.ToString().Equals("System.Guid Empty"))
+            else if (member.ToString()==CommonConst.SystemGuidEmpty)
             {
                 condition = GetCondition(eConditionType.Constant);
                 condition.DisplayName = Guid.Empty.ToString();
                 condition.ConditionType = eConditionType.Constant;
             }
-            else if (member.ToString().Equals("System.int.MaxValue"))
+            else if (member.ToString()==CommonConst.SystemintMaxValue)
             {
                 condition = GetCondition(eConditionType.Constant);
                 condition.DisplayName = int.MaxValue.ToString();
                 condition.ConditionType = eConditionType.Constant;
             }
-            else if (member.ToString().Equals("System.int.MinValue"))
+            else if (member.ToString()==CommonConst.SystemintMinValue)
             {
                 condition = GetCondition(eConditionType.Constant);
                 condition.DisplayName = int.MinValue.ToString();
+                condition.ConditionType = eConditionType.Constant;
+            }
+            else if (member.ToString() == CommonConst.SystemdoubleMaxValue)
+            {
+                condition = GetCondition(eConditionType.Constant);
+                condition.DisplayName = double.MaxValue.ToString();
+                condition.ConditionType = eConditionType.Constant;
+            }
+            else if (member.ToString() == CommonConst.SystemdoubleMinValue)
+            {
+                condition = GetCondition(eConditionType.Constant);
+                condition.DisplayName = double.MinValue.ToString();
+                condition.ConditionType = eConditionType.Constant;
+            }
+            else if (member.ToString() == CommonConst.SystemfloatMinValue)
+            {
+                condition = GetCondition(eConditionType.Constant);
+                condition.DisplayName = float.MinValue.ToString();
+                condition.ConditionType = eConditionType.Constant;
+            }
+            else if (member.ToString() == CommonConst.SystemfloatMaxValue)
+            {
+                condition = GetCondition(eConditionType.Constant);
+                condition.DisplayName = float.MaxValue.ToString();
+                condition.ConditionType = eConditionType.Constant;
+            }
+            else if (member.ToString() == CommonConst.SystemdecimalMaxValue)
+            {
+                condition = GetCondition(eConditionType.Constant);
+                condition.DisplayName = Decimal.MaxValue.ToString();
+                condition.ConditionType = eConditionType.Constant;
+            }
+            else if (member.ToString() == CommonConst.SystemdecimalMinValue)
+            {
+                condition = GetCondition(eConditionType.Constant);
+                condition.DisplayName = Decimal.MinValue.ToString();
                 condition.ConditionType = eConditionType.Constant;
             }
             return condition;

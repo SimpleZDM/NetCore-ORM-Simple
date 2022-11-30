@@ -18,10 +18,10 @@ namespace NetCore.ORM.Simple.Queryable
 {
     public interface ISimpleQueryable<T1,T2>:IQueryResult<T1> where T1 : class
     {
-        public IQueryResult<TResult> Select<TResult>(Expression<Func<T1, T2, TResult>> expression) where TResult : class;
-        public ISimpleQueryable<T1, T2> Where(Expression<Func<T1, T2, bool>> expression);
-        public ISimpleQueryable<T1, T2> OrderBy<TOrder>(Expression<Func<T1, T2, TOrder>> expression);
-        public ISimpleQueryable<T1, T2> OrderByDescending<TOrder>(Expression<Func<T1, T2, TOrder>> expression);
+         IQueryResult<TResult> Select<TResult>(Expression<Func<T1, T2, TResult>> expression) where TResult : class;
+         ISimpleQueryable<T1, T2> Where(Expression<Func<T1, T2, bool>> expression);
+         ISimpleQueryable<T1, T2> OrderBy<TOrder>(Expression<Func<T1, T2, TOrder>> expression);
+         ISimpleQueryable<T1, T2> OrderByDescending<TOrder>(Expression<Func<T1, T2, TOrder>> expression);
 
     }
 }

@@ -18,25 +18,25 @@ namespace NetCore.ORM.Simple.Queryable
 {
     public interface ISimpleGroupByQueryable<TResult,TGroup>:IQueryResult<TResult>
     {
-        public TGroup Key { get; set; }
-        public TField Sum<TField>(Expression<Func<TResult, TField>> expression);
+         TGroup Key { get; set; }
+         TField Sum<TField>(Expression<Func<TResult, TField>> expression);
 
 
-        public TField Average<TField>(Expression<Func<TResult, TField>> expression);
+         TField Average<TField>(Expression<Func<TResult, TField>> expression);
 
-        public int Count<TField>(Expression<Func<TResult, TField>> expression);
+         int Count<TField>(Expression<Func<TResult, TField>> expression);
 
-        public TField Max<TField>(Expression<Func<TResult, TField>> expression);
+         TField Max<TField>(Expression<Func<TResult, TField>> expression);
        
 
-        public TField Min<TField>(Expression<Func<TResult, TField>> expression);
+         TField Min<TField>(Expression<Func<TResult, TField>> expression);
 
 
 
-        public IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<ISimpleGroupByQueryable<TResult, TGroup>,TNewResult>> expression)where TNewResult : class;
+         IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<ISimpleGroupByQueryable<TResult, TGroup>,TNewResult>> expression)where TNewResult : class;
 
-        public ISimpleGroupByQueryable<TResult,TGroup> OrderBy<TOrder>(Expression<Func<ISimpleGroupByQueryable<TResult,TGroup>,TOrder>> expression);
-        public TField FirstOrDefault<TField>(Expression<Func<TResult, TField>> expression);
+         ISimpleGroupByQueryable<TResult,TGroup> OrderBy<TOrder>(Expression<Func<ISimpleGroupByQueryable<TResult,TGroup>,TOrder>> expression);
+         TField FirstOrDefault<TField>(Expression<Func<TResult, TField>> expression);
 
     }
 }

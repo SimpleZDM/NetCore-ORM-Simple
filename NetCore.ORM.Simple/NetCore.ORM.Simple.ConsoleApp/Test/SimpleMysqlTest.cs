@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
+using System.Data.Common;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.ConsoleApp.Test
@@ -27,20 +29,24 @@ namespace NetCore.ORM.Simple.ConsoleApp
             string db2 = "server=localhost;database=testdb2;user=root;pwd=123456;Allow Zero Datetime=true;Convert Zero Datetime=True;";
             string db3 = "server=localhost;database=testdb3;user=root;pwd=123456;Allow Zero Datetime=true;Convert Zero Datetime=True;";
             string StrService = "server=49.233.33.36;database=virtualsoftplatformdb;user=root;pwd=[Txy*!14@msql*^];SSL Mode=None";
+
+            DataBaseConfiguration.DBDrives = new Dictionary<eDBType, Tuple<Type, Type>>();
+            DataBaseConfiguration.DBDrives.Add(eDBType.Mysql, Tuple.Create(typeof(MySqlConnection), typeof(MySqlParameter)));
             client = new SimpleClient(
           new DataBaseConfiguration(true,
-          new ConnectionEntity(MastStr)
+          new(MastStr)
           {
               IsAutoClose = true,
               DBType = eDBType.Mysql,
               Name = "master",
+              ReadWeight=1,
               WriteReadType = eWriteOrReadType.Write
-          }, new (db1)
+          }, new(db1)
           {
               IsAutoClose = true,
               DBType = eDBType.Mysql,
               Name = "db1",
-              ReadWeight = 1,
+              ReadWeight = 3,
               WriteReadType = eWriteOrReadType.Read
           },
           new(db2)
@@ -48,7 +54,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
               IsAutoClose = true,
               DBType = eDBType.Mysql,
               Name = "db2",
-              ReadWeight = 3,
+              ReadWeight = 2,
               WriteReadType = eWriteOrReadType.Read
           },
           new(db3)
@@ -56,13 +62,13 @@ namespace NetCore.ORM.Simple.ConsoleApp
               IsAutoClose = true,
               DBType = eDBType.Mysql,
               Name = "db3",
-              ReadWeight = 6,
+              ReadWeight = 5,
               WriteReadType = eWriteOrReadType.Read
           }));
 
             client.SetAOPLog((sql, Params) =>
             {
-                Console.WriteLine(sql);
+                //Console.WriteLine(sql);
             });
             client.SetAttr(typeof(MyTableAttrbute), typeof(MyColumnAttrbute));
             // var data=client.Queryable<MatchLog>().Take(10).ToList();
@@ -177,17 +183,17 @@ namespace NetCore.ORM.Simple.ConsoleApp
         public void QueryTest()
         {
 
-            var myobj = new { Name = "sd", Age = 10 };
-            var type= myobj.GetType();
-            var arr=type.GetFields();
-            var arr1=type.GetProperties();
-            var o=Activator.CreateInstance(type,"d",10);
-           var fdata=client.Queryable<UserEntity,RoleEntity>
-                ((u,r)=>new JoinInfoEntity(eJoinType.Inner,u.RoleId==r.Id))
-                .GroupBy(u=>u.RoleId).Select(u=> new 
-                { Name = u.FirstOrDefault(f => f.Name),
-                    RoleId = u.Key,
-                  GID=u.FirstOrDefault(f=>f.gIdColumn)}).ToList();
+            // var myobj = new { Name = "sd", Age = 10 };
+            // var type= myobj.GetType();
+            // var arr=type.GetFields();
+            // var arr1=type.GetProperties();
+            // var o=Activator.CreateInstance(type,"d",10);
+            //var fdata=client.Queryable<UserEntity,RoleEntity>
+            //     ((u,r)=>new JoinInfoEntity(eJoinType.Inner,u.RoleId==r.Id))
+            //     .GroupBy(u=>u.RoleId).Select(u=> new 
+            //     { Name = u.FirstOrDefault(f => f.Name),
+            //         RoleId = u.Key,
+            //       GID=u.FirstOrDefault(f=>f.gIdColumn)}).ToList();
 
             int i = 1000;
             int j = 2000;
@@ -199,7 +205,8 @@ namespace NetCore.ORM.Simple.ConsoleApp
             try
             {
 
-                var datasss = client.Queryable<MissionDetailEntity>().Where(m => !m.IsDelete || (m.EndTime < DateTime.Now && m.StartTime >DateTime.MinValue)||!m.Id.Equals(Guid.Empty)).Take(500).ToList();
+                //var datasss = client.Queryable<MissionDetailEntity>().Where(m => !m.IsDelete || 
+                //(m.EndTime < DateTime.Now && m.StartTime >DateTime.MinValue)||!m.Id.Equals(Guid.Empty)).Take(500).ToList();
                 Console.WriteLine("****************查询测试*****************");
                 Console.WriteLine("****************1.简单单表查询*****************");
                 ///返回所有
@@ -229,25 +236,10 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 ////是否存在
                 bool any = client.Queryable<UserEntity>().Any();
 
-                //var first = client.Queryable<UserEntity>().First();
+                var first = client.Queryable<UserEntity>().First();
 
-                //var firstordefault = client.Queryable<UserEntity>().FirstOrDefault();
+                var firstordefault = client.Queryable<UserEntity>().FirstOrDefault();
 
-                ////返回匿名对象
-                //var data0 = client.Queryable<UserEntity>().Select(u => new { Name = u.Name, Id = u.Id }).ToList();
-                //var data = client.Queryable<UserEntity>().Select(u => new UserEntity { Name = u.Name, Id = u.Id }).
-                //  Select(u => new { Name = u.Name, Id = u.Id }).ToList();
-                ////加条件
-                //int min = 1746;
-                //int max = 19999;
-                //var data1 = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).ToList();
-                ////分组
-                //var group = client.Queryable<UserEntity>().
-                //    Where(user => user.Id > min && user.Id <= max).
-                //    GroupBy(u => new { u.CompanyId }).Where(u => u.Id > 100).ToList();
-                ////排序
-                //var order = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderBy(u => new { u.Id }).ToList();
-                //var orderDesce = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderByDescending(u => new { u.Id }).ToList();
                 //返回匿名对象
                 var data0 = client.Queryable<UserEntity>().Select(u => new { Name = u.Name, Id = u.Id }).ToList();
                 var data = client.Queryable<UserEntity>().Select(u => new UserEntity { Name = u.Name, Id = u.Id }).
@@ -261,10 +253,25 @@ namespace NetCore.ORM.Simple.ConsoleApp
                     Where(user => user.Id > min && user.Id <= max).
                     GroupBy(u => new { u.CompanyId }).Where(u => u.Id > 100).ToList();
                 //排序
-                var order = client.Queryable<UserEntity>().Where(user => user.Id >
+                var order = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderBy(u => new { u.Id }).ToList();
+                var orderDesce = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderByDescending(u => new { u.Id }).ToList();
+                //返回匿名对象
+                var data01 = client.Queryable<UserEntity>().Select(u => new { Name = u.Name, Id = u.Id }).ToList();
+                var data111 = client.Queryable<UserEntity>().Select(u => new UserEntity { Name = u.Name, Id = u.Id }).
+                  Select(u => new { Name = u.Name, Id = u.Id }).ToList();
+                //加条件
+                int min1 = 1746;
+                int max1 = 19999;
+                var data11 = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).ToList();
+                //分组
+                var group1 = client.Queryable<UserEntity>().
+                    Where(user => user.Id > min && user.Id <= max).
+                    GroupBy(u => new { u.CompanyId }).Where(u => u.Id > 100).ToList();
+                //排序
+                var order1 = client.Queryable<UserEntity>().Where(user => user.Id >
                 min && user.Id <= max).OrderBy(u => new { u.Id }).ToList();
 
-                var orderDesce = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderByDescending(u => new { u.Id }).ToList();
+                var orderDesc1e = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderByDescending(u => new { u.Id }).ToList();
 
                 //Console.WriteLine($"*****************是否有数据:{any}****************");
                 //Console.WriteLine($"*****************总行数:{count}****************");
@@ -303,7 +310,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 var JoinData1 = client.Queryable<
                     UserEntity, RoleEntity, CompanyEntity>(
                     (u, r, c) => new JoinInfoEntity(
-                   eJoinType.Inner,u.RoleId.Equals(r.Id),
+                   eJoinType.Inner, u.RoleId.Equals(r.Id),
                    eJoinType.Inner, u.CompanyId.Equals(c.Id)
                    )).
                    Where((u, r, c) => u.Id > 10).OrderByDescending((u, r) => u.Id).
@@ -343,7 +350,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 //      FirstOrDefaultName = v.FirstOrDefault(s => s.UserName),
                 //      Max = v.Max(s => s.RoleId)
                 //  }).ToList();
-                var data111 = JoinData1.ToList();
+                var data1111 = JoinData1.ToList();
                 /////连接查询分组
                 var JoinData2 = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) =>
                 new JoinInfoEntity(
@@ -375,7 +382,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 //Console.WriteLine($"*****************受影响行数:{result1}****************");
                 // Console.WriteLine($"*****************受影响行数:{result2}****************");
                 Console.WriteLine("****************测试结束*****************");
-                var obj = new { sdfs=1};
+                var obj = new { sdfs = 1 };
             }
             catch (Exception ex)
             {
@@ -391,22 +398,26 @@ namespace NetCore.ORM.Simple.ConsoleApp
             var db1 = 0;
             var db2 = 0;
             var db3 = 0;
+            var othder = 0;
 
             UserEntity iuser = new UserEntity();
             iuser.Name = "插入小明";
             iuser = client.Insert(iuser).ReturnEntity();
             iuser.Name = "更新小明";
+
+
             var result = client.Update(iuser).SaveChange();
 
             for (int i = 0; i < 100; i++)
             {
-                var user=client.Queryable<UserEntity>().Where(u=>u.Id.Equals(1)).First();
-                if (user!=null)
+                var user = client.Queryable<UserEntity>().Where(u => u.Id.Equals(1)).First();
+                if (user != null)
                 {
-                    if (user.RoleId==1)
+                    if (user.RoleId == 1)
                     {
                         db1++;
-                    }else if (user.RoleId==2)
+                    }
+                    else if (user.RoleId == 2)
                     {
                         db2++;
                     }
@@ -418,23 +429,51 @@ namespace NetCore.ORM.Simple.ConsoleApp
                     {
                         master++;
                     }
+                    else
+                    {
+                        othder++;
+                        Console.WriteLine(user.Id);
+                    }
                 }
             }
-            Console.WriteLine($"db1={db1}\n db2={db2}\n db3={db3} \n master={master}");
+            Console.WriteLine($"db1={db1}\n db2={db2}\n db3={db3} \n master={master} \nothder={othder}");
         }
 
         public void sqlTest()
         {
             Dictionary<string, object> p = new Dictionary<string, object>();
-            p.Add("@CompanyId_0",1);
+            p.Add("@CompanyId_0", 1);
             p.Add("@Name_0", "sdf");
             p.Add("@Description_0", "111");
             p.Add("@RoleId_0", 1);
             p.Add("@gIdColumn_0", Guid.Empty);
-            p.Add("@Age_0",1);
+            p.Add("@Age_0", 1);
 
-           var res=client.Insert<UserEntity>("INSERT  INTO  `usertable` (`CompanyId`,`Name`,`Description`,`RoleId`,`gIdColumn`,`Age`) " +
-                "VALUE(@CompanyId_0,@Name_0,@Description_0,@RoleId_0,@gIdColumn_0,@Age_0);", p).SaveChange();
+            var res = client.Insert<UserEntity>("INSERT  INTO  `usertable` (`CompanyId`,`Name`,`Description`,`RoleId`,`gIdColumn`,`Age`) " +
+                 "VALUE(@CompanyId_0,@Name_0,@Description_0,@RoleId_0,@gIdColumn_0,@Age_0);", p).SaveChange();
+        }
+        /// <summary>
+        /// 测试事务
+        /// </summary>
+        public void Transaction()
+        {
+            try
+            {
+                client.BeginTransaction();
+                UserEntity u= client.Queryable<UserEntity>().Where(u=>u.Id==3192).FirstOrDefault();
+                //u.Name = "bbbbsdsdfsb";
+                //client.Update(u).SaveChange();
+                int zero= 0;
+               // int res=1 / zero;
+                client.Commit();
+            }
+            catch (Exception e)
+            {
+                client.RollBack();
+                Console.WriteLine(e.Message);
+            }
+
+
         }
     }
 }

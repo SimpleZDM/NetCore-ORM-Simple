@@ -37,16 +37,6 @@ namespace NetCore.ORM.Simple.SqlBuilder
              DBMDConst.And,DBMDConst.Or,
               $"{DBMDConst.LessThan}{DBMDConst.GreaterThan}" };
         }
-        /// <summary>
-        /// 单条语句最多插入的量
-        /// insert into [table](*****) value(),value();罪过八百个value
-        /// </summary>
-        public const int INSERTMAX = 800;
-        /// <summary>
-        ///多个insert组合
-        ///insert into [table]() value();insert into [table]() value();.....
-        /// </summary>
-        public const int INSERTMAXCOUNT = 30;
 
         /// <summary>
         /// 
@@ -64,21 +54,5 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// </summary>
         public static string[] cStrSign;
 
-        public static string AscendOrDescend(eOrderType OrderType)
-        {
-            string value = string.Empty;
-            switch (OrderType)
-            {
-                case eOrderType.Ascending:
-                    value = DBMDConst.Ascending;
-                    break;
-                case eOrderType.Descending:
-                    value = DBMDConst.Descending;
-                    break;
-                default:
-                    break;
-            }
-            return value;
-        }
     }
 }

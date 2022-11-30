@@ -1,9 +1,14 @@
-﻿using NetCore.ORM.Simple;
+﻿using Microsoft.Data.Sqlite;
+using MySql.Data.MySqlClient;
+using NetCore.ORM.Simple;
 using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
+using SQLitePCL;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,6 +28,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
         ISimpleClient client;
         public SimpleSqliteTest()
         {
+            DataBaseConfiguration.DBDrives.Add(eDBType.Sqlite, Tuple.Create(typeof(SqliteConnection),typeof(SqliteParameter)));;
             client = new SimpleClient(
           new DataBaseConfiguration(false,
           new ConnectionEntity($"Data Source=C:\\Users\\11920\\Desktop\\sqlite.db;")
@@ -39,6 +45,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 Console.WriteLine(sql);
             });
             client.SetAttr(typeof(MyTableAttrbute),typeof(MyColumnAttrbute));
+
             // var data=client.Queryable<MatchLog>().Take(10).ToList();
         }
         /// <summary>
@@ -69,6 +76,11 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 var result = client.SaveChange();
                 Console.WriteLine($"*****************受影响行数:{result}****************");
                 Console.WriteLine("****************测试结束*****************");
+            //    System.Exception
+            //    HResult = 0x80131500
+            //SQLitePCL.raw.SetProvider();
+            //    SQLitePCL.Batteries.Init();
+  
             }
             catch (Exception ex)
             {

@@ -18,6 +18,6 @@ namespace NetCore.ORM.Simple.Visitor
 {
     public interface IExpressionVisitor
     {
-        public string GetValue();
+         string GetValue();
     }
 }

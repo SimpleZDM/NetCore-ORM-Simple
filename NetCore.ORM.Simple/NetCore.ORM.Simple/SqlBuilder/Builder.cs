@@ -88,8 +88,6 @@ namespace NetCore.ORM.Simple.SqlBuilder
         public void GetSelect<TData>(SelectEntity select,QueryEntity entity)
         {
              entity.LastAnonymity=select.LastAnonymity;
-             entity.LastType=select.LastType;
-             entity.DyToMap = select.DyToMap;
              select.MapInfos = select.MapInfos.OrderBy(m=>m.Soft).ToList();
             sqlBuilder.GetSelect<TData>(select, entity);
 
