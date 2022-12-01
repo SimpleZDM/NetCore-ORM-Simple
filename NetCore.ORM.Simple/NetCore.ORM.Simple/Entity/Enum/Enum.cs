@@ -115,4 +115,14 @@ namespace NetCore.ORM.Simple.Entity
         SimpleList,
         NuKnow
     }
+
+    public enum eDateType
+    {
+        Year=0,
+        Month,
+        Day,
+        Hour,
+        Minute,
+        Second,
+    }
 }

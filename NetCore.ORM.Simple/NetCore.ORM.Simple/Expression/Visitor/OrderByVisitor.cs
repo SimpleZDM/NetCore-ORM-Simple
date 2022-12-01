@@ -47,7 +47,7 @@ namespace NetCore.ORM.Simple.Visitor
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            Console.WriteLine(node.Value.ToString());
+           // Console.WriteLine(node.Value.ToString());
             return base.VisitConstant(node);
         }
 

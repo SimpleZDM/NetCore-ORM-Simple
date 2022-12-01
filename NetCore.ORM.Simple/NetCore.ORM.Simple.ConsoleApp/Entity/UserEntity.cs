@@ -26,7 +26,9 @@ namespace NetCore.ORM.Simple.ConsoleApp
         public string Description { get; set; }
         public int RoleId { get; set; }
         public Guid gIdColumn { get; set; }
-        public int Age { get; set; }
+        public float Age { get; set; }
+        public DateTime Time1 { get; set; }
+        public DateTime Time2 { get; set; }
 
         public int IDDD;
     }

@@ -40,13 +40,13 @@ namespace NetCore.ORM.Simple.ConsoleApp
               DBType = eDBType.Mysql,
               Name = "master",
               ReadWeight=1,
-              WriteReadType = eWriteOrReadType.Write
+              WriteReadType = eWriteOrReadType.ReadOrWrite
           }, new(db1)
           {
               IsAutoClose = true,
               DBType = eDBType.Mysql,
               Name = "db1",
-              ReadWeight = 3,
+              ReadWeight = 0,
               WriteReadType = eWriteOrReadType.Read
           },
           new(db2)
@@ -54,7 +54,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
               IsAutoClose = true,
               DBType = eDBType.Mysql,
               Name = "db2",
-              ReadWeight = 2,
+              ReadWeight = 0,
               WriteReadType = eWriteOrReadType.Read
           },
           new(db3)
@@ -62,13 +62,13 @@ namespace NetCore.ORM.Simple.ConsoleApp
               IsAutoClose = true,
               DBType = eDBType.Mysql,
               Name = "db3",
-              ReadWeight = 5,
+              ReadWeight = 0,
               WriteReadType = eWriteOrReadType.Read
           }));
 
             client.SetAOPLog((sql, Params) =>
             {
-                //Console.WriteLine(sql);
+                Console.WriteLine(sql);
             });
             client.SetAttr(typeof(MyTableAttrbute), typeof(MyColumnAttrbute));
             // var data=client.Queryable<MatchLog>().Take(10).ToList();
@@ -226,7 +226,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 ids.Count();
                 c.Add(new ViewEntity() { RoleId = 1816 });
                 UserEntity user = client.Queryable<UserEntity>().Where(u => c[0].RoleId.Equals(u.Id) && u.Name.Contains(str)).FirstOrDefault();
-                List<UserEntity> left = client.Queryable<UserEntity>().Where(u => u.Name.LeftContains(str)).ToList();
+                List<UserEntity> left = client.Queryable<UserEntity>().Where(u =>Simple.LeftContains(u.Name,str)).ToList();
                 List<UserEntity> user1 = client.Queryable<UserEntity>().Where(u => u.Id.Equals(ids[0])).ToList();
                 List<UserEntity> user2 = client.Queryable<UserEntity>().Where(u => lids[1].Equals(u.Id)).ToList();
                 List<UserEntity> user3 = client.Queryable<UserEntity>().Where(u => ids.Contains(u.Id)).ToList();
@@ -474,6 +474,26 @@ namespace NetCore.ORM.Simple.ConsoleApp
             }
 
 
+        }
+
+        public void TestCallMethod()
+        {
+            string str = "111";
+            string[] names = new string[] { "111", "222", "333" };
+            var data = client.Queryable<UserEntity>().Where(
+                u => u.Id == 3192 || Simple.LeftContains(u.Description,"asdfs")
+                || Simple.RightContains(u.Description,str)
+                || Simple.Contains(names,u.Description)
+                ).Select(u => new
+            {
+                Name = u.Name,
+                DateDiff = Simple.DateDiff(u.Time1, u.Time2,eDateType.Minute),
+                CompanyId = u.CompanyId,
+                Round = Simple.Round(u.Age,2),
+                Truncate = Simple.Truncate(u.Age,2),
+            }).ToList();
+            List<UserEntity> left = client.Queryable<UserEntity>().Where(u =>Simple.LeftContains(u.Name,str)).ToList();
+            Console.WriteLine(11);
         }
     }
 }

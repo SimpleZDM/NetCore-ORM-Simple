@@ -187,7 +187,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             base.SetAttr(Table,Column);
         }
 
-        protected override string MapMethod(string methodName, string leftValue, string rightValue, ConditionEntity condition, bool IsNot)
+        protected override string MapMethod(string methodName, string leftValue, string rightValue, bool IsNot,params ConditionEntity [] conditions)
         {
             string value = DBMDConst.Equal.ToString();
             if (Check.IsNullOrEmpty(methodName))
@@ -199,113 +199,65 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 case MethodConst._ToString:
                     break;
                 case MethodConst._Equals:
-                    if (IsNot)
-                    {
-                        value = $"{leftValue}{DBMDConst.LessThan}{DBMDConst.GreaterThan}{rightValue}";
-                    }
-                    else
-                    {
-                        value = $"{leftValue}{DBMDConst.Equal}{rightValue}";
-                    }
+
+                    value=MysqlConst._Equals(leftValue,rightValue,IsNot);
                     break;
                 case MethodConst._IsNull:
                 case MethodConst._IsNullOrEmpty:
-                    if (IsNot)
-                    {
-                        if (!Check.IsNullOrEmpty(leftValue))
-                        {
-                            value = $"{leftValue} {DBMDConst.Is} {DBMDConst.Not} {DBMDConst.StrNULL}";
-                        }
-                        else if (!Check.IsNullOrEmpty(rightValue))
-                        {
-                            value = $"{rightValue} {DBMDConst.Is} {DBMDConst.Not} {DBMDConst.StrNULL}";
-                        }
-                    }
-                    else
-                    {
-                        if (!Check.IsNullOrEmpty(leftValue))
-                        {
-                            value = $"{leftValue} {DBMDConst.Is} {DBMDConst.StrNULL}";
-                        }
-                        else if (!Check.IsNullOrEmpty(rightValue))
-                        {
-                            value = $"{rightValue} {DBMDConst.Is}  {DBMDConst.StrNULL}";
-                        }
-                    }
 
+                    value = MysqlConst._IsNullOrEmpty(leftValue,rightValue,IsNot);
                     break;
                 case MethodConst._Sum:
-                    value = $" SUM{DBMDConst.LeftBracket}{leftValue}{DBMDConst.RightBracket} ";
+
+                    value = MysqlConst._Sum(leftValue);
                     break;
                 case MethodConst._Min:
-                    value = $" Min{DBMDConst.LeftBracket}{leftValue}{DBMDConst.RightBracket} ";
+
+                    value =MysqlConst._Min(leftValue);
                     break;
+
                 case MethodConst._Max:
-                    value = $" Max{DBMDConst.LeftBracket}{leftValue}{DBMDConst.RightBracket}";
+                    value =MysqlConst._Max(leftValue);
                     break;
                 case MethodConst._Count:
-                    leftValue = Check.IsNullOrEmpty(leftValue) ? DBMDConst.Asterisk.ToString() : leftValue;
-                    value = $" COUNT{DBMDConst.LeftBracket}{leftValue}{DBMDConst.RightBracket}";
+
+                    value = MysqlConst._Count(leftValue);
                     break;
                 case MethodConst._Average:
-                    value = $" AVG{DBMDConst.LeftBracket}{leftValue}{DBMDConst.RightBracket} ";
+
+                    value = MysqlConst._Average(leftValue);
                     break;
                 case MethodConst._FirstOrDefault:
-                    value = $" {leftValue}";
+
+                    value =MysqlConst._FirstOrDefault(leftValue);
                     break;
                 case MethodConst._Contains:
-                    if (eDataType.SimpleString == condition.DataType)
-                    {
-                        if (IsNot)
-                        {
-                            value = $"{leftValue} {DBMDConst.Not} {DBMDConst.Like} {DBMDConst.SingleQuotes}{DBMDConst.Percent}{condition.DisplayName}{DBMDConst.Percent}{DBMDConst.SingleQuotes} ";
-                        }
-                        else
-                        {
-                            value = $"{leftValue}  {DBMDConst.Like} {DBMDConst.SingleQuotes}{DBMDConst.Percent}{condition.DisplayName}{DBMDConst.Percent}{DBMDConst.SingleQuotes} ";
 
-                        }
-                    }
-                    else if ((int)eDataType.SimpleArrayInt <= (int)condition.DataType
-                        && (int)eDataType.SimpleListDecimal >= (int)condition.DataType)
-                    {
-                        if (IsNot)
-                        {
-                            value = $"{leftValue} {DBMDConst.Not} {DBMDConst.In} {DBMDConst.LeftBracket}{condition.DisplayName}{DBMDConst.RightBracket} ";
-                        }
-                        else
-                        {
-                            value = $"{leftValue}  {DBMDConst.In} {DBMDConst.LeftBracket}{condition.DisplayName}{DBMDConst.RightBracket}";
-                        }
-                    }
+                    value = MysqlConst._Contains(leftValue,IsNot,conditions);
                     break;
                 case MethodConst._LeftContains:
-                    if (eDataType.SimpleString == condition.DataType)
-                    {
-                        if (IsNot)
-                        {
-                            value = $"{leftValue} {DBMDConst.Not} {DBMDConst.Like} {DBMDConst.SingleQuotes}{DBMDConst.Percent}{condition.DisplayName}{DBMDConst.SingleQuotes} ";
-                        }
-                        else
-                        {
-                            value = $"{leftValue} {DBMDConst.Like} {DBMDConst.SingleQuotes}{DBMDConst.Percent}{condition.DisplayName}{DBMDConst.SingleQuotes} ";
-                        }
 
-                    }
+                    value = MysqlConst._LeftContains(leftValue, IsNot, conditions);
                     break;
                 case MethodConst._RightContains:
-                    if (eDataType.SimpleString == condition.DataType)
-                    {
-                        if (IsNot)
-                        {
-                            value = $"{leftValue} {DBMDConst.Not} {DBMDConst.Like} {DBMDConst.SingleQuotes}{condition.DisplayName}{DBMDConst.Percent}{DBMDConst.SingleQuotes} ";
-                        }
-                        else
-                        {
-                            value = $"{leftValue} {DBMDConst.Like} {DBMDConst.SingleQuotes}{condition.DisplayName}{DBMDConst.Percent}{DBMDConst.SingleQuotes} ";
-                        }
 
-                    }
+                    value = MysqlConst._RightContains(leftValue,IsNot,conditions);
+                    break;
+                case MethodConst._Round:
+
+                    value = MysqlConst._Round(leftValue, conditions); 
+                    break;
+                case MethodConst._Truncate:
+
+                    value = MysqlConst._Truncate(leftValue,conditions);
+                    break;
+                case MethodConst._DATEDIFF:
+
+                    value = MysqlConst._DATEDIFF(leftValue,conditions);
+                    break;
+                case MethodConst._Now:
+
+                    value = MysqlConst._NOW();
                     break;
                 default:
                     break;

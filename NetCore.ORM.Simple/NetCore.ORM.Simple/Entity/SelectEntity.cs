@@ -28,8 +28,7 @@ namespace NetCore.ORM.Simple.Entity
             Conditions = new List<ConditionEntity>(15);
             TreeConditions = new List<TreeConditionEntity>(15);
             OrderInfos = new List<OrderByEntity>(5);
-            LastType = new Dictionary<string, Type>();
-            DyToMap = new List<dynamic>();
+            //DyToMap = new List<dynamic>();
             LastAnonymity = false;
             Table = new TableEntity(tableAttr, columnAttr, types);
         }
@@ -368,25 +367,25 @@ namespace NetCore.ORM.Simple.Entity
         public void CreateLastType<TResult>(int start, int end)
         {
             LastAnonymity = CommonConst.IsAnonymityObject<TResult>(Table.TableAtrr);
-            Type type = typeof(TResult);
-            if (!LastAnonymity)
-            {
-                DyToMap.Clear();
-                LastType.Clear();
-                LastType.Add(type.Name, type);
-            }
-            else
-            {
-                if (LastType.Count() == CommonConst.Zero)
-                {
-                    for (int i = start; i <= end; i++)
-                    {
-                        LastType.Add(Table.TableNames[i], Table.DicTable[Table.TableNames[i]].ClassType);
-                    }
+            //Type type = typeof(TResult);
+            //if (!LastAnonymity)
+            //{
+            //    //DyToMap.Clear();
+            //    //LastType.Clear();
+            //    //LastType.Add(type.Name, type);
+            //}
+            //else
+            //{
+            //    if (LastType.Count() == CommonConst.Zero)
+            //    {
+            //        for (int i = start; i <= end; i++)
+            //        {
+            //            LastType.Add(Table.TableNames[i], Table.DicTable[Table.TableNames[i]].ClassType);
+            //        }
 
-                }
+            //    }
 
-            }
+           // }
         }
 
 
@@ -613,6 +612,10 @@ namespace NetCore.ORM.Simple.Entity
                         currentTree.RightCondition.Value = value;
                     }
                 }
+                else
+                {
+                    currentTree.RightCondition.Value = node.Value.ToString();
+                }
 
             }
 
@@ -784,9 +787,7 @@ namespace NetCore.ORM.Simple.Entity
 
         public bool LastAnonymity { get { return lastAnonymity; } set { lastAnonymity = value; } }
 
-        public List<dynamic> DyToMap { get { return dyToMap; } set { dyToMap = value; } }
 
-        public Dictionary<string, Type> LastType { get { return lastType; } set { lastType = value; } }
 
         public TableEntity Table { get { return table; } set { table = value; } }
 
@@ -796,8 +797,6 @@ namespace NetCore.ORM.Simple.Entity
         private List<TreeConditionEntity> treeConditions;
         private List<OrderByEntity> orderInfos;
         private bool lastAnonymity;
-        private List<dynamic> dyToMap;
-        private Dictionary<string, Type> lastType;
         private TableEntity table;
     }
 }

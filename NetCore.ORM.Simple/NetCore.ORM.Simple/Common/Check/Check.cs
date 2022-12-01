@@ -15,7 +15,7 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Common
 {
-    public static class Check
+    internal static class Check
     {
         public static bool IsNull<T>(this T t) where T : class
         {
@@ -59,18 +59,18 @@ namespace NetCore.ORM.Simple.Common
             }
             return false;
         }
-        public static bool LeftContains(this string value,string left)
+       
+        public static bool IsMethodMultiParams(string methodName)
         {
-            return default(bool);
-        }
-        public static bool RightContains(this string value,string right)
-        {
-            return default(bool);
-        }
-
-        public static int DateDiff()
-        {
-            return default(int);
+            if (Check.IsNullOrEmpty(methodName))
+            {
+                return false;
+            }
+            if (methodName==MethodConst._DATEDIFF)
+            {
+                return true;
+            }
+            return false;
         }
 
     }

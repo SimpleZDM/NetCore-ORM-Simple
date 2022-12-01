@@ -141,7 +141,7 @@ namespace NetCore.ORM.Simple.Visitor
                     {
                         if (IsCompleteMember)
                         {
-                            currentMember = new Simple.Entity.MemberEntity();
+                            currentMember = new NetCore.ORM.Simple.Entity.MemberEntity();
                             IsCompleteMember = false;
                         }
 

@@ -56,7 +56,6 @@ namespace NetCore.ORM.Simple.Entity
         private string asName;
         private eTableType tableType;
         private eJoinType joinType;
-        private Queue<string> qValue;
         private List<TreeConditionEntity> treeConditions;
         private List<ConditionEntity> conditions;
     }

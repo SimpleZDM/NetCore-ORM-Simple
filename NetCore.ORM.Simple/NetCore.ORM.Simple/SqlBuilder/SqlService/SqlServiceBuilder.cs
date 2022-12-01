@@ -487,7 +487,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 }
                 else if (treeConditions[i].RelationCondition.ConditionType.Equals(eConditionType.Method))
                 {
-                    StrValue.Append(MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue, currentConditon, treeConditions[i].IsNot));
+                    StrValue.Append(MapMethod(treeConditions[i].RelationCondition.DisplayName, leftValue, rightValue,treeConditions[i].IsNot,currentConditon));
                 }
                 else
                 {

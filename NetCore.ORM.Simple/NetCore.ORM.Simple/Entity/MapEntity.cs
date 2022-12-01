@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,7 @@ namespace NetCore.ORM.Simple.Entity
         public MapEntity()
         {
             IsNeed = true;
+            Conditions = new Queue<ConditionEntity>();
         }
         /// <summary>
         /// 字段属性名称
@@ -72,6 +74,10 @@ namespace NetCore.ORM.Simple.Entity
         public Type PropertyType { get { return propertyType; } set { propertyType = value; } }
         public bool IsKey { get { return isKey; } set { isKey = value; } }
         public int Soft { get { return soft; } set { soft = value; } }
+        /// <summary>
+        /// 方法中包含多个参数
+        /// </summary>
+        public Queue<ConditionEntity> Conditions { get { return conditions; } set { conditions = value; } }
 
 
 
@@ -88,7 +94,9 @@ namespace NetCore.ORM.Simple.Entity
         private Type propertyType;
         private int soft;
         private string columnPropertyName;
-       
+        private Queue<ConditionEntity> conditions;
+
+
 
     }
 }

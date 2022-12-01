@@ -34,5 +34,24 @@ namespace NetCore.ORM.Simple.Common
         public const string _Contains= "Contains";
         public const string _LeftContains= "LeftContains";
         public const string _RightContains= "RightContains";
+
+        #region mysql
+        public const string _Now= "Now";
+        public const string _Year= "Year";
+        public const string _Month= "Month";
+        public const string _Day= "Day";
+        public const string _Hour= "Hour";
+        public const string _Minute= "Minute";
+        public const string _Second= "Second";
+        public const string _DateDiff="TIMESTAMPDIFF";
+        public const string _DATEDIFF= "DateDiff";
+        public const string _Round= "Round";
+        public const string _Truncate = "Truncate";
+        public const string _IF = "IF";
+
+
+
+        #endregion
+
     }
 }

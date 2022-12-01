@@ -69,114 +69,114 @@ namespace NetCore.ORM.Simple.Visitor
         public void VisitMap<T1, TResult>(Expression<Func<T1, TResult>> expression)
         {
             Select.CreateLastType<TResult>(0,0);
-            if (Select.LastAnonymity)
-            {
-                Select.DyToMap.Add(expression.Compile());
-            }
+            //if (Select.LastAnonymity)
+            //{
+            //    //Select.DyToMap.Add(expression.Compile());
+            //}
             mapVisitor.Modify(expression, Select.LastAnonymity);
         }
         public void VisitMap<T1, T2, TResult>(Expression<Func<T1, T2, TResult>> expression)
         {
             Select.CreateLastType<TResult>(0,1);
-            if (Select.LastAnonymity)
-            {
-                Select.DyToMap.Add(expression.Compile());
-            }
+            //if (Select.LastAnonymity)
+            //{
+            //    Select.DyToMap.Add(expression.Compile());
+            //}
             mapVisitor.Modify(expression,Select.LastAnonymity);
         }
         public void VisitMap<T1, T2, T3, TResult>(Expression<Func<T1, T2, T3, TResult>> expression)
         {
             Select.CreateLastType<TResult>(0,2);
-            if (Select.LastAnonymity)
-            {
-                Select.DyToMap.Add(expression.Compile());
-            }
+            //if (Select.LastAnonymity)
+            //{
+            //    Select.DyToMap.Add(expression.Compile());
+            //}
             mapVisitor.Modify(expression, Select.LastAnonymity);
         }
         public void VisitMap<T1, T2, T3, T4, TResult>(Expression<Func<T1, T2, T3, T4, TResult>> expression)
         {
             Select.CreateLastType<TResult>(0,3);
-            if (Select.LastAnonymity)
-            {
-                Select.DyToMap.Add(expression.Compile());
-            }
+            //if (Select.LastAnonymity)
+            //{
+            //    Select.DyToMap.Add(expression.Compile());
+            //}
             mapVisitor.Modify(expression, Select.LastAnonymity);
         }
         public void VisitMap<T1, T2, T3, T4, T5, TResult>(Expression<Func<T1, T2, T3, T4, T5, TResult>> expression)
         {
             Select.CreateLastType<TResult>(0, 4);
-            if (Select.LastAnonymity)
-            {
-                Select.DyToMap.Add(expression.Compile());
-            }
+            //if (Select.LastAnonymity)
+            //{
+            //    Select.DyToMap.Add(expression.Compile());
+            //}
             mapVisitor.Modify(expression, Select.LastAnonymity);
         }
         public void VisitMap<T1, T2, T3, T4, T5,T6, TResult>(Expression<Func<T1, T2, T3, T4, T5,T6, TResult>> expression)
         {
             Select.CreateLastType<TResult>(0,5);
-            if (Select.LastAnonymity)
-            {
-                Select.DyToMap.Add(expression.Compile());
-            }
+            //if (Select.LastAnonymity)
+            //{
+            //    Select.DyToMap.Add(expression.Compile());
+            //}
             mapVisitor.Modify(expression,Select.LastAnonymity);
         }
 
         public void VisitMap<T1, T2, T3, T4, T5, T6,T7, TResult>(Expression<Func<T1, T2, T3, T4, T5, T6,T7, TResult>> expression)
         {
             Select.CreateLastType<TResult>(0, 6);
-            if (Select.LastAnonymity)
-            {
-                Select.DyToMap.Add(expression.Compile());
-            }
+            //if (Select.LastAnonymity)
+            //{
+            //    Select.DyToMap.Add(expression.Compile());
+            //}
             mapVisitor.Modify(expression, Select.LastAnonymity);
         }
 
         public void VisitMap<T1, T2, T3, T4, T5, T6, T7,T8, TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, T7,T8, TResult>> expression)
         {
             Select.CreateLastType<TResult>(0,7);
-            if (Select.LastAnonymity)
-            {
-                Select.DyToMap.Add(expression.Compile());
-            }
+            //if (Select.LastAnonymity)
+            //{
+            //    Select.DyToMap.Add(expression.Compile());
+            //}
             mapVisitor.Modify(expression, Select.LastAnonymity);
         }
 
         public void VisitMap<T1, T2, T3, T4, T5, T6, T7, T8,T9, TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8,T9, TResult>> expression)
         {
             Select.CreateLastType<TResult>(0, 8);
-            if (Select.LastAnonymity)
-            {
-                Select.DyToMap.Add(expression.Compile());
-            }
+            //if (Select.LastAnonymity)
+            //{
+            //    Select.DyToMap.Add(expression.Compile());
+            //}
             mapVisitor.Modify(expression, Select.LastAnonymity);
         }
 
         public void VisitMap<T1, T2, T3, T4, T5, T6, T7, T8, T9,T10, TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9,T10, TResult>> expression)
         {
             Select.CreateLastType<TResult>(0,9);
-            if (Select.LastAnonymity)
-            {
-                Select.DyToMap.Add(expression.Compile());
-            }
+            //if (Select.LastAnonymity)
+            //{
+            //    Select.DyToMap.Add(expression.Compile());
+            //}
             mapVisitor.Modify(expression, Select.LastAnonymity);
         }
         public void VisitMap<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11, TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11, TResult>> expression)
         {
             Select.CreateLastType<TResult>(0, 10);
-            if (Select.LastAnonymity)
-            {
-                Select.DyToMap.Add(expression.Compile());
-            }
+            //if (Select.LastAnonymity)
+            //{
+            //    Select.DyToMap.Add(expression.Compile());
+            //}
             mapVisitor.Modify(expression, Select.LastAnonymity);
         }
 
         public void VisitMap<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11,T12, TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11,T12, TResult>> expression)
         {
             Select.CreateLastType<TResult>(0, 11);
-            if (Select.LastAnonymity)
-            {
-                Select.DyToMap.Add(expression.Compile());
-            }
+            //if (Select.LastAnonymity)
+            //{
+            //    Select.DyToMap.Add(expression.Compile());
+            //}
             mapVisitor.Modify(expression, Select.LastAnonymity);
         }
 

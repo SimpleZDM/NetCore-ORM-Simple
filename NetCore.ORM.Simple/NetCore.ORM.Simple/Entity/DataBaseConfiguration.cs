@@ -136,7 +136,7 @@ namespace NetCore.ORM.Simple.Entity
         }
 
         /// <summary>
-        /// 
+        /// 获取一个链接配置
         /// </summary>
         /// <param name="commandType"></param>
         /// <returns></returns>

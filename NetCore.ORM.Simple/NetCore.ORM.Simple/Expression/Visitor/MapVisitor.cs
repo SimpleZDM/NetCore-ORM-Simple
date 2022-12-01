@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -50,6 +51,9 @@ namespace NetCore.ORM.Simple.Visitor
         /// </summary>
         private bool isAnonymity;
 
+        private bool isMethodMultiParams;
+        private bool isMethodParamsStart;
+
         private int soft;
 
 
@@ -60,7 +64,9 @@ namespace NetCore.ORM.Simple.Visitor
             currentTables = new Dictionary<string, int>();
             select.InitMap();
             IsAgain = true;
-           
+            isMethodMultiParams = false;
+            isMethodParamsStart = false;
+
         }
         /// <summary>
         /// 修改表达式树的形式
@@ -79,7 +85,7 @@ namespace NetCore.ORM.Simple.Visitor
             }
             foreach (ParameterExpression item in ((dynamic)expression).Parameters)
             {
-                currentTables.Add(item.Name,currentTables.Count);
+                currentTables.Add(item.Name, currentTables.Count);
             }
             Visit(expression);
             currentmapInfo = null;
@@ -94,6 +100,68 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override Expression VisitBinary(BinaryExpression node)
         {
+            ConditionEntity condition = null;
+            switch (node.NodeType)
+            {
+                case ExpressionType.AndAlso:
+
+                    break;
+                case ExpressionType.Call:
+                    break;
+                case ExpressionType.GreaterThan:
+                    if (!Check.IsNull(currentmapInfo))
+                    {
+                        condition = select.GetCondition(eConditionType.Sign, eSignType.GrantThan);
+                        currentmapInfo.Conditions.Enqueue(condition);
+                    }
+                    break;
+                case ExpressionType.GreaterThanOrEqual:
+                    if (!Check.IsNull(currentmapInfo))
+                    {
+                        condition = select.GetCondition(eConditionType.Sign, eSignType.GreatThanOrEqual);
+                        currentmapInfo.Conditions.Enqueue(condition);
+                    }
+                    break;
+                case ExpressionType.LessThan:
+                    if (!Check.IsNull(currentmapInfo))
+                    {
+                        condition = select.GetCondition(eConditionType.Sign, eSignType.LessThan);
+                        currentmapInfo.Conditions.Enqueue(condition);
+                    }
+                    break;
+                case ExpressionType.LessThanOrEqual:
+                    if (!Check.IsNull(currentmapInfo))
+                    {
+                        condition = select.GetCondition(eConditionType.Sign, eSignType.LessThanOrEqual);
+                        currentmapInfo.Conditions.Enqueue(condition);
+                    }
+
+                    break;
+                case ExpressionType.Equal:
+                    if (!Check.IsNull(currentmapInfo))
+                    {
+                        condition = select.GetCondition(eConditionType.Sign, eSignType.Equal);
+                        currentmapInfo.Conditions.Enqueue(condition);
+                    }
+                    break;
+                case ExpressionType.NotEqual:
+                    if (!Check.IsNull(currentmapInfo))
+                    {
+                        condition = select.GetCondition(eConditionType.Sign, eSignType.NotEqual);
+                        currentmapInfo.Conditions.Enqueue(condition);
+                    }
+                    break;
+                case ExpressionType.OrElse:
+
+                    break;
+                case ExpressionType.ArrayIndex:
+
+                    base.VisitBinary(node);
+                    break;
+                default:
+                    break;
+            }
+            return node;
             return node;
         }
 
@@ -104,15 +172,21 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override Expression VisitConstant(ConstantExpression node)
         {
+            if (!Check.IsNull(currentmapInfo))
+            {
+                var condition = select.GetCondition(eConditionType.Constant);
+                condition.Value = node.Value;
+                currentmapInfo.Conditions.Enqueue(condition);
+            }
             return base.VisitConstant(node);
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
+
+            isMethodMultiParams = Check.IsMethodMultiParams(node.Method.Name);
+
             base.VisitMethodCall(node);
-
-            
-
             if (Check.IsNull(currentmapInfo))
             {
                 currentmapInfo = new MapEntity();
@@ -123,18 +197,20 @@ namespace NetCore.ORM.Simple.Visitor
             {
                 currentmapInfo.MethodName = node.Method.Name;
             }
+
             if (isAnonymity && string.IsNullOrEmpty(currentmapInfo.ColumnName))
             {
                 currentmapInfo.Soft = soft;
                 SetPropName();
                 soft++;
             }
-            if (isAnonymity && currentmapInfo.PropertyType!=null&&
-                select.MapInfos.Any(m => m.PropertyType!=null&& m.PropertyType.Equals(currentmapInfo.PropertyType)))
+            if (isAnonymity && currentmapInfo.PropertyType != null &&
+                select.MapInfos.Any(m => m.PropertyType != null && m.PropertyType.Equals(currentmapInfo.PropertyType)))
             {
                 currentmapInfo = null;
             }
-            
+            isMethodMultiParams = false;
+            isMethodParamsStart = false;
             return node;
         }
 
@@ -160,15 +236,15 @@ namespace NetCore.ORM.Simple.Visitor
         {
             currentmapInfo = new MapEntity();
             base.VisitMemberBinding(node);
-           
+
             if (!isAnonymity)
             {
                 //非匿名对象属性名称
                 currentmapInfo.LastPropName = node.Member.Name;
             }
-            
+
             currentmapInfo.PropName = node.Member.Name;
-            if (!select.MapInfos.Any(m=>m.PropName.Equals(currentmapInfo.PropName)))
+            if (!select.MapInfos.Any(m => m.PropName.Equals(currentmapInfo.PropName)))
             {
                 select.AddMapInfo(currentmapInfo);
             }
@@ -177,7 +253,7 @@ namespace NetCore.ORM.Simple.Visitor
 
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            
+
             return base.VisitParameter(node);
         }
 
@@ -201,9 +277,9 @@ namespace NetCore.ORM.Simple.Visitor
             string PropName = node.Member.Name;
             if (node.Member.Name.Equals("Key"))
             {
-                if (select.OrderInfos.Where(g => g.IsGroupBy).Count()==1) 
+                if (select.OrderInfos.Where(g => g.IsGroupBy).Count() == 1)
                 {
-                   var group= select.OrderInfos.Where(g => g.IsGroupBy).FirstOrDefault();
+                    var group = select.OrderInfos.Where(g => g.IsGroupBy).FirstOrDefault();
                     PropName = group.PropName;
                 }
                 else
@@ -211,22 +287,53 @@ namespace NetCore.ORM.Simple.Visitor
                     throw new Exception("不能将key直接赋值给一个对象的成员!");
                 }
             }
-            
+
             PropertyInfo prop = null;
-            string TableName=null;
+            string TableName = null;
             if ((node.Expression is ParameterExpression Parameter) && currentTables.ContainsKey(Parameter.Name))
             {
-                prop = select.GetPropertyType(currentTables[Parameter.Name],PropName); 
+                prop = select.GetPropertyType(currentTables[Parameter.Name], PropName);
                 if (!Check.IsNull(prop))
                 {
                     PropName = prop.Name;
                     TableName = select.GetAsTableName(currentTables[Parameter.Name]);
                 }
             }
+
+
             if (IsAgain)
             {
-                currentmapInfo = select.MapFirstOrDefault(m =>
-                 m.PropName.Equals(PropName));
+
+                MapEntity map = null;
+                if (!Check.IsNull(TableName))
+                {
+                    map = select.MapFirstOrDefault(m =>
+                  m.PropName.Equals(PropName) && m.TableName == TableName);
+                }
+                else
+                {
+                    map = select.MapFirstOrDefault(m =>
+                    m.PropName.Equals(PropName));
+                }
+
+                if (isMethodMultiParams && isMethodParamsStart)
+                {
+                    if (!Check.IsNull(map))
+                    {
+                        var condition = select.GetCondition(eConditionType.ColumnName);
+                        condition.DisplayName = $"{map.TableName}{DBMDConst.Dot}{map.ColumnName}";
+                        currentmapInfo.Conditions.Enqueue(condition);
+                    }
+                    return node;
+                }
+                if (isMethodMultiParams)
+                {
+                    isMethodParamsStart = true;
+                }
+
+                currentmapInfo = map;
+
+
                 if (!Check.IsNull(currentmapInfo))
                 {
                     currentmapInfo.IsNeed = true;
@@ -292,7 +399,7 @@ namespace NetCore.ORM.Simple.Visitor
                 if (Members.Count() > MemberCurrent)
                 {
                     currentmapInfo.PropName = Members[MemberCurrent].Name;
-                    currentmapInfo.PropertyType =((PropertyInfo)Members[MemberCurrent]).PropertyType;
+                    currentmapInfo.PropertyType = ((PropertyInfo)Members[MemberCurrent]).PropertyType;
                     MemberCurrent++;
                 }
             }

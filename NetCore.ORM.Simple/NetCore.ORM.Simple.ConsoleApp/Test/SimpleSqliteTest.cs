@@ -188,8 +188,8 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 ids.Count();
                 c.Add(new ViewEntity() { RoleId = 1816 });
                 UserEntity user = client.Queryable<UserEntity>().Where(u => c[0].RoleId.Equals(u.Id) && u.Name.Contains(str)).FirstOrDefault();
-                List<UserEntity> left = client.Queryable<UserEntity>().Where(u => u.Name.LeftContains(str)).ToList();
-                List<UserEntity> user1 = client.Queryable<UserEntity>().Where(u => u.Id.Equals(dic[1816]) && u.Id.Equals(ids[0]) || Check.IsNullOrEmpty(u.Name) || lids[1].Equals(u.Id)).ToList();
+                List<UserEntity> left = client.Queryable<UserEntity>().Where(u =>Simple.LeftContains( u.Name,str)).ToList();
+                List<UserEntity> user1 = client.Queryable<UserEntity>().Where(u => u.Id.Equals(dic[1816]) && u.Id.Equals(ids[0]) || Simple.IsNullOrEmpty(u.Name) || lids[1].Equals(u.Id)).ToList();
                 List<UserEntity> user2 = client.Queryable<UserEntity>().Where(u => lids[1].Equals(u.Id)).ToList();
                 List<UserEntity> user3 = client.Queryable<UserEntity>().Where(u => ids.Contains(u.Id)).ToList();
                 List<UserEntity> user4 = client.Queryable<UserEntity>().Where(u => lids.Contains(u.Id)).ToList();
