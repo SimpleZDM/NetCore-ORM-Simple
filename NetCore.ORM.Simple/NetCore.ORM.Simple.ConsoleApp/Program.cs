@@ -10,6 +10,8 @@ public static class Program
 {
     public static int Main(string []args)
     {
+        A a=new A();
+        a.test();
 
         //object o1 = new { UserName = 11 };
         //var b =Activator.CreateInstance(o1.GetType());
@@ -62,14 +64,14 @@ public static class Program
         // test.Where();
 
         SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
-        MysqlTest.MoreQuerTest();
-        MysqlTest.sqlTest();
-        MysqlTest.InsertTest();
-        MysqlTest.UpdateTest();
-        MysqlTest.DeleteTest();
-        Console.WriteLine();
-        MysqlTest.QueryTest();
-        MysqlTest.Transaction();
+        //MysqlTest.MoreQuerTest();
+        //MysqlTest.sqlTest();
+        //MysqlTest.InsertTest();
+        //MysqlTest.UpdateTest();
+        //MysqlTest.DeleteTest();
+        //Console.WriteLine();
+        //MysqlTest.QueryTest();
+        //MysqlTest.Transaction();
         MysqlTest.TestCallMethod();
 
         //SimpleSqliteTest sqliteTest = new SimpleSqliteTest();

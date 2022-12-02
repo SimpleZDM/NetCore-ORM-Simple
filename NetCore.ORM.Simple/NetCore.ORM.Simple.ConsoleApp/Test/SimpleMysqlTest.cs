@@ -1,4 +1,4 @@
-﻿using NetCore.ORM.Simple.Entity;
+﻿using NetCore.ORM.Simple;
 using NetCore.ORM.Simple.Common;
 using System;
 using System.Collections.Generic;
@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using System.Data.Common;
+using NetCore.ORM.Simple.Entity;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.ConsoleApp.Test
@@ -68,7 +69,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
 
             client.SetAOPLog((sql, Params) =>
             {
-                //Console.WriteLine(sql);
+                Console.WriteLine(sql);
             });
             client.SetAttr(typeof(MyTableAttrbute), typeof(MyColumnAttrbute));
             // var data=client.Queryable<MatchLog>().Take(10).ToList();
@@ -473,7 +474,25 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 Console.WriteLine(e.Message);
             }
 
+            string MastStr = "server=localhost;database=testdb;user=root;pwd=123456;Allow Zero Datetime=true;Convert Zero Datetime=True;";
 
+            //DataBaseConfiguration.DBDrives = new Dictionary<eDBType, Tuple<Type, Type>>();
+            DataBaseConfiguration.DBDrives.Add(eDBType.Mysql, Tuple.Create(typeof(MySqlConnection), typeof(MySqlParameter)));
+            client = new SimpleClient(
+          new DataBaseConfiguration(true,
+          new ConnectionEntity(MastStr)
+          {
+              IsAutoClose = true,
+              DBType = eDBType.Mysql,
+              Name = "master",
+              ReadWeight = 1,
+              WriteReadType = eWriteOrReadType.ReadOrWrite
+          }
+         ));
+            client.SetAOPLog((sql, Params) =>
+            {
+                Console.WriteLine(sql);
+            });
         }
 
         public void TestCallMethod()
@@ -481,22 +500,25 @@ namespace NetCore.ORM.Simple.ConsoleApp
             string str = "111";
             string[] names = new string[] { "111", "222", "333" };
             var data = client.Queryable<UserEntity>().Where(
-                u => u.Id == 3202 || Simple.LeftContains(u.Description,"asdfs")
-                || Simple.RightContains(u.Description,str)
-                || Simple.Contains(names,u.Description)
+                u => u.Id == 3202 || Simple.LeftContains(u.Description, "asdfs")
+                || Simple.RightContains(u.Description, str)
+                || Simple.Contains(names, u.Description)
                 ).Select(u => new
-            {
-                Name = u.Name,
-                DateDiff = Simple.DateDiff(u.Time1, u.Time2,eDateType.Minute),
-                CompanyId = u.CompanyId,
-                Round = Simple.Round(u.Age,2),
-                Truncate = Simple.Truncate(u.Age,2),
-                Now=Simple.Now(),
-                Year=Simple.Year(u.Time1),
-                Month=Simple.Month(u.Time1),
-                Day=Simple.Day(u.Time1),
-            }).ToList();
+                {
+                    Name = u.Name,
+                    //DateDiff = Simple.DateDiff(u.Time1, u.Time2, eDateType.Minute),
+                    //CompanyId = u.CompanyId,
+                    //Round = Simple.Round(u.Age, 2),
+                    //Truncate = Simple.Truncate(u.Age, 2),
+                    //Now = Simple.Now(),
+                    //Year = Simple.Year(u.Time1),
+                    //Month = Simple.Month(u.Time1),
+                    //Day = Simple.Day(u.Time1),
+                    BoolIs = Simple.IF(u.Time1>=u.Time2,1,2)
+                }).ToList();
             List<UserEntity> left = client.Queryable<UserEntity>().Where(u =>Simple.LeftContains(u.Name,str)).ToList();
+            
+            //client.Read("select * from usertable where id=1",);
             Console.WriteLine(11);
         }
     }

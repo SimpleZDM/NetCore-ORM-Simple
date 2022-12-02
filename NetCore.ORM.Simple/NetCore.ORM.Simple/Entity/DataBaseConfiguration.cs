@@ -1,4 +1,5 @@
 ﻿using NetCore.ORM.Simple.Common;
+using NetCore.ORM.Simple.Entity;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -13,7 +14,7 @@ using System.Linq;
  * 更改历史：
  * 
  * *******************************************************/
-namespace NetCore.ORM.Simple.Entity
+namespace NetCore.ORM.Simple
 {
     /// <summary>
     /// 数据库链接基本配置

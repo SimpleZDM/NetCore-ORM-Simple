@@ -13,7 +13,7 @@ using System.Threading.Tasks;
  * 更改历史：
  * 
  * *******************************************************/
-namespace NetCore.ORM.Simple.Entity
+namespace NetCore.ORM.Simple
 {
     public enum eDBType
     {
