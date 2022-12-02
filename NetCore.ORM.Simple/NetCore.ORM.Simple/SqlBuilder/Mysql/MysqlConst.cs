@@ -271,6 +271,24 @@ namespace NetCore.ORM.Simple.SqlBuilder
             value = $"{MethodConst._Now}{DBMDConst.LeftBracket}{DBMDConst.RightBracket}";
             return value;
         }
+        public static string _Year(string leftValue)
+        {
+            string value = null;
+            value = $"{MethodConst._Year}{DBMDConst.LeftBracket}{leftValue}{DBMDConst.RightBracket}";
+            return value;
+        }
+        public static string _Month(string leftValue)
+        {
+            string value = null;
+            value = $"{MethodConst._Month}{DBMDConst.LeftBracket}{leftValue}{DBMDConst.RightBracket}";
+            return value;
+        }
+        public static string _Day(string leftValue)
+        {
+            string value = null;
+            value = $"{MethodConst._Day}{DBMDConst.LeftBracket}{leftValue}{DBMDConst.RightBracket}";
+            return value;
+        }
 
         public static string _IF(string leftValue, params ConditionEntity[] conditions)
         {

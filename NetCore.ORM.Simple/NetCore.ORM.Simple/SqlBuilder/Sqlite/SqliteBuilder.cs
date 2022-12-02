@@ -152,7 +152,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             var Key =GetAutoKey(type);
             if (Check.IsNull(Key))
             {
-                throw new Exception("");
+                throw new Exception("请配置主键!");
             }
             string TableName = GetTableName(type);
             sql.StrSqlValue.Append($" {DBMDConst.Where} {GetColName(Key)}" +

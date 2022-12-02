@@ -79,6 +79,23 @@ namespace NetCore.ORM.Simple.Entity
         /// </summary>
         public Queue<ConditionEntity> Conditions { get { return conditions; } set { conditions = value; } }
 
+        public MapEntity Clon()
+        {
+            MapEntity entity=new MapEntity();
+            entity.Conditions = new Queue<ConditionEntity>();
+            entity.TableName = this.tableName;
+            entity.PropName = this.PropName;
+            entity.LastPropName = this.LastPropName;
+            entity.ColumnName = this.ColumnName;
+            entity.ColumnPropertyName = this.ColumnPropertyName;
+            entity.IsNeed = this.IsNeed;
+            entity.IsKey = this.IsKey;
+            entity.ClassName = this.ClassName;
+            entity.EntityType = this.EntityType;
+            entity.PropertyType = this.PropertyType;
+            return entity;
+        }
+
 
 
         private string propName;

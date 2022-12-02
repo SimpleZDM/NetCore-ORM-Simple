@@ -30,7 +30,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
             string db3 = "server=localhost;database=testdb3;user=root;pwd=123456;Allow Zero Datetime=true;Convert Zero Datetime=True;";
             string StrService = "server=49.233.33.36;database=virtualsoftplatformdb;user=root;pwd=[Txy*!14@msql*^];SSL Mode=None";
 
-            DataBaseConfiguration.DBDrives = new Dictionary<eDBType, Tuple<Type, Type>>();
+            //DataBaseConfiguration.DBDrives = new Dictionary<eDBType, Tuple<Type, Type>>();
             DataBaseConfiguration.DBDrives.Add(eDBType.Mysql, Tuple.Create(typeof(MySqlConnection), typeof(MySqlParameter)));
             client = new SimpleClient(
           new DataBaseConfiguration(true,
@@ -68,7 +68,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
 
             client.SetAOPLog((sql, Params) =>
             {
-                Console.WriteLine(sql);
+                //Console.WriteLine(sql);
             });
             client.SetAttr(typeof(MyTableAttrbute), typeof(MyColumnAttrbute));
             // var data=client.Queryable<MatchLog>().Take(10).ToList();
@@ -481,7 +481,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
             string str = "111";
             string[] names = new string[] { "111", "222", "333" };
             var data = client.Queryable<UserEntity>().Where(
-                u => u.Id == 3192 || Simple.LeftContains(u.Description,"asdfs")
+                u => u.Id == 3202 || Simple.LeftContains(u.Description,"asdfs")
                 || Simple.RightContains(u.Description,str)
                 || Simple.Contains(names,u.Description)
                 ).Select(u => new
@@ -491,6 +491,10 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 CompanyId = u.CompanyId,
                 Round = Simple.Round(u.Age,2),
                 Truncate = Simple.Truncate(u.Age,2),
+                Now=Simple.Now(),
+                Year=Simple.Year(u.Time1),
+                Month=Simple.Month(u.Time1),
+                Day=Simple.Day(u.Time1),
             }).ToList();
             List<UserEntity> left = client.Queryable<UserEntity>().Where(u =>Simple.LeftContains(u.Name,str)).ToList();
             Console.WriteLine(11);

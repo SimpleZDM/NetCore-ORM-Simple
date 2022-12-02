@@ -309,6 +309,11 @@ namespace NetCore.ORM.Simple.Visitor
                 {
                     map = select.MapFirstOrDefault(m =>
                   m.PropName.Equals(PropName) && m.TableName == TableName);
+                    if (map==null)
+                    {
+                        map=select.MapFirstOrDefault(m =>
+                        m.ColumnName.Equals(PropName) && m.TableName == TableName);
+                    }
                 }
                 else
                 {
@@ -336,10 +341,17 @@ namespace NetCore.ORM.Simple.Visitor
 
                 if (!Check.IsNull(currentmapInfo))
                 {
-                    currentmapInfo.IsNeed = true;
-                    currentmapInfo.Soft = soft;
-                    SetPropName();
-                    soft++;
+                    if (currentmapInfo.IsNeed == true)
+                    {
+                        CreateMap();
+                    }
+                    else
+                    {
+                        currentmapInfo.IsNeed = true;
+                        currentmapInfo.Soft = soft;
+                        SetPropName();
+                        soft++;
+                    }
                     return node;
                 }
                 else
@@ -390,6 +402,14 @@ namespace NetCore.ORM.Simple.Visitor
             soft++;
             SetPropName();
 
+        }
+        public void CreateMap()
+        {
+            currentmapInfo = currentmapInfo.Clon();
+            select.AddMapInfo(currentmapInfo);
+            currentmapInfo.Soft = soft;
+            soft++;
+            SetPropName();
         }
 
         public void SetPropName()

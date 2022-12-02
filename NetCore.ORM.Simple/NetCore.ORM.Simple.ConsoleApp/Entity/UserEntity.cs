@@ -19,9 +19,10 @@ namespace NetCore.ORM.Simple.ConsoleApp
     [MyTableAttrbute("usertable")]
     public class UserEntity
     {
+        public int CompanyId { get; set; }
         [MyColumnAttrbute(name:"Id",key:true,autoIncrease:true)]
         public int Id { get; set; }
-        public int CompanyId { get; set; }
+        
         public string Name { get; set; }
         public string Description { get; set; }
         public int RoleId { get; set; }

@@ -69,7 +69,7 @@ public static class Program
         MysqlTest.DeleteTest();
         Console.WriteLine();
         MysqlTest.QueryTest();
-        //MysqlTest.Transaction();
+        MysqlTest.Transaction();
         MysqlTest.TestCallMethod();
 
         //SimpleSqliteTest sqliteTest = new SimpleSqliteTest();

@@ -897,8 +897,16 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     value = MysqlConst._DATEDIFF(leftValue, conditions);
                     break;
                 case MethodConst._Now:
-
                     value = MysqlConst._NOW();
+                    break;
+                case MethodConst._Year:
+                    value = MysqlConst._Year(leftValue);
+                    break;
+                case MethodConst._Month:
+                    value = MysqlConst._Month(leftValue);
+                    break;
+                case MethodConst._Day:
+                    value = MysqlConst._Day(leftValue);
                     break;
                 case MethodConst._IF:
                     value="";

@@ -69,11 +69,11 @@ namespace NetCore.ORM.Simple.Common
         }
         public static PropertyInfo GetKey(this Type type,Type ColumnType)
         {
-            return GetPropertyInfos(type, column =>column.Key,ColumnType).FirstOrDefault();
+            return GetPropertyInfos(type, column =>column.Key,ColumnType,true).FirstOrDefault();
         }
         public static PropertyInfo GetAutoKey(this Type type, Type ColumnType)
         {
-            return GetPropertyInfos(type, column => column.Key&&column.AutoIncrease, ColumnType).FirstOrDefault();
+            return GetPropertyInfos(type, column => column.Key&&column.AutoIncrease, ColumnType,true).FirstOrDefault();
         }
         public static IEnumerable<PropertyInfo> GetNoIgnore(this Type type, Func<PropertyInfo, bool> func)
         {
@@ -173,7 +173,7 @@ namespace NetCore.ORM.Simple.Common
             return null;
         }
 
-        private static IEnumerable<PropertyInfo> GetPropertyInfos(Type type,Func<IColumn,bool> func,Type ColumnType)
+        private static IEnumerable<PropertyInfo> GetPropertyInfos(Type type,Func<IColumn,bool> func,Type ColumnType,bool declare=false)
         {
             if (Check.IsNull(type))
             {
@@ -186,7 +186,7 @@ namespace NetCore.ORM.Simple.Common
             IEnumerable<PropertyInfo> props = type.GetProperties().
                 Where(p => {
                     bool value = false;
-                    if (p.IsDefined(ColumnType, false) == false)
+                    if (p.IsDefined(ColumnType, false) == false&&declare==false)
                     {
                         return true;
                     }
