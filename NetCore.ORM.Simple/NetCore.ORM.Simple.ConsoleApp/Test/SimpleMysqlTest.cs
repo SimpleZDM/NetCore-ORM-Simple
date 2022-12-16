@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using System.Data.Common;
 using NetCore.ORM.Simple.Entity;
+using MDT.VirtualSoftPlatform.Entity;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.ConsoleApp.Test
@@ -184,33 +185,35 @@ namespace NetCore.ORM.Simple.ConsoleApp
         public void QueryTest()
         {
 
-            // var myobj = new { Name = "sd", Age = 10 };
-            // var type= myobj.GetType();
-            // var arr=type.GetFields();
-            // var arr1=type.GetProperties();
-            // var o=Activator.CreateInstance(type,"d",10);
-            //var fdata=client.Queryable<UserEntity,RoleEntity>
-            //     ((u,r)=>new JoinInfoEntity(eJoinType.Inner,u.RoleId==r.Id))
-            //     .GroupBy(u=>u.RoleId).Select(u=> new 
-            //     { Name = u.FirstOrDefault(f => f.Name),
-            //         RoleId = u.Key,
-            //       GID=u.FirstOrDefault(f=>f.gIdColumn)}).ToList();
+            var myobj = new { Name = "sd", Age = 10 };
+            var type = myobj.GetType();
+            var arr = type.GetFields();
+            var arr1 = type.GetProperties();
+            var o = Activator.CreateInstance(type, "d", 10);
+            var fdata = client.Queryable<UserEntity, RoleEntity>
+                 ((u, r) => new JoinInfoEntity(eJoinType.Inner, u.RoleId == r.Id))
+                 .GroupBy(u => u.RoleId).Select(u => new
+                 {
+                     Name = u.FirstOrDefault(f => f.Name),
+                     RoleId = u.Key,
+                     GID = u.FirstOrDefault(f => f.gIdColumn)
+                 }).ToList();
 
             int i = 1000;
             int j = 2000;
             //var JoinData = client.Queryable<UserEntity, RoleEntity, CompanyEntity>(
             //        (u, r, c) => new JoinInfoEntity(
-            //        new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
-            //        new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
-            //        )).GroupBy((u,r,c)=>new {u.Id}).Where(u=>u.Id>=i&&u.Id<=j).Where(u=>u.Id>1500).ToList();
+            //        eJoinType.Inner, u.RoleId.Equals(r.Id),
+            //        eJoinType.Inner, u.CompanyId.Equals(c.Id)
+            //        )).GroupBy((u, r, c) => new { u.Id }).Where(u => u.Id >= i && u.Id <= j).Where(u => u.Id > 1500).ToList();
             try
             {
 
-                //var datasss = client.Queryable<MissionDetailEntity>().Where(m => !m.IsDelete || 
-                //(m.EndTime < DateTime.Now && m.StartTime >DateTime.MinValue)||!m.Id.Equals(Guid.Empty)).Take(500).ToList();
+              //  var datasss = client.Queryable<MissionDetailEntity>().Where(m => !m.IsDelete ||
+              //  (m.EndTime < DateTime.Now && m.StartTime > DateTime.MinValue) || !m.Id.Equals(Guid.Empty)).Take(500).ToList();
                 Console.WriteLine("****************查询测试*****************");
                 Console.WriteLine("****************1.简单单表查询*****************");
-                ///返回所有
+                //返回所有
                 int[] ids = new int[] { 1811, 1813, 1814, 1815, 18116 };
                 Dictionary<int, int> dic = new Dictionary<int, int>();
                 List<int> lids = new List<int>();
@@ -226,10 +229,10 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 c.Count();
                 ids.Count();
                 c.Add(new ViewEntity() { RoleId = 1816 });
-                UserEntity user = client.Queryable<UserEntity>().Where(u => c[0].RoleId.Equals(u.Id) && u.Name.Contains(str)).FirstOrDefault();
-                List<UserEntity> left = client.Queryable<UserEntity>().Where(u =>Simple.LeftContains(u.Name,str)).ToList();
-                List<UserEntity> user1 = client.Queryable<UserEntity>().Where(u => u.Id.Equals(ids[0])).ToList();
-                List<UserEntity> user2 = client.Queryable<UserEntity>().Where(u => lids[1].Equals(u.Id)).ToList();
+                UserEntity user = client.Queryable<UserEntity>().Where(u => c[0].RoleId==u.Id && u.Name.Contains(str)).FirstOrDefault();
+                List<UserEntity> left = client.Queryable<UserEntity>().Where(u => Simple.LeftContains(u.Name, str)).ToList();
+                List<UserEntity> user1 = client.Queryable<UserEntity>().Where(u => u.Id==ids[0]).ToList();
+                List<UserEntity> user2 = client.Queryable<UserEntity>().Where(u => lids[1]==(u.Id)).ToList();
                 List<UserEntity> user3 = client.Queryable<UserEntity>().Where(u => ids.Contains(u.Id)).ToList();
                 List<UserEntity> user4 = client.Queryable<UserEntity>().Where(u => lids.Contains(u.Id)).ToList();
                 ///数据的条数
@@ -252,7 +255,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 //分组
                 var group = client.Queryable<UserEntity>().
                     Where(user => user.Id > min && user.Id <= max).
-                    GroupBy(u => new { u.CompanyId }).Where(u => u.Id > 100).ToList();
+                    GroupBy(u => new { u.CompanyId }).ToList();
                 //排序
                 var order = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderBy(u => new { u.Id }).ToList();
                 var orderDesce = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderByDescending(u => new { u.Id }).ToList();
@@ -267,48 +270,48 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 //分组
                 var group1 = client.Queryable<UserEntity>().
                     Where(user => user.Id > min && user.Id <= max).
-                    GroupBy(u => new { u.CompanyId }).Where(u => u.Id > 100).ToList();
+                    GroupBy(u => new { u.CompanyId }).Where(u=>u.CompanyId>1).ToList();
                 //排序
                 var order1 = client.Queryable<UserEntity>().Where(user => user.Id >
                 min && user.Id <= max).OrderBy(u => new { u.Id }).ToList();
 
                 var orderDesc1e = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderByDescending(u => new { u.Id }).ToList();
 
-                //Console.WriteLine($"*****************是否有数据:{any}****************");
-                //Console.WriteLine($"*****************总行数:{count}****************");
+                Console.WriteLine($"*****************是否有数据:{any}****************");
+                Console.WriteLine($"*****************总行数:{count}****************");
 
-                //Console.WriteLine("****************2.多表连接查询*****************");
-                //Console.WriteLine($"*****************连接查询****************");
+                Console.WriteLine("****************2.多表连接查询*****************");
+                Console.WriteLine($"*****************连接查询****************");
 
-                //var JoinData = client.Queryable<UserEntity, RoleEntity, CompanyEntity>(
-                //    (u, r, c) => new JoinInfoEntity(
-                //    new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
-                //    new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
-                //    )).ToList();
+                var JoinData = client.Queryable<UserEntity, RoleEntity, CompanyEntity>(
+                    (u, r, c) => new JoinInfoEntity(
+                    eJoinType.Inner, u.RoleId.Equals(r.Id),
+                    eJoinType.Inner, u.CompanyId.Equals(c.Id)
+                    )).ToList();
 
-                //var JoinData1 = client.Queryable<
-                //    UserEntity, RoleEntity, CompanyEntity>(
-                //    (u, r, c) => new JoinInfoEntity(
-                //   new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
-                //   new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
-                //   )).
-                //   Where((u, r, c) => u.Id > 10).OrderByDescending((u, r) => u.Id).
-                //   Select((u, r, c) => new
-                //   {
-                //       UserName = u.Name,
-                //       CompanyName = c.CompanyName,
-                //       RoleName = r.DisplayName,
-                //       Id = u.Id
-                //   });
-
-                //UserEntity u = new UserEntity();
-                //RoleEntity r = new RoleEntity();
-                //CompanyEntity cc = new CompanyEntity();
-                //new JoinInfoEntity(
-                //   (eJoinType.Inner, u.RoleId.Equals(r.Id)),
-                //   (eJoinType.Inner, u.CompanyId.Equals(cc.Id))
-                //   );
                 var JoinData1 = client.Queryable<
+                    UserEntity, RoleEntity, CompanyEntity>(
+                    (u, r, c) => new JoinInfoEntity(
+                   eJoinType.Inner, u.RoleId.Equals(r.Id),
+                   eJoinType.Inner, u.CompanyId.Equals(c.Id)
+                   )).
+                   Where((u, r, c) => u.Id > 10).OrderByDescending((u, r) => u.Id).
+                   Select((u, r, c) => new
+                   {
+                       UserName = u.Name,
+                       CompanyName = c.CompanyName,
+                       RoleName = r.DisplayName,
+                       Id = u.Id
+                   }).ToList();
+
+                UserEntity u = new UserEntity();
+                RoleEntity r = new RoleEntity();
+                CompanyEntity cc = new CompanyEntity();
+                new JoinInfoEntity(
+                   eJoinType.Inner, u.RoleId.Equals(r.Id),
+                   eJoinType.Inner, u.CompanyId.Equals(cc.Id)
+                   );
+                var JoinData19 = client.Queryable<
                     UserEntity, RoleEntity, CompanyEntity>(
                     (u, r, c) => new JoinInfoEntity(
                    eJoinType.Inner, u.RoleId.Equals(r.Id),
@@ -323,37 +326,41 @@ namespace NetCore.ORM.Simple.ConsoleApp
                        Id = u.Id
                    });
 
-                //JoinData1.Where(s => s.Id > 10);
+                JoinData1.Where(s => s.Id > 10);
 
-                //JoinData1.Where(s => s.Id > 100 && s.Id > 1000);
+                JoinData1.Where(s => s.Id > 100 && s.Id > 1000);
 
-                //JoinData1.Where(s => true);
+                JoinData1.Where(s => true);
 
                 //var data111 = JoinData1.ToList();
                 ///////连接查询分组
-                //var JoinData2 = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) => new JoinInfoEntity(
-                //  new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
-                //  new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
-                //  )).
-                //  Where((u, r, c) => u.Id > 10).Select((u, r, c) =>
-                //  new ViewEntity
-                //  {
-                //      UserName = u.Name,
-                //      CompanyId = c.Id,
-                //      CompanyName = c.CompanyName,
-                //      RoleId = r.Id
-                //  }
-                //  ).
-                //  GroupBy(v => v.RoleId).
-                //  Select((v) => new GroupEntity()
-                //  {
-                //      Count = v.Count(),
-                //      FirstOrDefaultName = v.FirstOrDefault(s => s.UserName),
-                //      Max = v.Max(s => s.RoleId)
-                //  }).ToList();
-                var data1111 = JoinData1.ToList();
-                /////连接查询分组
                 var JoinData2 = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) =>
+                new JoinInfoEntity(
+                  eJoinType.Inner, u.RoleId.Equals(r.Id),
+                  eJoinType.Inner, u.CompanyId.Equals(c.Id)
+                  ))
+                 .Select((u, r, c) =>
+                  new ViewEntity
+                  {
+                      UserName = u.Name,
+                      CompanyId = c.Id,
+                      CompanyName = c.CompanyName,
+                      RoleId = r.Id
+                  }
+                  ).
+                  GroupBy(v => v.RoleId).
+                  Select(v => new
+                  {
+                      Count = v.Count(),
+                      UserName = v.FirstOrDefault(r=>r.UserName),
+                      RoleId = v.Max(r => r.CompanyId)
+
+                  }).ToList();
+
+
+                // var data1111 = JoinData1.ToList();
+                /////连接查询分组
+                var JoinData21 = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) =>
                 new JoinInfoEntity(
                   eJoinType.Inner, u.RoleId.Equals(r.Id),
                   eJoinType.Inner, u.CompanyId.Equals(c.Id))).
@@ -374,14 +381,16 @@ namespace NetCore.ORM.Simple.ConsoleApp
                       //Max = v.Max(s => s.RoleId)
                   }).ToList();
 
-                //var orderBy = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) => new JoinInfoEntity(
-                //   new JoinMapEntity(eJoinType.Inner, u.RoleId.Equals(r.Id)),
-                //   new JoinMapEntity(eJoinType.Inner, u.CompanyId.Equals(c.Id))
-                //   )).
-                //   Where((u, r, c) => u.Id > 10).
-                //   Select((u, r, c) => new { UserName = u.Name, CompanyName = c.CompanyName, RoleName = r.DisplayName, Id = u.Id }).OrderBy(u => u.Id).ToList();
-                //Console.WriteLine($"*****************受影响行数:{result1}****************");
-                // Console.WriteLine($"*****************受影响行数:{result2}****************");
+                var orderBy = client.Queryable<UserEntity, RoleEntity, CompanyEntity>((u, r, c) => new JoinInfoEntity(
+                   eJoinType.Inner, u.RoleId.Equals(r.Id),
+                   eJoinType.Inner, u.CompanyId.Equals(c.Id)
+                   )).
+                   Where((u, r, c) => u.Id > 10).
+                   Select((u, r, c) => 
+                   new { UserName = u.Name, CompanyName = c.CompanyName, RoleName = r.DisplayName, Id = u.Id })
+                   .OrderBy(u => u.Id).ToList();
+                Console.WriteLine($"*****************受影响行数:****************");
+                Console.WriteLine($"*****************受影响行数:****************");
                 Console.WriteLine("****************测试结束*****************");
                 var obj = new { sdfs = 1 };
             }
@@ -499,22 +508,24 @@ namespace NetCore.ORM.Simple.ConsoleApp
         {
             string str = "111";
             string[] names = new string[] { "111", "222", "333" };
-            var data = client.Queryable<UserEntity>().Where(
-                u => u.Id == 3202 || Simple.LeftContains(u.Description, "asdfs")
-                || Simple.RightContains(u.Description, str)
-                || Simple.Contains(names, u.Description)
-                ).Select(u => new
+            var data = client.Queryable<UserEntity>().
+                //Where(
+                //u => u.Id == 3202 || Simple.LeftContains(u.Description, "asdfs")
+                //|| Simple.RightContains(u.Description, str)
+                //|| Simple.Contains(names, u.Description)
+                //).
+                Select(u => new
                 {
                     Name = u.Name,
                     //DateDiff = Simple.DateDiff(u.Time1, u.Time2, eDateType.Minute),
                     //CompanyId = u.CompanyId,
-                    //Round = Simple.Round(u.Age, 2),
+                     Round = Simple.IF(u.RoleId==1, 2).ElseIF(u.RoleId==2,3).End(2),
                     //Truncate = Simple.Truncate(u.Age, 2),
                     //Now = Simple.Now(),
                     //Year = Simple.Year(u.Time1),
                     //Month = Simple.Month(u.Time1),
                     //Day = Simple.Day(u.Time1),
-                    BoolIs = Simple.IF(u.Time1>=u.Time2,1,2)
+                     BoolIs = Simple.IF(u.Time1>=u.Time2,1,2)
                 }).ToList();
             List<UserEntity> left = client.Queryable<UserEntity>().Where(u =>Simple.LeftContains(u.Name,str)).ToList();
             

@@ -129,7 +129,7 @@ namespace NetCore.ORM.Simple.Visitor
                     {
                         if (IsCompleteMember)
                         {
-                            currentMember = new NetCore.ORM.Simple.Entity.MemberEntity();
+                            currentMember = new Entity.MemberEntity();
                             IsCompleteMember = false;
                         }
                     }

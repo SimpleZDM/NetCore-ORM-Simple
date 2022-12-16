@@ -70,9 +70,9 @@ public static class Program
         //MysqlTest.UpdateTest();
         //MysqlTest.DeleteTest();
         //Console.WriteLine();
-        //MysqlTest.QueryTest();
+       MysqlTest.QueryTest();
         //MysqlTest.Transaction();
-        MysqlTest.TestCallMethod();
+         MysqlTest.TestCallMethod();
 
         //SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
         //sqliteTest.InsertTest();

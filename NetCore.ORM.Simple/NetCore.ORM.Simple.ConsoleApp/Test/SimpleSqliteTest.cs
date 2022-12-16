@@ -213,7 +213,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 //分组
                 var group = client.Queryable<UserEntity>().
                     Where(user => user.Id > min && user.Id <= max).
-                    GroupBy(u => new { u.CompanyId }).Where(u => u.Id > 100).ToList();
+                    GroupBy(u => new { u.CompanyId }).ToList();
                 //排序
                 var order = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderBy(u => new { u.Id }).ToList();
                 var orderDesce = client.Queryable<UserEntity>().Where(user => user.Id > min && user.Id <= max).OrderByDescending(u => new { u.Id }).ToList();

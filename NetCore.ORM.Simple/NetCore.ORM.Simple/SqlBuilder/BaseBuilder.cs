@@ -518,7 +518,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 string rightValue = string.Empty;
                 ConditionEntity currentConditon = null;
                
-                    leftValue = SetCondition(treeConditions[i].LeftCondition, sqlEntity,i);
+                leftValue = SetCondition(treeConditions[i].LeftCondition, sqlEntity,i);
                 if (Check.IsNullOrEmpty(leftValue))
                 {
                     leftValue = SetCondition(treeConditions[i].RightCondition, sqlEntity, i);
@@ -564,6 +564,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 {
                     StrValue.Append($"{leftValue}{MysqlConst.cStrSign[(int)treeConditions[i].RelationCondition.SignType]}{rightValue}");
                 }
+
                 foreach (var sign in treeConditions[i].RightBracket)
                 {
                     StrValue.Append(MysqlConst.cStrSign[(int)sign]);

@@ -100,9 +100,6 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            SelectEntity e = new SelectEntity(null,null);
-            ConditionVisitor conditionVisitor = new ConditionVisitor(e);
-            conditionVisitor.Visit(node);
             ConditionEntity condition = null;
             switch (node.NodeType)
             {
@@ -164,7 +161,6 @@ namespace NetCore.ORM.Simple.Visitor
                 default:
                     break;
             }
-            return node;
             return node;
         }
 

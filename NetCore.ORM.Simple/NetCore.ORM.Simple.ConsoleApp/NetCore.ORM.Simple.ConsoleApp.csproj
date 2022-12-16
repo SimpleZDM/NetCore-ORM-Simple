@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NetCore.ORM.Simple\NetCore.ORM.Simple.csproj" />
+    <ProjectReference Include="..\NetCore.ORM.Simple_V2\NetCore.ORM.Simple_V2.csproj" />
   </ItemGroup>
 
 </Project>

@@ -418,6 +418,10 @@ namespace NetCore.ORM.Simple.Entity
                 {
                     TreeConditions.Add(currentTree);
                 }
+                else
+                {
+                    currentJoin.TreeConditions.Add(currentTree);
+                }
                 IsComplete = false;
             }
             currentTree.LeftBracket.Add(eSignType.LeftBracket);
@@ -439,6 +443,10 @@ namespace NetCore.ORM.Simple.Entity
                 if (Check.IsNull(currentJoin))
                 {
                     TreeConditions.Add(currentTree);
+                }
+                else
+                {
+                    currentJoin.TreeConditions.Add(currentTree);
                 }
                 IsComplete = false;
             }
