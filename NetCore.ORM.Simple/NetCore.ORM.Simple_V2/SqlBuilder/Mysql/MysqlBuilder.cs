@@ -184,23 +184,31 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
        
 
-        protected override string MapMethod(List<MethodEntity> methods)
+        protected override string MapMethod(List<MethodEntity> methods,SqlBase sql)
         {
             StringBuilder sbValue =new StringBuilder();// DBMDConst.Equal.ToString();
 
             foreach (var m in methods)
             {
-                if (m.MethodType==eMethodType.DataBase)
+                if (m.MethodType == eMethodType.DataBase)
                 {
                     if (MysqlConst.dicMethods.ContainsKey(m.Name))
                     {
-                       sbValue.Append(MysqlConst.dicMethods[m.Name].Invoke(m));
+                        if (!Check.IsNullOrEmpty(m.TreeConditions) && !Check.IsNull(sql))
+                        {
+                            QueryEntity qsql = new QueryEntity();
+                            LinkConditions(m.Conditions, m.TreeConditions, sql);
+                            if (!Check.IsNullOrEmpty(qsql.DbParams))
+                            {
+                                sql.DbParams.AddRange(qsql.DbParams);
+                            }
+                            m.Extensions = qsql.StrSqlValue.ToString();
+                        }
+                        sbValue.Append(MysqlConst.dicMethods[m.Name].Invoke(m));
                     }
                 }
-               
             }
-            
-          
+
             return sbValue.ToString();
         }
     }

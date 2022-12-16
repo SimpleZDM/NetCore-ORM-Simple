@@ -120,20 +120,15 @@ namespace NetCore.ORM.Simple.Visitor
             {
                 if (!Check.IsNullOrEmpty(currentmapInfo.Methods[0].Parameters))
                 {
-                    if (select.MapInfos.Any(p=>
-                    p.TableName==currentmapInfo.Methods[0].Parameters[0].TableName&&
-                    p.ColumnName == currentmapInfo.Methods[0].Parameters[0].ColumnName
-                    ))
+
+                    if (!SetMap(currentmapInfo.Methods[0].Parameters[0]))
                     {
-                        var map = select.MapInfos.Where(p=>p.TableName == currentmapInfo.Methods[0].Parameters[0].TableName &&
-                    p.ColumnName == currentmapInfo.Methods[0].Parameters[0].ColumnName).FirstOrDefault();
-                        map.IsNeed = true;
-                        map.Soft = soft;
-                        MapExtension.SetPropName(isAnonymity,ref MemberCurrent,ref currentmapInfo,Members);
-                        soft++;
-                        map.Methods = currentmapInfo.Methods;
-                        currentmapInfo = map;
+                        if (!Check.IsNullOrEmpty(currentmapInfo.Methods[0].TreeConditions))
+                        {
+                            SetMap(currentmapInfo.Methods[0].TreeConditions[0].LeftCondition);
+                        }
                     }
+                   
                 }
                 else
                 {
@@ -221,6 +216,26 @@ namespace NetCore.ORM.Simple.Visitor
         protected override Expression VisitNewArray(NewArrayExpression node)
         {
             return base.VisitNewArray(node);
+        }
+
+        private bool SetMap(ConditionEntity condition)
+        {
+            if (select.MapInfos.Any(p =>
+                    p.TableName == condition.TableName &&
+                    p.ColumnName == condition.ColumnName
+                    ))
+            {
+                var map = select.MapInfos.Where(p => p.TableName == condition.TableName &&
+            p.ColumnName == condition.ColumnName).FirstOrDefault();
+                map.IsNeed = true;
+                map.Soft = soft;
+                MapExtension.SetPropName(isAnonymity, ref MemberCurrent, ref currentmapInfo, Members);
+                soft++;
+                map.Methods = currentmapInfo.Methods;
+                currentmapInfo = map;
+                return true;
+            }
+            return false;
         }
     }
 }

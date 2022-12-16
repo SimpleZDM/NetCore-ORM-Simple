@@ -82,15 +82,17 @@ namespace NetCore.ORM.Simple.Visitor
             }
             if (node.Type.IsValueType)
             {
+                ConditionEntity condition = GetCondition(eConditionType.Constant);
                 if (node.Type.IsEnum)
                 {
                     int.TryParse(node.Value.ToString(), out int value);
-                    right.DisplayName = value.ToString();
+                    condition.Value = node.Value;
                 }
                 else
                 {
-                    right.DisplayName = node.Value.ToString();
+                    condition.DisplayName = node.Value.ToString();
                 }
+                currentMethod.Parameters.Add(condition);
             }
             else
             {
@@ -110,8 +112,11 @@ namespace NetCore.ORM.Simple.Visitor
                 currentMethod = new MethodEntity();
               
             }
-            VisitMethod(node, ref currentMethod,ref currentMember); 
-            methods.Add(currentMethod);
+            VisitMethod(node, ref currentMethod,ref currentMember);
+            if (Check.IsNullOrEmpty(methods)||!object.ReferenceEquals(methods[methods.Count-1],currentMethod))
+            {
+                methods.Add(currentMethod);
+            }
         }
 
 

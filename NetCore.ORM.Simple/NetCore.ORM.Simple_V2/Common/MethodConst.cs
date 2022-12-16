@@ -49,6 +49,7 @@ namespace NetCore.ORM.Simple.Common
         public const string _Truncate = "Truncate";
         public const string _IF = "IF";
         public const string _ElseIF = "ElseIF";
+        public const string _End = "End";
 
 
 

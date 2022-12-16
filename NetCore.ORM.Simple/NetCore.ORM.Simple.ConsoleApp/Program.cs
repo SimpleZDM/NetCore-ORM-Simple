@@ -4,6 +4,7 @@ using NetCore.ORM.Simple.Entity;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace NetCore.ORM.Simple.ConsoleApp;
 public static class Program
@@ -62,7 +63,10 @@ public static class Program
         // SimpleExpressionTest test = new SimpleExpressionTest();
         //test.Select();
         // test.Where();
-
+        UserEntity u = new UserEntity();
+        List<UserEntity> users = new List<UserEntity>();
+        users.Add(u);
+        Console.WriteLine(object.ReferenceEquals(users[0],u));
         SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
         //MysqlTest.MoreQuerTest();
         //MysqlTest.sqlTest();
@@ -70,7 +74,7 @@ public static class Program
         //MysqlTest.UpdateTest();
         //MysqlTest.DeleteTest();
         //Console.WriteLine();
-       MysqlTest.QueryTest();
+      // MysqlTest.QueryTest();
         //MysqlTest.Transaction();
          MysqlTest.TestCallMethod();
 

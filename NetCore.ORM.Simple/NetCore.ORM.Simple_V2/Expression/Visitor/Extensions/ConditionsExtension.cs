@@ -541,8 +541,8 @@ namespace NetCore.ORM.Simple.Visitor
                 conditon.TableName = NameEntity.DisplayNmae;
                 if (!Check.IsNull(Prop))
                 {
-                    PropName = table.GetColumnName(Index, PropName);
-                    conditon.DisplayName =GetDisplayName(conditon.AsTableName,PropName);
+                    conditon.ColumnName = Prop.GetColName();
+                    conditon.DisplayName =GetDisplayName(conditon.AsTableName,conditon.ColumnName);
                 }
             }
             conditon.PropertyType = type;

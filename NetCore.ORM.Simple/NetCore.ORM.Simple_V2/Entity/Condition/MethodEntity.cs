@@ -48,6 +48,8 @@ namespace NetCore.ORM.Simple.Entity
         public List<ConditionEntity>Parameters { get { return parameters; } set { parameters = value; } }
         public bool IsNot { get { return isNot; } set { isNot = value; } }
 
+        public string Extensions { get { return extensions; } set { extensions = value; } }
+
         public MethodInfo Method { get; set; }
 
 
@@ -57,5 +59,6 @@ namespace NetCore.ORM.Simple.Entity
         private List<ConditionEntity> conditions;
         private List<ConditionEntity> parameters;
         public bool isNot;
+        public string extensions;
     }
 }

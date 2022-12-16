@@ -47,6 +47,7 @@ namespace NetCore.ORM.Simple.Visitor
         private Dictionary<string, int> currentTables;
         public Expression Modify(Expression expression, List<MethodEntity> _methods, Dictionary<string, int> _tables, params MapEntity[] _mapInfos)
         {
+            IsComplate = true;
             currentTables = _tables;
             methods = _methods;
             mapInfos = _mapInfos;
@@ -71,14 +72,15 @@ namespace NetCore.ORM.Simple.Visitor
                 currentMethod = new MethodEntity();
                 IsComplate = false;
             }
-            node.VisitMethod(ref currentMethod,ref currentMember,methods);
             base.VisitMethodCall(node);
+            node.VisitMethod(ref currentMethod,ref currentMember,methods);
             IsComplate = true;
             if (IsComplate)
             {
                 currentMethod = new MethodEntity();
                 IsComplate = false;
             }
+            IsComplate = true;
             return node;
         }
 

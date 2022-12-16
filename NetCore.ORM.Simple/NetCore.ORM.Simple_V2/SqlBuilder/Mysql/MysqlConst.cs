@@ -65,6 +65,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
         dicMethods.Add(MethodConst._DATEDIFF, _DATEDIFF);
         dicMethods.Add(MethodConst._Round, _Round);
         dicMethods.Add(MethodConst._Truncate,_Truncate);
+        dicMethods.Add(MethodConst._IF,_IF);
+        dicMethods.Add(MethodConst._ElseIF,_ElseIF);
+        dicMethods.Add(MethodConst._End,_End);
         //dicMethods.Add(MethodConst._ElseIF,_ElseIF);
         }
         public static void AddMysqlExtensMethod(string methodName,Func<MethodEntity,string> method)
@@ -335,7 +338,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         {
             string value = null;
 
-            if (Check.IsNullOrEmpty(method.Parameters) || method.Parameters.Count< 1)
+            if (Check.IsNullOrEmpty(method.Parameters) || method.Parameters.Count<2)
             {
                 throw new Exception("使用该DATEDIFF请传递中正确的参数!");
             }
@@ -388,6 +391,18 @@ namespace NetCore.ORM.Simple.SqlBuilder
             return value;
         }
         public static string _IF(MethodEntity method)
+        {
+            string value = null;
+            value = $"{DBMDConst.Case} {DBMDConst.When}{DBMDConst.LeftBracket}{method.Extensions}{DBMDConst.RightBracket}{DBMDConst.Then} ";
+            return value;
+        }
+        public static string _ElseIF(MethodEntity method)
+        {
+            string value = null;
+            value = $"{MethodConst._Now}{DBMDConst.LeftBracket}{DBMDConst.RightBracket}";
+            return value;
+        }
+        public static string _End(MethodEntity method)
         {
             string value = null;
             value = $"{MethodConst._Now}{DBMDConst.LeftBracket}{DBMDConst.RightBracket}";

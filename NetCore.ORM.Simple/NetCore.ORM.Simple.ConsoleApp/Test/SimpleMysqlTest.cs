@@ -517,8 +517,8 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 Select(u => new
                 {
                     Name = u.Name,
-                    //DateDiff = Simple.DateDiff(u.Time1, u.Time2, eDateType.Minute),
-                    //CompanyId = u.CompanyId,
+                    DateDiff = Simple.DateDiff(u.Time1, u.Time2, eDateType.Minute),
+                    CompanyId = u.CompanyId,
                      Round = Simple.IF(u.RoleId==1, 2).ElseIF(u.RoleId==2,3).End(2),
                     //Truncate = Simple.Truncate(u.Age, 2),
                     //Now = Simple.Now(),

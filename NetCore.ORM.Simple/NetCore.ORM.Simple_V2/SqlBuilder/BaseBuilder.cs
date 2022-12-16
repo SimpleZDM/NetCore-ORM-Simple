@@ -438,7 +438,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         }
                         else
                         {
-                            sqlEntity.StrSqlValue.Append($" {MapMethod(mapInfos[i].Methods)} {DBMDConst.As} {mapInfos[i].AsColumnName} ");
+                            sqlEntity.StrSqlValue.Append($" {MapMethod(mapInfos[i].Methods,sqlEntity)} {DBMDConst.As} {mapInfos[i].AsColumnName} ");
                         }
 
 
@@ -800,7 +800,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         }
 
 
-        protected virtual string MapMethod(List<MethodEntity> methods)
+        protected virtual string MapMethod(List<MethodEntity> methods,SqlBase sql=null)
         {
             StringBuilder sbValue = new StringBuilder();// DBMDConst.Equal.ToString();
             foreach (var m in methods)
@@ -809,6 +809,16 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 {
                     if (MysqlConst.dicMethods.ContainsKey(m.Name))
                     {
+                        if (!Check.IsNullOrEmpty(m.TreeConditions)&& !Check.IsNull(sql))
+                        {
+                            QueryEntity qsql = new QueryEntity();
+                            LinkConditions(m.Conditions,m.TreeConditions,sql);
+                            if (!Check.IsNullOrEmpty(qsql.DbParams))
+                            {
+                                sql.DbParams.AddRange(qsql.DbParams);
+                            }
+                            m.Extensions= qsql.StrSqlValue.ToString();
+                        }
                         sbValue.Append(MysqlConst.dicMethods[m.Name].Invoke(m));
                     }
                 }

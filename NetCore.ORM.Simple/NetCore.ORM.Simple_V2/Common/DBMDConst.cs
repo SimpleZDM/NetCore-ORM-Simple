@@ -61,6 +61,11 @@ namespace NetCore.ORM.Simple.Common
             Right = "Right";
             Inner = "Inner";
             Join = "Join";
+            Case = "Case";
+            When = "When";
+            Then = "Then";
+            End = "End";
+            Else = "Else";
             #endregion
 
             #region sign
@@ -131,6 +136,12 @@ namespace NetCore.ORM.Simple.Common
         public static string Right;
         public static string Inner;
         public static string Join;
+        public static string Case;
+        public static string When;
+        public static string Then;
+        public static string End;
+        public static string Else;
+
         #endregion
 
         #region sign
