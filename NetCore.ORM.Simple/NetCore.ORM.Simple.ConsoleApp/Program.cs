@@ -17,7 +17,7 @@ public static class Program
         //object o1 = new { UserName = 11 };
         //var b =Activator.CreateInstance(o1.GetType());
 
-        //Anonymity anonymity = new Anonymity();
+        Anonymity anonymity = new Anonymity();
 
         //string[] namelist = new string[] { "UserName", "UserId" };
         //Dictionary<string, Type> dic = new Dictionary<string, Type>();
