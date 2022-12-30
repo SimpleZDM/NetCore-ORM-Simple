@@ -5,8 +5,6 @@ VisualStudioVersion = 17.2.32314.265
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetCore.ORM.Simple.ConsoleApp", "NetCore.ORM.Simple.ConsoleApp\NetCore.ORM.Simple.ConsoleApp.csproj", "{09FD9BA6-EF77-4D40-949A-B2698C1894DF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetCore.ORM.Simple", "NetCore.ORM.Simple\NetCore.ORM.Simple.csproj", "{B0343337-7160-4D90-A724-88B60FFAA7C4}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{09FD9BA6-EF77-4D40-949A-B2698C1894DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09FD9BA6-EF77-4D40-949A-B2698C1894DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09FD9BA6-EF77-4D40-949A-B2698C1894DF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B0343337-7160-4D90-A724-88B60FFAA7C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B0343337-7160-4D90-A724-88B60FFAA7C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B0343337-7160-4D90-A724-88B60FFAA7C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B0343337-7160-4D90-A724-88B60FFAA7C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
