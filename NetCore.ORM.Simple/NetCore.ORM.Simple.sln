@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32314.265
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetCore.ORM.Simple.ConsoleApp", "NetCore.ORM.Simple.ConsoleApp\NetCore.ORM.Simple.ConsoleApp.csproj", "{09FD9BA6-EF77-4D40-949A-B2698C1894DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetCore.ORM.Simple", "NetCore.ORM.Simple\NetCore.ORM.Simple.csproj", "{449E53AC-7809-46FD-A52C-DB1B04F8B31E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{09FD9BA6-EF77-4D40-949A-B2698C1894DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09FD9BA6-EF77-4D40-949A-B2698C1894DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09FD9BA6-EF77-4D40-949A-B2698C1894DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09FD9BA6-EF77-4D40-949A-B2698C1894DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{449E53AC-7809-46FD-A52C-DB1B04F8B31E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{449E53AC-7809-46FD-A52C-DB1B04F8B31E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{449E53AC-7809-46FD-A52C-DB1B04F8B31E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{449E53AC-7809-46FD-A52C-DB1B04F8B31E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DCB8F121-5FE7-42F5-A4D3-382776DF5997}
+	EndGlobalSection
+EndGlobal
