@@ -304,11 +304,7 @@ namespace NetCore.ORM.Simple.Visitor
         }
         public static void SetConstantContValue(this ConditionEntity left, ConditionEntity right, ConstantExpression node)
         {
-            bool IsRight = true;
-            if (Check.IsNull(right))
-            {
-                IsRight = false;
-            }
+            bool IsRight = !Check.IsNull(right);
             if (!Check.IsNull(left))
             {
                 if (!Check.IsNullOrEmpty(left.Members))
@@ -318,109 +314,162 @@ namespace NetCore.ORM.Simple.Visitor
                     if (meber.Member is FieldInfo f)
                     {
                         value = f.GetValue(node.Value);
-                        if (!Check.IsNull(meber.OParams))
+                        if (!Check.IsNullOrEmpty(meber.OParams))
                         {
-                            value = ((dynamic)value)[(dynamic)meber.OParams];
+                            value = GetValue(value,meber.OParams.Count()-1, meber.OParams.ToArray());
                         }
-
                     }
                     while (!Check.IsNullOrEmpty(left.Members))
                     {
                         MemberEntity m = left.Members.Pop();
+
                         if (m.Member is FieldInfo field)
                         {
-                            if (!Check.IsNull(m.OParams))
-                            {
-                                value = ((dynamic)field.GetValue(value))[m.OParams];
-                            }
-                            else if (!Check.IsNull(m.KeyMember))
-                            {
-                                if (m.KeyMember is PropertyInfo PropKey)
-                                {
-                                    var Key = PropKey.GetValue(value);
-                                    value = ((dynamic)field.GetValue(value))[(dynamic)Key];
-                                }
-                                else if (m.KeyMember is FieldInfo fieldKey)
-                                {
-                                    var Key = fieldKey.GetValue(node.Value);
-                                    value = ((dynamic)field.GetValue(value))[(dynamic)Key];
-                                }
-                            }
-                            else
-                            {
-                                value = field.GetValue(value);
-                            }
+                            value=GetValue(field,m,value,node);
                         }
                         if (m.Member is PropertyInfo Property)
                         {
-                            if (!Check.IsNull(m.OParams))
-                            {
-                                var o = Property.GetValue(value);
-                                value = ((dynamic)o)[(dynamic)m.OParams];
-                            }
-                            else if (!Check.IsNull(m.KeyMember))
-                            {
-                                if (m.KeyMember is PropertyInfo PropKey)
-                                {
-                                    var Key = PropKey.GetValue(node.Value);
-                                    value = ((dynamic)Property.GetValue(value))[(dynamic)Key];
-                                }
-                                else if (m.KeyMember is FieldInfo fieldKey)
-                                {
-                                    var Key = fieldKey.GetValue(node.Value);
-                                    value = ((dynamic)Property.GetValue(value))[(dynamic)Key];
-                                }
-                            }
-                            else
-                            {
-                                value = Property.GetValue(value);
-                            }
+                            value=GetValue(Property,m,value,node);
                         }
                     }
-
-
                     if (value.GetType().IsValueType)
                     {
-
-                        if (IsRight)
-                        {
-                            right.DisplayName = value.ToString();
-                        }
-                        else
-                        {
-                            left.DisplayName=value.ToString();
-                        }
-
+                        SetName(left,right,IsRight,value);
                     }
                     else
                     {
-                        if (IsRight)
-                        {
-                            right.Value = value;
-                        }
-                        else
-                        {
-                            left.Value = value;
-                        }
-
+                        SetValue(left,right,IsRight,value);
                     }
                 }
                 else
                 {
-                    if (IsRight)
-                    {
-                        right.Value = node.Value.ToString();
-                    }
-                    else
-                    {
-                        left.Value = node.Value.ToString();
-                    }
-                  
+                    SetValue(left,right,IsRight,node);
                 }
 
             }
 
         }
-       
+
+        public static object GetValue(FieldInfo field,MemberEntity menber,object value,ConstantExpression node)
+        {
+            if (!Check.IsNullOrEmpty(menber.OParams))
+            {
+                //value = ((dynamic)field.GetValue(value))[menber.OParams];
+               value=GetValue(value,field,menber.OParams.ToArray());
+            }
+            else if (!Check.IsNull(menber.KeyMember))
+            {
+                if (menber.KeyMember is PropertyInfo PropKey)
+                {
+                    var Key = PropKey.GetValue(value);
+                    value = ((dynamic)field.GetValue(value))[(dynamic)Key];
+                }
+                else if (menber.KeyMember is FieldInfo fieldKey)
+                {
+                    var Key = fieldKey.GetValue(node.Value);
+                    value = ((dynamic)field.GetValue(value))[(dynamic)Key];
+                }
+            }
+            else
+            {
+                value = field.GetValue(value);
+            }
+            return value;
+        }
+
+        public static object GetValue(PropertyInfo Property, MemberEntity menber, object value, ConstantExpression node)
+        {
+
+            if (!Check.IsNullOrEmpty(menber.OParams))
+            {
+                //var o = Property.GetValue(value);
+                //value = ((dynamic)o)[(dynamic)menber.OParams];
+                value=GetValue(value,Property, menber.OParams.ToArray());
+            }
+            else if (!Check.IsNull(menber.KeyMember))
+            {
+                if (menber.KeyMember is PropertyInfo PropKey)
+                {
+                    var Key = PropKey.GetValue(node.Value);
+                    value = ((dynamic)Property.GetValue(value))[(dynamic)Key];
+                }
+                else if (menber.KeyMember is FieldInfo fieldKey)
+                {
+                    var Key = fieldKey.GetValue(node.Value);
+                    value = ((dynamic)Property.GetValue(value))[(dynamic)Key];
+                }
+            }
+            else
+            {
+                value = Property.GetValue(value);
+            }
+            return value;
+        }
+
+        public static object GetValue(object value,int length,params object[] objects)
+        {
+            if (length<0||length>=objects.Length)
+            {
+                return value;
+            }
+            for (int i = length; i>=0; i--)
+            {
+                dynamic dyValue = value;
+                dynamic dyParams=objects[i];
+                value = ((dynamic)value)[dyParams];
+            }
+            return value;
+        }
+
+        public static object GetValue(object value, FieldInfo field,params object[] objects)
+        {
+            int length = objects.Length - 1;
+            value = ((dynamic)field.GetValue(value))[objects[length]];
+            return GetValue(value,length-1,objects);
+        }
+        public static object GetValue(object value, PropertyInfo Property, params object[] objects)
+        {
+            int length = objects.Length - 1;
+            dynamic dValue = Property.GetValue(value);
+            value = dValue[(dynamic)objects[length]];
+            return GetValue(value, length-1, objects); ;
+        }
+
+        public static void SetValue(ConditionEntity left, ConditionEntity right,bool IsRight,object value)
+        {
+            if (IsRight)
+            {
+                right.Value = value;
+            }
+            else
+            {
+                left.Value = value;
+            }
+        }
+
+        public static void SetValue(ConditionEntity left, ConditionEntity right, bool IsRight, ConstantExpression node)
+        {
+            if (IsRight)
+            {
+                right.Value = node.Value.ToString();
+            }
+            else
+            {
+                left.Value = node.Value.ToString();
+            }
+        }
+
+        public static void SetName(ConditionEntity left, ConditionEntity right, bool IsRight,object value)
+        {
+            if (IsRight)
+            {
+                right.DisplayName = value.ToString();
+            }
+            else
+            {
+                left.DisplayName = value.ToString();
+            }
+        }
+
     }
 }

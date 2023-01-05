@@ -48,7 +48,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
               IsAutoClose = true,
               DBType = eDBType.Mysql,
               Name = "db1",
-              ReadWeight = 3,
+              ReadWeight = 0,
               WriteReadType = eWriteOrReadType.Read
           },
           new(db2)
@@ -56,7 +56,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
               IsAutoClose = true,
               DBType = eDBType.Mysql,
               Name = "db2",
-              ReadWeight = 3,
+              ReadWeight = 0,
               WriteReadType = eWriteOrReadType.Read
           },
           new(db3)
@@ -64,7 +64,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
               IsAutoClose = true,
               DBType = eDBType.Mysql,
               Name = "db3",
-              ReadWeight = 3,
+              ReadWeight = 0,
               WriteReadType = eWriteOrReadType.Read
           }));
 
@@ -181,6 +181,9 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 Console.WriteLine(ex.Message);
             }
         }
+        public class Test{
+            public Dictionary<int,UserEntity> dic { get; set; }
+        }
 
         public void QueryTest()
         {
@@ -216,20 +219,32 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 //返回所有
                 int[] ids = new int[] { 1811, 1813, 1814, 1815, 18116 };
                 Dictionary<int, int> dic = new Dictionary<int, int>();
+                Dictionary<int, UserEntity> dicEntity = new Dictionary<int, UserEntity>();
                 List<int> lids = new List<int>();
                 lids.Add(1811);
-                lids.Add(1816);
-                dic.Add(1816, 1816);
+                lids.Add(3212);
+                dic.Add(1816, 3212);
                 dic.Add(1817, 1817);
                 string[] names = new string[] { "111", "222", "333" };
                 string str = "111";
+                dicEntity.Add(1,new UserEntity()
+                {
+                    Id= 3212
+                });
 
-                List<UserEntity> users = client.Queryable<UserEntity>().Where(u => ids.Contains(u.Id) && names.Contains(u.Name)).ToList();
+                //List<UserEntity> users = client.Queryable<UserEntity>().Where(u => ids.Contains(u.Id) && names.Contains(u.Name)).ToList();
                 List<ViewEntity> c = new List<ViewEntity>();
                 c.Count();
                 ids.Count();
-                c.Add(new ViewEntity() { RoleId = 1816 });
-                UserEntity user = client.Queryable<UserEntity>().Where(u => c[0].RoleId==u.Id && u.Name.Contains(str)).FirstOrDefault();
+                c.Add(new ViewEntity() { RoleId = 3212 });
+                Test t= new Test();
+                t.dic = new Dictionary<int, UserEntity>();
+                t.dic.Add(1,new UserEntity() { Id= 3212 });
+                List<Test> tests = new List<Test>();
+                tests.Add(t);
+                Dictionary<int, List<Test>> dttt = new Dictionary<int, List<Test>>();
+                dttt.Add(1, tests);
+                UserEntity user = client.Queryable<UserEntity>().Where(u =>dttt[1][0].dic[1].Id==u.Id&&tests[0].dic[1].Id==u.Id).FirstOrDefault();
                 List<UserEntity> left = client.Queryable<UserEntity>().Where(u => Simple.LeftContains(u.Name, str)).ToList();
                 List<UserEntity> user1 = client.Queryable<UserEntity>().Where(u => u.Id==ids[0]).ToList();
                 List<UserEntity> user2 = client.Queryable<UserEntity>().Where(u => lids[1]==(u.Id)).ToList();

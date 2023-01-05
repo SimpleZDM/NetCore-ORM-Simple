@@ -154,6 +154,7 @@ namespace NetCore.ORM.Simple.Visitor
         {
             CustomerVisitConstant(node);
             base.VisitConstant(node);
+            currentMember = null;
             return node;
 
         }
@@ -277,7 +278,7 @@ namespace NetCore.ORM.Simple.Visitor
                     {
                         if (!Check.IsNull(currentMember))
                         {
-                            currentMember.OParams = constant.Value;
+                            currentMember.OParams.Add(constant.Value);
                         }
                     }
                     base.VisitBinary(node);
@@ -334,10 +335,9 @@ namespace NetCore.ORM.Simple.Visitor
                     if (IsCompleteMember)
                     {
                         currentMember = new MemberEntity();
-                        currentMember.OParams = call.Arguments[0];
                         IsCompleteMember = false;
                     }
-
+                    currentMember.OParams.Add(call.Arguments[0]);
 
                 }
                 if (node.Arguments[0] is ConstantExpression constant)
@@ -346,14 +346,13 @@ namespace NetCore.ORM.Simple.Visitor
                     if (IsCompleteMember)
                     {
                         currentMember = new MemberEntity();
-                        currentMember.OParams = constant.Value;
                         IsCompleteMember = false;
                     }
+                    currentMember.OParams.Add(constant.Value);
                 }
 
             }
             IsComplete = true;
-            IsCompleteMember = true;
         }
         public void CustomerVisitMember(MemberInfo member, MemberEntity currentMember)
         {
@@ -366,7 +365,7 @@ namespace NetCore.ORM.Simple.Visitor
             {
 
 
-                if (Check.IsNull(currentMember))
+                if (Check.IsNull(currentMember)||IsCompleteMember)
                 {
                     currentMember = new MemberEntity();
                 }

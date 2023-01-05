@@ -21,12 +21,16 @@ namespace NetCore.ORM.Simple.Entity
     /// </summary>
     public class MemberEntity
     {
+        public MemberEntity() 
+        {
+            OParams = new List<object>();
+        }
         public MemberInfo Member { get { return member; } set { member = value; } }
-        public object OParams { get { return oParams; } set { oParams = value; } }
+        public List<object> OParams { get { return oParams; } set { oParams = value; } }
         public MemberInfo KeyMember { get { return keyMember; } set { keyMember = value; } }
 
         private MemberInfo member;
-        private object oParams;
+        private List<object> oParams;
         private MemberInfo keyMember;
     }
 }

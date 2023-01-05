@@ -1,7 +1,6 @@
 ﻿using MDT.VirtualSoftPlatform.Entity;
 using NetCore.ORM.Simple.ConsoleApp.构造匿名对象;
 using NetCore.ORM.Simple.Entity;
-using NetCore.ORM.Simple.Visitor;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,9 +11,6 @@ public static class Program
 {
     public static int Main(string []args)
     {
-        A a=new A();
-        a.test();
-
         //object o1 = new { UserName = 11 };
         //var b =Activator.CreateInstance(o1.GetType());
 
@@ -40,7 +36,7 @@ public static class Program
         //Console.WriteLine(typeof(List<int>).IsArray);
         // Console.WriteLine(typeof(Dictionary<int,int>).IsD);
         //Console.WriteLine(typeof(int[]).IsArray);
-       // StartTast("server=49.233.33.36;database=virtualsoftplatformdb;user=root;pwd=[Txy*!14@msql*^];SSL Mode=None");
+        // StartTast("server=49.233.33.36;database=virtualsoftplatformdb;user=root;pwd=[Txy*!14@msql*^];SSL Mode=None");
 
         //Console.WriteLine();
         //object o = 1;
@@ -69,19 +65,19 @@ public static class Program
         users.Add(u);
         Console.WriteLine(object.ReferenceEquals(users[0],u));
         SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
-        //MysqlTest.MoreQuerTest();
+       // MysqlTest.MoreQuerTest();
         //MysqlTest.sqlTest();
         //MysqlTest.InsertTest();
         //MysqlTest.UpdateTest();
         //MysqlTest.DeleteTest();
         //Console.WriteLine();
-        //MysqlTest.QueryTest();
+        MysqlTest.QueryTest();
         //MysqlTest.Transaction();
         MysqlTest.TestCallMethod();
-        SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
-        sqliteTest.InsertTest();
+        //SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
+        //sqliteTest.InsertTest();
 
-        sqliteTest.UpdateTest();
+        //sqliteTest.UpdateTest();
 
         //sqliteTest.UpdateTest();
         //sqliteTest.DeleteTest();

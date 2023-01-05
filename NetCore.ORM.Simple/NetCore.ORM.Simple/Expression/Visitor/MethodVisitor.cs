@@ -156,12 +156,12 @@ namespace NetCore.ORM.Simple.Visitor
                 if (node.Arguments[0] is MethodCallExpression call)
                 {
                     currentMember = new MemberEntity();
-                    currentMember.OParams = call.Arguments[0];
+                    currentMember.OParams.Add(call.Arguments[0]);
                 }
                 if (node.Arguments[0] is ConstantExpression constant)
                 {
                     currentMember = new MemberEntity();
-                    currentMember.OParams = constant.Value;
+                    currentMember.OParams.Add(constant.Value);
                 }
             }
             if (Check.IsNullOrEmpty(methods) || !object.ReferenceEquals(methods[methods.Count - 1], currentMethod))
