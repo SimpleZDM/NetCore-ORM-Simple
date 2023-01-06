@@ -16,29 +16,79 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Queryable
 {
-    public interface ISimpleGroupByQueryable<TResult,TGroup>:IQueryResult<TResult>
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <typeparam name="TGroup"></typeparam>
+    public interface ISimpleGroupByQueryable<TResult, TGroup> : IQueryResult<TResult>
     {
-         TGroup Key { get; set; }
-         TField Sum<TField>(Expression<Func<TResult, TField>> expression);
-
-
-         TField Average<TField>(Expression<Func<TResult, TField>> expression);
-
-         int Count<TField>(Expression<Func<TResult, TField>> expression);
-
-         TField Max<TField>(Expression<Func<TResult, TField>> expression);
-       
-
-         TField Min<TField>(Expression<Func<TResult, TField>> expression);
-
+        /// <summary>
+        /// 
+        /// </summary>
+        TGroup Key { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TField"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        TField Sum<TField>(Expression<Func<TResult, TField>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TField"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        TField Average<TField>(Expression<Func<TResult, TField>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TField"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        int Count<TField>(Expression<Func<TResult, TField>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TField"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        TField Max<TField>(Expression<Func<TResult, TField>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TField"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        TField Min<TField>(Expression<Func<TResult, TField>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TField"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
         TField FirstOrDefault<TField>(Expression<Func<TResult, TField>> expression);
-
-
-
-         IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<ISimpleGroupByQueryable<TResult, TGroup>,TNewResult>> expression)where TNewResult : class;
-
-         ISimpleGroupByQueryable<TResult,TGroup> OrderBy<TOrder>(Expression<Func<ISimpleGroupByQueryable<TResult,TGroup>,TOrder>> expression);
-         ISimpleGroupByQueryable<TResult, TGroup> Where(Expression<Func<TGroup, bool>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TNewResult"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        IQueryResult<TNewResult> Select<TNewResult>(Expression<Func<ISimpleGroupByQueryable<TResult, TGroup>, TNewResult>> expression) where TNewResult : class;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleGroupByQueryable<TResult, TGroup> OrderBy<TOrder>(Expression<Func<ISimpleGroupByQueryable<TResult, TGroup>, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleGroupByQueryable<TResult, TGroup> Where(Expression<Func<TGroup, bool>> expression);
 
     }
 }

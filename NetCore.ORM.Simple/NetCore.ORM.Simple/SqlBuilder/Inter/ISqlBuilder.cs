@@ -19,20 +19,37 @@ namespace NetCore.ORM.Simple.SqlBuilder
 {
     internal interface ISqlBuilder
     {
-         SqlCommandEntity GetInsert<TData>(TData data, int random );
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TData"></typeparam>
+        /// <param name="data"></param>
+        /// <param name="random"></param>
+        /// <returns></returns>
+        SqlCommandEntity GetInsert<TData>(TData data, int random);
         /// <summary>
         /// 批量插入生成sql语句
         /// </summary>
         /// <typeparam name="TData"></typeparam>
         /// <param name="datas"></param>
         /// <returns></returns>
-         SqlCommandEntity GetInsert<TData>(List<TData> datas,int offset);
-         SqlCommandEntity GetUpdate<TData>(TData data,int random);
-         SqlCommandEntity GetUpdate<TData>(List<TData> datas, int offset);
-
-
-        
-
+        SqlCommandEntity GetInsert<TData>(List<TData> datas, int offset);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TData"></typeparam>
+        /// <param name="data"></param>
+        /// <param name="random"></param>
+        /// <returns></returns>
+        SqlCommandEntity GetUpdate<TData>(TData data, int random);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TData"></typeparam>
+        /// <param name="datas"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        SqlCommandEntity GetUpdate<TData>(List<TData> datas, int offset);
 
         /// <summary>
         /// 
@@ -41,23 +58,66 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="joinInfos">连接部分</param>
         /// <param name="condition">条件部分</param>
         /// <returns></returns>
-         void GetSelect<TData>(ContextSelect select,QueryEntity entity);
+        void GetSelect<TData>(ContextSelect select, QueryEntity entity);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="conditions"></param>
+        /// <param name="treeConditions"></param>
+        /// <returns></returns>
+        SqlCommandEntity GetDelete(Type type, List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TData"></typeparam>
+        /// <param name="data"></param>
+        /// <param name="random"></param>
+        /// <returns></returns>
+        SqlCommandEntity GetDelete<TData>(TData data, int random);
 
-         SqlCommandEntity GetDelete(Type type, List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="Params"></param>
+        /// <returns></returns>
+        SqlCommandEntity GetInsert(string sql, Dictionary<string, object> Params);
 
-         SqlCommandEntity GetDelete<TData>(TData data,int random);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="Params"></param>
+        /// <returns></returns>
+        SqlCommandEntity GetUpdate(string sql, Dictionary<string, object> Params);
 
-         SqlCommandEntity GetInsert(string sql, Dictionary<string, object> Params);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="Params"></param>
+        /// <returns></returns>
+        SqlCommandEntity GetDelete(string sql, Dictionary<string, object> Params);
 
-          SqlCommandEntity GetUpdate(string sql, Dictionary<string, object> Params);
-
-         SqlCommandEntity GetDelete(string sql, Dictionary<string, object> Params);
-
-
-         QueryEntity GetSelect(string sql, Dictionary<string, object> Params);
-        
-
-         void GetLastInsert<TData>(QueryEntity sql);
-          void GetCount(ContextSelect select, QueryEntity entity);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="Params"></param>
+        /// <returns></returns>
+        QueryEntity GetSelect(string sql, Dictionary<string, object> Params);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TData"></typeparam>
+        /// <param name="sql"></param>
+        void GetLastInsert<TData>(QueryEntity sql);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="select"></param>
+        /// <param name="entity"></param>
+        void GetCount(ContextSelect select, QueryEntity entity);
     }
 }

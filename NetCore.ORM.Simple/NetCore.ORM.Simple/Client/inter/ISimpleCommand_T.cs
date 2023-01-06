@@ -15,12 +15,27 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple
 {
-    public  interface ISimpleCommand<TEntity>
+    public interface ISimpleCommand<TEntity>
     {
-          Task<int> SaveChangeAsync();
-          int SaveChange();
-
-          Task<TEntity> ReturnEntityAsync();
-          TEntity ReturnEntity();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        Task<int> SaveChangeAsync();
+        /// <summary>
+        ///  
+        /// </summary>
+        /// <returns></returns>
+        int SaveChange();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        Task<TEntity> ReturnEntityAsync();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        TEntity ReturnEntity();
     }
 }

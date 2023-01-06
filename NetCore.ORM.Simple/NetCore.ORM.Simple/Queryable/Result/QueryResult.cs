@@ -25,15 +25,14 @@ namespace NetCore.ORM.Simple.Queryable
 {
     internal class QueryResult<TResult>:IQueryResult<TResult>
     {
-
+        protected int PageSize;
+        protected int PageNumber;
         protected eDBType DBType;
+        protected IDBDrive DbDrive;
         protected ISqlBuilder builder;
         protected SimpleVisitor visitor;
         protected QueryEntity sqlEntity;
-        protected int PageNumber;
-        protected int PageSize;
-        protected IDBDrive DbDrive;
-
+       
         /// <summary>
         /// 初始化
         /// </summary>
@@ -45,85 +44,125 @@ namespace NetCore.ORM.Simple.Queryable
             this.DbDrive = DbDrive;
             builder = _builder;
         }
+        /// <summary>
+        /// 
+        /// </summary>
         public QueryResult()
         {
             sqlEntity = new QueryEntity();
         }
-        public QueryResult(
-            SimpleVisitor _visitor,
-            ISqlBuilder _builder,IDBDrive DbDrive)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_visitor"></param>
+        /// <param name="_builder"></param>
+        /// <param name="DbDrive"></param>
+        public QueryResult(SimpleVisitor _visitor, ISqlBuilder _builder,IDBDrive DbDrive)
         {
             visitor = _visitor;
             builder = _builder;
             sqlEntity=new QueryEntity();
             this.DbDrive = DbDrive;
         }
-
-        public virtual int Count()
-        {
-            builder.GetCount(visitor.GetSelectInfo(), sqlEntity);
-            return DbDrive.ReadCount(sqlEntity);
-        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public bool Any()
         {
-            sqlEntity.PageSize = 1;
-            sqlEntity.PageNumber = 1;
-            builder.GetCount(visitor.GetSelectInfo(), sqlEntity);
+            sqlEntity.SetPage(1, 1);
+            builder.GetCount(visitor.GetContextSelect(), sqlEntity);
             return DbDrive.ReadAny(sqlEntity); ;
         }
-        public async Task<int> CountAsync()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public virtual int Count()
         {
-            builder.GetCount(visitor.GetSelectInfo(), sqlEntity);
-            return await DbDrive.ReadCountAsync(sqlEntity);
+            builder.GetCount(visitor.GetContextSelect(), sqlEntity);
+            return DbDrive.ReadCount(sqlEntity);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task<bool> AnyAsync()
         {
-            sqlEntity.PageSize = 1;
-            sqlEntity.PageNumber = 1;
-            builder.GetCount(visitor.GetSelectInfo(), sqlEntity);
+            sqlEntity.SetPage(1, 1);
+            builder.GetCount(visitor.GetContextSelect(), sqlEntity);
             return await DbDrive.ReadAnyAsync(sqlEntity);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<int> CountAsync()
+        {
+            builder.GetCount(visitor.GetContextSelect(), sqlEntity);
+            return await DbDrive.ReadCountAsync(sqlEntity);
+        }
+       
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public TResult First()
         {
 
-            sqlEntity.PageSize = 1;
-            sqlEntity.PageNumber = 1;
-            builder.GetSelect<TResult>(visitor.GetSelectInfo(), sqlEntity);
+            sqlEntity.SetPage(1, 1);
+            builder.GetSelect<TResult>(visitor.GetContextSelect(), sqlEntity);
             return  DbDrive.ReadFirstOrDefault<TResult>(sqlEntity);
         }
-        public async Task<TResult> FirstAsync()
-        {
-            sqlEntity.PageSize = 1;
-            sqlEntity.PageNumber = 1;
-            builder.GetSelect<TResult>(visitor.GetSelectInfo(), sqlEntity);
-            return await DbDrive.ReadFirstOrDefaultAsync<TResult>(sqlEntity);
-        }
-        public TResult FirstOrDefault()
-        {
-            sqlEntity.PageSize = 1;
-            sqlEntity.PageNumber = 1;
-            builder.GetSelect<TResult>(visitor.GetSelectInfo(), sqlEntity);
-            return  DbDrive.ReadFirstOrDefault<TResult>(sqlEntity);
-        }
-        public async Task<TResult> FirstOrDefaultAsync()
-        {
-            sqlEntity.PageSize = 1;
-            sqlEntity.PageNumber = 1;
-            builder.GetSelect<TResult>(visitor.GetSelectInfo(),sqlEntity);
-            return await DbDrive.ReadFirstOrDefaultAsync<TResult>(sqlEntity);
-        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public List<TResult> ToList()
         {
-            builder.GetSelect<TResult>(visitor.GetSelectInfo(), sqlEntity);
+            builder.GetSelect<TResult>(visitor.GetContextSelect(), sqlEntity);
             List<TResult> data = DbDrive.Read<TResult>(sqlEntity).ToList();
             return data;
         }
-      
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public TResult FirstOrDefault()
+        {
+            sqlEntity.SetPage(1, 1);
+            builder.GetSelect<TResult>(visitor.GetContextSelect(), sqlEntity);
+            return DbDrive.ReadFirstOrDefault<TResult>(sqlEntity);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<TResult> FirstAsync()
+        {
+            sqlEntity.SetPage(1, 1);
+            builder.GetSelect<TResult>(visitor.GetContextSelect(),sqlEntity);
+            return await DbDrive.ReadFirstOrDefaultAsync<TResult>(sqlEntity);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<TResult> FirstOrDefaultAsync()
+        {
+            sqlEntity.SetPage(1, 1);
+            builder.GetSelect<TResult>(visitor.GetContextSelect(),sqlEntity);
+            return await DbDrive.ReadFirstOrDefaultAsync<TResult>(sqlEntity);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<TResult>> ToListAsync()
         {
             sqlEntity.StrSqlValue.Clear();
             sqlEntity.DbParams.Clear();
-            builder.GetSelect<TResult>(visitor.GetSelectInfo(), sqlEntity);
+            builder.GetSelect<TResult>(visitor.GetContextSelect(),sqlEntity);
             return (await DbDrive.ReadAsync<TResult>(sqlEntity)).ToList();
         }
 

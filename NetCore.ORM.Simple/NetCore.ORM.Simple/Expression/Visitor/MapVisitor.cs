@@ -28,14 +28,11 @@ namespace NetCore.ORM.Simple.Visitor
         private bool IsAgain;
         private bool IsAnonymity;
         private int MemberCurrent;
-
         private ContextSelect contextSelect;
         private MapEntity CurrentMapInfo;
         private MethodVisitor methodVisitor;
         private Dictionary<string, int> TableParams;
         private MemberInfo[] Members { get; set; }
-
-
         public MapVisitor(ContextSelect _contextSlect)
         {
             TableParams = new Dictionary<string, int>();
@@ -66,7 +63,6 @@ namespace NetCore.ORM.Simple.Visitor
             Visit(expression);
             return expression;
         }
-
         /// <summary>
         /// 表达式树的二元操作
         /// </summary>
@@ -76,7 +72,6 @@ namespace NetCore.ORM.Simple.Visitor
         {
             return node;
         }
-
         /// <summary>
         /// 表达式树的常量操作
         /// </summary>
@@ -86,7 +81,6 @@ namespace NetCore.ORM.Simple.Visitor
         {
             return base.VisitConstant(node);
         }
-
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             CurrentMapInfo = new MapEntity();
@@ -125,18 +119,30 @@ namespace NetCore.ORM.Simple.Visitor
             CurrentMapInfo.PropName = node.Member.Name;
             return node;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         protected override Expression VisitParameter(ParameterExpression node)
         {
 
             return base.VisitParameter(node);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         protected override Expression VisitListInit(ListInitExpression node)
         {
             return base.VisitListInit(node);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         protected override Expression VisitLoop(LoopExpression node)
         {
             return base.VisitLoop(node);
@@ -152,12 +158,10 @@ namespace NetCore.ORM.Simple.Visitor
             CustomVisitMember(node);
             return node;
         }
-
         protected override Expression VisitMemberInit(MemberInitExpression node)
         {
             return base.VisitMemberInit(node);
         }
-
         protected override Expression VisitNew(NewExpression node)
         {
             if (IsAnonymity)
@@ -167,16 +171,17 @@ namespace NetCore.ORM.Simple.Visitor
             }
             return base.VisitNew(node);
         }
-
         protected override Expression VisitNewArray(NewArrayExpression node)
         {
             return base.VisitNewArray(node);
         }
 
-
         #region method extensions
-
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <exception cref="Exception"></exception>
         public  void CustomVisitMember(MemberExpression node)
         {
             string PropName = node.Member.Name;
@@ -220,6 +225,9 @@ namespace NetCore.ORM.Simple.Visitor
                 AddMapInfo(node.Expression.ToString(), PropName);
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
         private void SetAnonymityProperty()
         {
             if (IsAnonymity)
@@ -232,6 +240,11 @@ namespace NetCore.ORM.Simple.Visitor
                 }
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Params"></param>
+        /// <param name="PropName"></param>
         public  void AddMapInfo(string Params, string PropName)
         {
             var index = TableParams[Params];
@@ -239,6 +252,9 @@ namespace NetCore.ORM.Simple.Visitor
             contextSelect.MapInfos.Add(CurrentMapInfo);
             Activate();
         }
+        /// <summary>
+        /// 
+        /// </summary>
         private void AddMapInfo()
         {
             ConditionEntity condition=null;
@@ -301,6 +317,9 @@ namespace NetCore.ORM.Simple.Visitor
             }
             Activate();
         }
+        /// <summary>
+        /// 
+        /// </summary>
         private void Activate()
         {
             CurrentMapInfo.IsNeed = true;

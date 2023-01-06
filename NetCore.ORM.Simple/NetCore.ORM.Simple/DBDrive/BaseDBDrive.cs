@@ -688,7 +688,6 @@ namespace NetCore.ORM.Simple
             });
             return result;
         }
-
         public virtual async Task<TEntity> ExcuteAsync<TEntity>(SqlCommandEntity entity, string query) where TEntity : class
         {
             TEntity Entity = null;
@@ -724,7 +723,6 @@ namespace NetCore.ORM.Simple
             });
             return Entity;
         }
-
         public virtual int Excute(SqlCommandEntity[] sqlCommand, int InsertMaxCount = 800)
         {
             Open();
@@ -753,7 +751,6 @@ namespace NetCore.ORM.Simple
             }
             return result;
         }
-
         public virtual async Task<int> ExcuteAsync(SqlCommandEntity[] sqlCommand, int InsertMaxCount = 800)
         {
             Open();

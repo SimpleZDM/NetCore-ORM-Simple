@@ -24,9 +24,7 @@ namespace NetCore.ORM.Simple.Queryable
         {
 
         }
-        public SimpleQuery(
-          SimpleVisitor _visitor,
-          ISqlBuilder _builder, IDBDrive DbDrive):base(_visitor, _builder, DbDrive)
+        public SimpleQuery(SimpleVisitor _visitor,ISqlBuilder _builder, IDBDrive DbDrive):base(_visitor, _builder, DbDrive)
         {
          
         }
@@ -75,7 +73,6 @@ namespace NetCore.ORM.Simple.Queryable
             visitor.VisitorCondition(expression);
             return this;
         }
-
         public ISimpleQuery<TResult> Select(Expression<Func<TResult, TResult>> expression)
         {
             visitor.VisitMap(expression);

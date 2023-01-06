@@ -16,8 +16,16 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Queryable
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface ISimpleQueryable<T>:ISimpleQuery<T> where T : class
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         ISimpleQueryable<T> SimpleQueryable();
         
     }

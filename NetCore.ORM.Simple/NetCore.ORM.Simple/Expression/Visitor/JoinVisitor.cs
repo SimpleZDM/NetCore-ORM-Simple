@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
-//using MemberEntity= NetCore.ORM.Simple.Entity.MemberEntity;
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.Visitor
  * 接口名称 JoinVisitor
@@ -21,7 +20,6 @@ namespace NetCore.ORM.Simple.Visitor
 {
     internal class JoinVisitor : ExpressionVisitor, IExpressionVisitor
     {
-        private bool IsAgain;
         private JoinTableEntity CurrentJoinTable;
         private ConditionVisitor conditionVisitor;
         private Dictionary<string, int> TableParams;

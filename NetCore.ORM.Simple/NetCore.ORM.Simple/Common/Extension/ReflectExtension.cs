@@ -17,11 +17,22 @@ namespace NetCore.ORM.Simple.Common
 {
     public static class ReflectExtension
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static string GetTypeName<T>()
         {
             Type type = typeof(T);
             return type.GetTableName();
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <returns></returns>
         public static string[] GetTypeName<T,T2>() 
         {
             string[] names = new string[2];
@@ -29,6 +40,13 @@ namespace NetCore.ORM.Simple.Common
             names[2] = GetTypeName<T2>();
             return names;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <returns></returns>
         public static string[] GetTypeName<T,T2,T3>()
         {
             string[] names=new string[3];
@@ -37,6 +55,14 @@ namespace NetCore.ORM.Simple.Common
             names[2]=GetTypeName<T3>();
             return names;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <returns></returns>
         public static string[] GetTypeName<T, T2, T3,T4>()
         {
             string[] names = new string[4];
@@ -46,6 +72,15 @@ namespace NetCore.ORM.Simple.Common
             names[3] = GetTypeName<T4>();
             return names;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <returns></returns>
         public static string[] GetTypeName<T, T2, T3, T4,T5>()
         {
             string[] names = new string[5];
@@ -56,6 +91,16 @@ namespace NetCore.ORM.Simple.Common
             names[4] = GetTypeName<T5>();
             return names;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <returns></returns>
         public static string[] GetTypeName<T, T2, T3, T4, T5,T6>()
         {
             string[] names = new string[6];
@@ -67,6 +112,17 @@ namespace NetCore.ORM.Simple.Common
             names[5] = GetTypeName<T6>();
             return names;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <typeparam name="T7"></typeparam>
+        /// <returns></returns>
         public static string[] GetTypeName<T, T2, T3, T4, T5, T6,T7>()
         {
             string[] names = new string[7];
@@ -79,6 +135,18 @@ namespace NetCore.ORM.Simple.Common
             names[6] = GetTypeName<T7>();
             return names;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <typeparam name="T7"></typeparam>
+        /// <typeparam name="T8"></typeparam>
+        /// <returns></returns>
         public static string[] GetTypeName<T, T2, T3, T4, T5, T6, T7,T8>()
         {
             string[] names = new string[8];
@@ -92,6 +160,19 @@ namespace NetCore.ORM.Simple.Common
             names[7] = GetTypeName<T8>();
             return names;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <typeparam name="T7"></typeparam>
+        /// <typeparam name="T8"></typeparam>
+        /// <typeparam name="T9"></typeparam>
+        /// <returns></returns>
         public static string[] GetTypeName<T, T2, T3, T4, T5, T6, T7, T8,T9>()
         {
             string[] names = new string[9];
@@ -106,6 +187,20 @@ namespace NetCore.ORM.Simple.Common
             names[8] = GetTypeName<T9>();
             return names;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <typeparam name="T7"></typeparam>
+        /// <typeparam name="T8"></typeparam>
+        /// <typeparam name="T9"></typeparam>
+        /// <typeparam name="T10"></typeparam>
+        /// <returns></returns>
         public static string[] GetTypeName<T, T2, T3, T4, T5, T6, T7, T8, T9,T10>()
         {
             string[] names = new string[10];
@@ -121,6 +216,21 @@ namespace NetCore.ORM.Simple.Common
             names[9] = GetTypeName<T10>();
             return names;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <typeparam name="T7"></typeparam>
+        /// <typeparam name="T8"></typeparam>
+        /// <typeparam name="T9"></typeparam>
+        /// <typeparam name="T10"></typeparam>
+        /// <typeparam name="T11"></typeparam>
+        /// <returns></returns>
         public static string[] GetTypeName<T, T2, T3, T4, T5, T6, T7, T8, T9,T10,T11>()
         {
             string[] names = new string[11];
@@ -137,6 +247,22 @@ namespace NetCore.ORM.Simple.Common
             names[10] = GetTypeName<T11>();
             return names;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <typeparam name="T7"></typeparam>
+        /// <typeparam name="T8"></typeparam>
+        /// <typeparam name="T9"></typeparam>
+        /// <typeparam name="T10"></typeparam>
+        /// <typeparam name="T11"></typeparam>
+        /// <typeparam name="T12"></typeparam>
+        /// <returns></returns>
         public static string[] GetTypeName<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11,T12>()
         {
             string[] names = new string[12];
@@ -154,12 +280,22 @@ namespace NetCore.ORM.Simple.Common
             names[11] = GetTypeName<T12>();
             return names;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static Type GetType<T>()
         {
             Type type = typeof(T);
             return type;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <returns></returns>
         public static Type[] GetType<T, T2>()
         {
             Type[] types = new Type[2];
@@ -167,6 +303,13 @@ namespace NetCore.ORM.Simple.Common
             types[1] = GetType<T2>();
             return types;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <returns></returns>
         public static Type[] GetType<T, T2, T3>()
         {
             Type[] types = new Type[3];
@@ -175,6 +318,14 @@ namespace NetCore.ORM.Simple.Common
             types[2] = GetType<T3>();
             return types;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <returns></returns>
         public static Type[] GetType<T, T2, T3, T4>()
         {
             Type[] types = new Type[4];
@@ -184,6 +335,15 @@ namespace NetCore.ORM.Simple.Common
             types[3] = GetType<T4>();
             return types;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <returns></returns>
         public static Type[] GetType<T, T2, T3, T4,T5>()
         {
             Type[] types = new Type[5];
@@ -194,8 +354,19 @@ namespace NetCore.ORM.Simple.Common
             types[4] = GetType<T5>();
             return types;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <returns></returns>
         public static Type[] GetType<T,T2, T3, T4, T5,T6>()
         {
+            
             Type[] types = new Type[6];
             types[0] = GetType<T>();
             types[1] = GetType<T2>();
@@ -205,6 +376,17 @@ namespace NetCore.ORM.Simple.Common
             types[5] = GetType<T6>();
             return types;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <typeparam name="T7"></typeparam>
+        /// <returns></returns>
         public static Type[] GetType<T, T2, T3, T4, T5, T6,T7>()
         {
             Type[] types = new Type[7];
@@ -217,7 +399,18 @@ namespace NetCore.ORM.Simple.Common
             types[6] = GetType<T7>();
             return types;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <typeparam name="T7"></typeparam>
+        /// <typeparam name="T8"></typeparam>
+        /// <returns></returns>
         public static Type[] GetType<T, T2, T3, T4, T5, T6, T7,T8>()
         {
             Type[] types = new Type[8];
@@ -231,6 +424,19 @@ namespace NetCore.ORM.Simple.Common
             types[7] = GetType<T8>();
             return types;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <typeparam name="T7"></typeparam>
+        /// <typeparam name="T8"></typeparam>
+        /// <typeparam name="T9"></typeparam>
+        /// <returns></returns>
         public static Type[] GetType<T, T2, T3, T4, T5, T6, T7, T8,T9>()
         {
             Type[] types = new Type[9];
@@ -245,6 +451,20 @@ namespace NetCore.ORM.Simple.Common
             types[8] = GetType<T9>();
             return types;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <typeparam name="T7"></typeparam>
+        /// <typeparam name="T8"></typeparam>
+        /// <typeparam name="T9"></typeparam>
+        /// <typeparam name="T10"></typeparam>
+        /// <returns></returns>
         public static Type[] GetType<T, T2, T3, T4, T5, T6, T7, T8, T9,T10>()
         {
             Type[] types = new Type[10];
@@ -260,6 +480,21 @@ namespace NetCore.ORM.Simple.Common
             types[9] = GetType<T10>();
             return types;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <typeparam name="T7"></typeparam>
+        /// <typeparam name="T8"></typeparam>
+        /// <typeparam name="T9"></typeparam>
+        /// <typeparam name="T10"></typeparam>
+        /// <typeparam name="T11"></typeparam>
+        /// <returns></returns>
         public static Type[] GetType<T, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11>()
         {
             Type[] types = new Type[11];
@@ -276,6 +511,22 @@ namespace NetCore.ORM.Simple.Common
             types[10] = GetType<T11>();
             return types;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <typeparam name="T7"></typeparam>
+        /// <typeparam name="T8"></typeparam>
+        /// <typeparam name="T9"></typeparam>
+        /// <typeparam name="T10"></typeparam>
+        /// <typeparam name="T11"></typeparam>
+        /// <typeparam name="T12"></typeparam>
+        /// <returns></returns>
         public static Type[] GetType<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11,T12>()
         {
             Type[] types = new Type[12];

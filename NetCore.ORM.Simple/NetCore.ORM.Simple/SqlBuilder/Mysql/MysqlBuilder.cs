@@ -157,6 +157,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         {
             if (!Check.IsNull(OrderByInfos) && OrderByInfos.Where(o => o.IsOrderBy).Any())
             {
+                entity.AddLineFeed();
                 entity.StrSqlValue.Append($" {DBMDConst.Order} {DBMDConst.By} ");
                 entity.StrSqlValue.Append(string.Join(DBMDConst.Comma.ToString(), 
                     OrderByInfos.Where(o => o.IsOrderBy).OrderBy(o => o.OrderSoft).
@@ -173,6 +174,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         {
             if (!Check.IsNull(OrderByInfos) && OrderByInfos.Where(g => g.IsGroupBy).Any())
             {
+                entity.AddLineFeed();
                 entity.StrSqlValue.Append($" {DBMDConst.Group} {DBMDConst.By} ");
                 entity.StrSqlValue.Append(string.Join(DBMDConst.Comma.ToString(),
                     OrderByInfos.Where(g => g.IsGroupBy).OrderBy(g => g.GroupSoft).

@@ -117,14 +117,17 @@ namespace NetCore.ORM.Simple
         }
         public ISimpleCommand<TEntity> Insert<TEntity>(List<TEntity> entitys) where TEntity : class, new()
         {
-            var sql = builder.GetInsert(entitys,changeOffset);
+            return Insert(entitys.ToArray());
+        }
+        public ISimpleCommand<TEntity> Insert<TEntity>(params TEntity[] entitys) where TEntity : class, new()
+        {
+            var sql = builder.GetInsert(entitys, changeOffset);
             sql.DbCommandType = eDbCommandType.Insert;
             sqls.Add(sql);
-            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,dbType, sql, sqls, dbDrive);
-            changeOffset = entitys.Count()+ changeOffset;
+            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, dbType, sql, sqls, dbDrive);
+            changeOffset = entitys.Count() + changeOffset;
             return command;
         }
-
         public ISimpleCommand<TEntity> Update<TEntity>(TEntity entity) where TEntity : class, new()
         {
             var sql = builder.GetUpdate(entity,changeOffset);
@@ -132,7 +135,6 @@ namespace NetCore.ORM.Simple
             changeOffset++;
             return command;
         }
-
         public ISimpleCommand<TEntity> Update<TEntity>(string sql,Dictionary<string,object> Params) where TEntity : class, new()
         {
             var sqlCommand = builder.GetUpdate(sql,Params);
@@ -147,14 +149,13 @@ namespace NetCore.ORM.Simple
             changeOffset = entitys.Count()+ changeOffset;
             return command;
         }
-
         public ISimpleCommand<TEntity> Delete<TEntity>(Expression<Func<TEntity,bool>>expression) where TEntity : class, new()
         {
             Type type = typeof(TEntity);
-            ContextSelect select = new ContextSelect(type);
-            //var Visitor = new ConditionVisitor(select.TreeConditions,select.Conditions, select.Table);
-            //Visitor.Modify(expression);
-            var sql = builder.GetDelete(type, select.Conditions, select.TreeConditions);
+            ContextSelect contextSelect = new ContextSelect(type);
+            var Visitor = new ConditionVisitor(contextSelect);
+            Visitor.Modify(expression);
+            var sql = builder.GetDelete(type, contextSelect.Conditions,contextSelect.TreeConditions);
             sqls.Add(sql);
             ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,dbType, sql, sqls, dbDrive);
             return command;
@@ -167,7 +168,6 @@ namespace NetCore.ORM.Simple
             changeOffset++;
             return command;
         }
-
         public ISimpleCommand<TEntity> Delete<TEntity>(string sql,Dictionary<string,object> Params) where TEntity : class, new()
         {
             var sqlCommand = builder.GetDelete(sql, changeOffset);

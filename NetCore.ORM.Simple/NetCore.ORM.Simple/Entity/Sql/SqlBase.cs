@@ -65,6 +65,31 @@ namespace NetCore.ORM.Simple.Entity
            
             DbParams.Add(Params);
         }
+        /// <summary>
+        /// 添加一个换行符号
+        /// </summary>
+        public void AddLineFeed(bool IsConstraint=false)
+        {
+            char cLineFeed = '\n';
+            if (IsConstraint)
+            {
+                strSqlValue.AppendLine();
+            }
+            else
+            {
+                if (strSqlValue[strSqlValue.Length - 1] != cLineFeed)
+                {
+                    strSqlValue.AppendLine();
+                }
+            }
+        }
+        /// <summary>
+        /// 添加一个水平制表符号
+        /// </summary>
+        public void AddHorizontalTAB()
+        {
+            strSqlValue.Append("\t");
+        }
         private List<DbParameter> dbParams;
         private StringBuilder strSqlValue;
         private eDbCommandType dbCommandType;

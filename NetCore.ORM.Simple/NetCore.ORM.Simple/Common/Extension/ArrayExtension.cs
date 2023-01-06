@@ -19,6 +19,13 @@ namespace NetCore.ORM.Simple.Common
 {
     public class ArrayExtension
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static string GetValue<T>(T t, object obj)
         {
             string value = string.Empty; ;
@@ -68,6 +75,14 @@ namespace NetCore.ORM.Simple.Common
             }
             return value;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="obj"></param>
+        /// <param name="prop"></param>
+        /// <returns></returns>
         public static string GetValue<T>(T t, object obj, PropertyInfo prop)
         {
             string value = null;
@@ -135,6 +150,14 @@ namespace NetCore.ORM.Simple.Common
            
             return value;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="obj"></param>
+        /// <param name="field"></param>
+        /// <returns></returns>
         public static string GetValue<T>(T t, object obj, FieldInfo field)
         {
             string value = string.Empty; ;

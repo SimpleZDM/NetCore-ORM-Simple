@@ -27,13 +27,15 @@ namespace NetCore.ORM.Simple.Visitor
         private bool IsComplate;
         private ContextSelect contextSelect;
 
-
         private ConditionVisitor conditionVisitor;
         public MethodVisitor(ContextSelect _contextSelect)
         {
             contextSelect= _contextSelect;
             IsComplate = true;
         }
+        /// <summary>
+        /// 
+        /// </summary>
         public void InitConditionVisitor()
         {
            
@@ -44,7 +46,13 @@ namespace NetCore.ORM.Simple.Visitor
             }
 
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="_methods"></param>
+        /// <param name="_tables"></param>
+        /// <returns></returns>
         public Expression Modify(Expression expression, List<MethodEntity> _methods, Dictionary<string, int> _tables)
         {
             IsComplate = true;
@@ -53,17 +61,31 @@ namespace NetCore.ORM.Simple.Visitor
             Visit(expression);
             return expression;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         protected override Expression VisitBinary(BinaryExpression node)
         {
             conditionVisitor.Modify(node, currentMethod.TreeConditions, currentMethod.Conditions, TableParams);
             return node;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         protected override Expression VisitConstant(ConstantExpression node)
         {
             CustomerVisitConstant(node);
             return base.VisitConstant(node);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             if (IsComplate)
@@ -82,22 +104,31 @@ namespace NetCore.ORM.Simple.Visitor
             IsComplate = true;
             return node;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         protected override Expression VisitMember(MemberExpression node)
         {
             CustomerVisitMember(node);
             return base.VisitMember(node);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         protected override Expression VisitUnary(UnaryExpression node)
         {
             base.VisitUnary(node);
             return node;
         }
-
-
-
         #region extension method
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
         public  void CustomerVisitMember(MemberExpression node)
         {
             ConditionEntity condition = null;
@@ -124,6 +155,11 @@ namespace NetCore.ORM.Simple.Visitor
             }
             currentMethod.Parameters.Add(condition);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="member"></param>
         public  void VisitMember(ConditionEntity condition, MemberInfo member)
         {
             var memberCondition = ConditionsExtension.SetConstMember(contextSelect,member);
@@ -143,6 +179,10 @@ namespace NetCore.ORM.Simple.Visitor
                 currentMethod.Parameters.Add(memberCondition);
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
         public void CustomerVisitMethod(MethodCallExpression node)
         {
             if (Check.IsNull(currentMethod))
@@ -169,7 +209,12 @@ namespace NetCore.ORM.Simple.Visitor
                 methods.Add(currentMethod);
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public  bool CustomerVisitConstant(ConstantExpression node)
         {
             if (Check.IsNull(currentMethod))

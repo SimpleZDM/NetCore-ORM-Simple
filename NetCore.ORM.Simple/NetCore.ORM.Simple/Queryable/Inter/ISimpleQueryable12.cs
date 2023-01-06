@@ -16,114 +16,398 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Queryable
 {
-    public interface ISimpleQueryable<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12>:ISimpleQuery<T1>
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T1"></typeparam>
+    /// <typeparam name="T2"></typeparam>
+    /// <typeparam name="T3"></typeparam>
+    /// <typeparam name="T4"></typeparam>
+    /// <typeparam name="T5"></typeparam>
+    /// <typeparam name="T6"></typeparam>
+    /// <typeparam name="T7"></typeparam>
+    /// <typeparam name="T8"></typeparam>
+    /// <typeparam name="T9"></typeparam>
+    /// <typeparam name="T10"></typeparam>
+    /// <typeparam name="T11"></typeparam>
+    /// <typeparam name="T12"></typeparam>
+    public interface ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : ISimpleQuery<T1>
     {
-         ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, TResult>> expression) where TResult : class;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, TResult>> expression) where TResult : class;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, TResult>> expression) where TResult : class;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, TResult>> expression) where TResult : class;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, T5, TResult>> expression) where TResult : class;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, TResult>> expression) where TResult : class;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, TResult>> expression) where TResult : class;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, TResult>> expression) where TResult : class;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult>> expression) where TResult : class;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult>> expression) where TResult : class;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult>> expression) where TResult : class;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult>> expression) where TResult : class;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, bool>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, bool>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, T4, bool>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, T4, T5, bool>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, T4, T5, T6, bool>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, T4, T5, T6, T7, bool>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, bool>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, bool>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, bool>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, bool>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, bool>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, T5, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TGroup"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, TGroup>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TGroup"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, TGroup>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TGroup"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, TGroup>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TGroup"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, TGroup>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TGroup"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
 
-         ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, TResult>> expression) where TResult : class;
+        ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, TGroup>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TGroup"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, TGroup>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TGroup"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, TGroup>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TGroup"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TGroup>> expression);
 
-         ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, TResult>> expression) where TResult : class;
-
-         ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, T5, TResult>> expression) where TResult : class;
-
-         ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, TResult>> expression) where TResult : class;
-
-         ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, TResult>> expression) where TResult : class;
-
-         ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, TResult>> expression) where TResult : class;
-
-         ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult>> expression) where TResult : class;
-
-         ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult>> expression) where TResult : class;
-
-         ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult>> expression) where TResult : class;
-
-         ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult>> expression) where TResult : class;
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, bool>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, bool>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, T4, bool>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, T4, T5, bool>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, T4, T5, T6, bool>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, T4, T5, T6, T7, bool>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, bool>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, bool>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, bool>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, bool>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Where(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, bool>> expression);
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, TOrder>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, TOrder>> expression);
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, TOrder>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, T5, TOrder>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, TOrder>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, TOrder>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, TOrder>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TOrder>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TOrder>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TOrder>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderBy<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TOrder>> expression);
-
-         ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, TGroup>> expression);
-
-         ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, TGroup>> expression);
-
-         ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, TGroup>> expression);
-
-         ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, TGroup>> expression);
-        
-         ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, TGroup>> expression);
-         ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, TGroup>> expression);
-
-         ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, TGroup>> expression);
-        
-         ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TGroup>> expression);
-
-
-         ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TGroup>> expression);
-        
-         ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TGroup>> expression);
-        
-         ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TGroup>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, TOrder>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, TOrder>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, TOrder>> expression);
-        
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, TOrder>> expression);
-        
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, TOrder>> expression);
-       
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, TOrder>> expression);
-        
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, TOrder>> expression);
-        
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TOrder>> expression);
-        
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TOrder>> expression);
-        
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TOrder>> expression);
-
-         ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TGroup"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TGroup>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TGroup"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TGroup>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TGroup"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TGroup>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TOrder>> expression);
     }
 }

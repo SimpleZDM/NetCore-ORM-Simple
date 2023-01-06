@@ -37,6 +37,12 @@ namespace NetCore.ORM.Simple.Entity
             StrSqlValue.Append(sql);
         }
 
+        public void SetPage(int pageNumber,int pageSize)
+        {
+            this.PageNumber = pageNumber;
+            this.PageSize = pageSize;
+        }
+
         /// <summary>
         /// 取出的数据
         /// </summary>

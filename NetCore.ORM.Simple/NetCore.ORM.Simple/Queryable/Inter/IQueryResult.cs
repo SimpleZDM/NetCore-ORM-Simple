@@ -18,29 +18,61 @@ using System.Xml;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Queryable
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
     public interface IQueryResult<TResult>
     {
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
          int Count();
-        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
          bool Any();
-        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
          Task<int> CountAsync();
-       
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
          Task<bool> AnyAsync();
-        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
          TResult First();
-        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
          Task<TResult> FirstAsync();
-       
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
          TResult FirstOrDefault();
-       
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
          Task<TResult> FirstOrDefaultAsync();
-      
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
          List<TResult> ToList();
-        
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
          Task<List<TResult>> ToListAsync();
-       
     }
 }

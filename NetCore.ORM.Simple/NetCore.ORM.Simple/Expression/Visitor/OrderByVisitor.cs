@@ -26,11 +26,22 @@ namespace NetCore.ORM.Simple.Visitor
         private eOrderOrGroupType OrderOrGroup;
         private eOrderType OrderType;
         private ContextSelect select;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="select"></param>
         public OrderByVisitor(ContextSelect select)
         {
             this.select = select;
             TableParams = new Dictionary<string, int>();
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="orderOrGroup"></param>
+        /// <param name="orderType"></param>
+        /// <returns></returns>
         public Expression Modify(Expression expression,eOrderOrGroupType orderOrGroup, eOrderType orderType)
         {
             TableParams.Clear();
@@ -43,29 +54,50 @@ namespace NetCore.ORM.Simple.Visitor
             Visit(expression);
             return expression;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         protected override Expression VisitConstant(ConstantExpression node)
         {
             return base.VisitConstant(node);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             
             return base.VisitMethodCall(node);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         protected override MemberBinding VisitMemberBinding(MemberBinding node)
         {
             base.VisitMemberBinding(node);
             return node;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         protected override Expression VisitParameter(ParameterExpression node)
         {
            
             return base.VisitParameter(node);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         protected override Expression VisitMember(MemberExpression node)
         {
             int Index = -1;
@@ -77,23 +109,40 @@ namespace NetCore.ORM.Simple.Visitor
             CreateOrder(PropName, Index);
             return node;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         protected override Expression VisitMemberInit(MemberInitExpression node)
         {
             return base.VisitMemberInit(node);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         protected override Expression VisitNew(NewExpression node)
         {
             return base.VisitNew(node);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         protected override Expression VisitNewArray(NewArrayExpression node)
         {
             return base.VisitNewArray(node);
         }
 
-        #region
+        #region method
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="PropName"></param>
+        /// <param name="Index"></param>
         public void CreateOrder(string PropName, int Index)
         {
             if (select.OrderInfos.Any(info =>

@@ -27,7 +27,6 @@ namespace NetCore.ORM.Simple.Visitor
         /// 当前等式
         /// </summary>
         private TreeConditionEntity currentTree;
-
         private List<TreeConditionEntity> treeConditions;
         private List<ConditionEntity> conditions;
         private ContextSelect contextSelect;
@@ -35,38 +34,32 @@ namespace NetCore.ORM.Simple.Visitor
         /// 单个等式是否解析完成
         /// </summary>
         private bool IsComplete;
-
         /// <summary>
         /// 是否经过多次映射- 根据最后一次映射数据
         /// </summary>
-        private bool IsMultipleMap { get; set; }
-
         /// <summary>
         /// 当前表达式目录树中表的别称
         /// </summary>
         private Dictionary<string, int> TableParams;
-
         private bool IsCompleteMember;
-
         private MemberEntity currentMember;
-
         /// <summary>
         /// 多重条件的时候
         /// </summary>
         /// 
         private int firstConditionIndex;
-
         private MethodVisitor MethodVisitor;
-
-
         /// <summary>
-        /// get value
+        /// 
         /// </summary>
-        /// <returns></returns>
-        public Tuple<List<TreeConditionEntity>, List<ConditionEntity>> GetValue()
+        public ConditionVisitor()
         {
-            return null;
+            Init();
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_select"></param>
         public ConditionVisitor(ContextSelect _select)
         {
             contextSelect = _select;
@@ -74,7 +67,9 @@ namespace NetCore.ORM.Simple.Visitor
             conditions = _select.Conditions;
             Init();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public void Init()
         {
             IsComplete = true;
@@ -83,10 +78,29 @@ namespace NetCore.ORM.Simple.Visitor
             firstConditionIndex = 0;
             TableParams = new Dictionary<string, int>();
         }
-        public ConditionVisitor()
+        /// <summary>
+        /// 
+        /// </summary>
+        private void InitModify()
         {
-            Init();
+            IsComplete = true;
+            currentTree = null;
+            ConditionsExtension.TreeConditionInit(treeConditions, conditions, ref firstConditionIndex);
+            IsMultipleMap = true;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        public void InitMethodVisitor()
+        {
+
+            if (Check.IsNull(MethodVisitor))
+            {
+                MethodVisitor = new MethodVisitor(contextSelect);
+                MethodVisitor.InitConditionVisitor();
+            }
+        }
+        
         /// <summary>
         /// 修改表达式树的形式
         /// </summary>
@@ -107,7 +121,14 @@ namespace NetCore.ORM.Simple.Visitor
             Visit(expression);
             return expression;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="_treeConditions"></param>
+        /// <param name="_conditions"></param>
+        /// <param name="_tables"></param>
+        /// <returns></returns>
         public Expression Modify(Expression expression, List<TreeConditionEntity> _treeConditions, List<ConditionEntity> _conditions, Dictionary<string, int> _tables)
         {
             TableParams = _tables;
@@ -117,24 +138,6 @@ namespace NetCore.ORM.Simple.Visitor
             Visit(expression);
             return expression;
         }
-
-        public void InitMethodVisitor()
-        {
-           
-            if (Check.IsNull(MethodVisitor))
-            {
-                MethodVisitor = new MethodVisitor(contextSelect);
-                MethodVisitor.InitConditionVisitor();
-            }
-        }
-        private void InitModify()
-        {
-            IsComplete = true;
-            currentTree = null;
-            ConditionsExtension.TreeConditionInit(treeConditions, conditions, ref firstConditionIndex);
-            IsMultipleMap = true;
-        }
-
         /// <summary>
         /// 表达式树的二元操作
         /// </summary>
@@ -195,8 +198,6 @@ namespace NetCore.ORM.Simple.Visitor
             }
             return node;
         }
-
-
         protected override Expression VisitUnary(UnaryExpression node)
         {
             base.VisitUnary(node);
@@ -209,8 +210,6 @@ namespace NetCore.ORM.Simple.Visitor
             base.VisitMember(node);
             return node;
         }
-
-
         protected override MemberListBinding VisitMemberListBinding(MemberListBinding node)
         {
             return node;
@@ -225,9 +224,11 @@ namespace NetCore.ORM.Simple.Visitor
             return node;
         }
 
-
         #region extension method
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
         public void CustomerVisitBinary(BinaryExpression node)
         {
             switch (node.NodeType)
@@ -287,6 +288,10 @@ namespace NetCore.ORM.Simple.Visitor
                     break;
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
         public void CustomerVisitMember(MemberExpression node)
         {
             if (Check.IsNull(currentTree))
@@ -314,6 +319,10 @@ namespace NetCore.ORM.Simple.Visitor
             }
             IsCompleteMember = true;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
         public void CustomerMethod(MethodCallExpression node)
         {
             if (Check.IsNull(currentTree))
@@ -354,6 +363,11 @@ namespace NetCore.ORM.Simple.Visitor
             }
             IsComplete = true;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="member"></param>
+        /// <param name="currentMember"></param>
         public void CustomerVisitMember(MemberInfo member, MemberEntity currentMember)
         {
             if (Check.IsNull(currentTree.LeftCondition))
@@ -373,6 +387,11 @@ namespace NetCore.ORM.Simple.Visitor
                 currentTree.LeftCondition.Members.Push(currentMember);
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         public  bool CustomerVisitConstant(ConstantExpression node)
         {
             if (Check.IsNull(currentTree))
@@ -414,6 +433,13 @@ namespace NetCore.ORM.Simple.Visitor
             }
             return true;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="signType"></param>
+        /// <param name="Visitor"></param>
+        /// <exception cref="Exception"></exception>
         public void MultipleBinary(BinaryExpression node, eSignType signType, Action<Expression> Visitor)
         {
             if (Check.IsNull(Visitor))
@@ -447,6 +473,12 @@ namespace NetCore.ORM.Simple.Visitor
             currentTree.RightBracket.Add(eSignType.RightBracket);
             IsComplete = true;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="Visitor"></param>
+        /// <param name="signType"></param>
         public void SingleBinary(BinaryExpression node, Action<Expression> Visitor, eSignType signType)
         {
             if (Check.IsNull(currentTree))
@@ -462,6 +494,11 @@ namespace NetCore.ORM.Simple.Visitor
 
             IsComplete = true;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="IsLeft"></param>
         private void MethodParamsSetTreeCondition(ConditionEntity condition,bool IsLeft)
         {
             bool IsInit = false;

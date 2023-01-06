@@ -58,13 +58,8 @@ namespace NetCore.ORM.Simple.Common
         /// <summary>
         /// 判断是否是匿名对象的标记
         /// </summary>
-        
         private static string Anonymity;
-
-
         private static string[] ErrorDescriptions;
-
-
         public static int Zero=0;
         public static int One=1;
 
@@ -72,13 +67,8 @@ namespace NetCore.ORM.Simple.Common
         /// 大小写字母
         /// </summary>
         public static char[] Letters; 
-
         public static string StrDataCount;
-
         public static string[] StrDataType;
-
-
-
         public static bool IsAnonymityObject<T>()
         {
             Type type = typeof(T);
@@ -101,8 +91,6 @@ namespace NetCore.ORM.Simple.Common
             }
             return ErrorDescriptions[0];
         }
-
-       
         public static eDataType GetType(Type type)
         {
             eDataType dataType = eDataType.NuKnow;
@@ -183,8 +171,6 @@ namespace NetCore.ORM.Simple.Common
             }
             return dataType;
         }
-
-
         public static string SystemDateTimeNow;
         public static string SystemDateTimeMaxValue;
         public static string SystemDateTimeMinValue;

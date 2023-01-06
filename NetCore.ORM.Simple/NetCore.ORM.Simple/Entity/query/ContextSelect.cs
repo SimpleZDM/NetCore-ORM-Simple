@@ -32,29 +32,16 @@ namespace NetCore.ORM.Simple.Entity
             LastAnonymity = false;
             Table = new ContextTableEntity(types);
         }
-
         /// <summary>
         /// 获取表名称
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-
-
-
-
-
         public void IsAnonymity<TResult>()
         {
             LastAnonymity = CommonConst.IsAnonymityObject<TResult>();
         }
-
-
-
-
-        #region Expression Visitor
-
-        #endregion
 
         /// <summary>
         /// 
@@ -183,7 +170,7 @@ namespace NetCore.ORM.Simple.Entity
             {
                 throw new Exception("未找到属性名称或者表名称!");
             }
-            return $"{TableName}{DBMDConst.Dot}{PropName}";
+            return $"{DBMDConst.UnSingleQuotes}{TableName}{DBMDConst.UnSingleQuotes}{DBMDConst.Dot}{DBMDConst.UnSingleQuotes}{PropName}{DBMDConst.UnSingleQuotes}";
         }
         #endregion
 
@@ -204,7 +191,6 @@ namespace NetCore.ORM.Simple.Entity
             }
             return map;
         }
-
         public MapEntity GetMapInfoByName(string TableName, string PropName)
         {
             if (Check.IsNull(PropName))

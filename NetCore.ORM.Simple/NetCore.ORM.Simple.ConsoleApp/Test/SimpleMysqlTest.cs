@@ -9,6 +9,7 @@ using MySql.Data.MySqlClient;
 using System.Data.Common;
 using NetCore.ORM.Simple.Entity;
 using MDT.VirtualSoftPlatform.Entity;
+using static NetCore.ORM.Simple.ConsoleApp.SimpleMysqlTest;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.ConsoleApp.Test
@@ -183,6 +184,7 @@ namespace NetCore.ORM.Simple.ConsoleApp
         }
         public class Test{
             public Dictionary<int,UserEntity> dic { get; set; }
+            public List<UserEntity> user { get; set; }
         }
 
         public void QueryTest()
@@ -244,7 +246,11 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 tests.Add(t);
                 Dictionary<int, List<Test>> dttt = new Dictionary<int, List<Test>>();
                 dttt.Add(1, tests);
-                UserEntity user = client.Queryable<UserEntity>().Where(u =>dttt[1][0].dic[1].Id==u.Id&&tests[0].dic[1].Id==u.Id).FirstOrDefault();
+                t.user = new List<UserEntity>();
+                t.user.Add(new UserEntity() { Id= 3212 });
+
+                UserEntity1 u1s = client.Queryable<UserEntity1>().Where(u=>u.Id1==3212).FirstOrDefault();
+                UserEntity user = client.Queryable<UserEntity>().Where(u => dttt[1][0].user[0].Id==u.Id &&dttt[1][0].dic[1].Id==u.Id&&tests[0].dic[1].Id==u.Id).FirstOrDefault();
                 List<UserEntity> left = client.Queryable<UserEntity>().Where(u => Simple.LeftContains(u.Name, str)).ToList();
                 List<UserEntity> user1 = client.Queryable<UserEntity>().Where(u => u.Id==ids[0]).ToList();
                 List<UserEntity> user2 = client.Queryable<UserEntity>().Where(u => lids[1]==(u.Id)).ToList();

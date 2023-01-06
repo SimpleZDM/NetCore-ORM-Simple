@@ -47,7 +47,12 @@ namespace NetCore.ORM.Simple.SqlBuilder
             sql.StrSqlValue.Append(string.Join(DBMDConst.Comma.ToString(), Props.Select(p => 
             $"{DBMDConst.UnSingleQuotes}{p.GetColName()}{DBMDConst.UnSingleQuotes}")));
             sql.StrSqlValue.Append(DBMDConst.RightBracket);
-            sql.StrSqlValue.Append($" {DBMDConst.Value}{DBMDConst.LeftBracket}");
+
+            sql.StrSqlValue.AppendLine();
+            sql.AddHorizontalTAB();
+            sql.StrSqlValue.Append($" {DBMDConst.Value}");
+            sql.StrSqlValue.AppendLine();
+            sql.StrSqlValue.Append($"{DBMDConst.LeftBracket}");
             sql.StrSqlValue.Append(string.Join(DBMDConst.Comma.ToString(),
                 Props.Select(p =>
                 {
@@ -176,6 +181,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     sql.StrSqlValue.Append(string.Join(DBMDConst.Comma.ToString(), Props.Select(p => 
                     $"{DBMDConst.UnSingleQuotes}{p.GetColName()}{DBMDConst.UnSingleQuotes}")));
                     sql.StrSqlValue.Append(DBMDConst.RightBracket);
+                    sql.AddLineFeed();
+                    sql.AddHorizontalTAB();
                     sql.StrSqlValue.Append($" {DBMDConst.Value}");
                 }
                 Index++;
@@ -203,6 +210,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     else
                     {
                         sql.StrSqlValue.Append(DBMDConst.Comma);
+                        sql.AddLineFeed();
                     }
                 }
             }
@@ -294,28 +302,14 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 throw new ArgumentNullException(nameof(select));
             }
-            if (select.MapInfos.Count.Equals(CommonConst.Zero))
-            {
-                Type type = typeof(TData);
-                string TableName = type.GetTableName();
-                foreach (var prop in type.GetNoIgnore())
-                {
-                    select.MapInfos.Add(new MapEntity()
-                    {
-                        PropName = prop.GetColName(),
-                        ColumnName = prop.GetColName(),
-                        TableName = TableName,
-                    });
-                }
-            }
             //视图
             entity.StrSqlValue.Append($"{DBMDConst.Select} ");
             entity.MapInfos = select.MapInfos.ToArray();
             LinkMapInfos(select.MapInfos, entity);
             //连接
-            LinkJoinInfos(select.JoinInfos.Values.ToArray(), entity);
+            LinkJoinInfos(select.JoinInfos.Values.ToArray(),entity);
             //条件
-            if (!Check.IsNull(select.TreeConditions) && select.TreeConditions.Count > CommonConst.Zero)
+            if (!Check.IsNull(select.TreeConditions) && select.TreeConditions.Count>CommonConst.Zero)
             {
                 entity.StrSqlValue.Append($" {DBMDConst.Where}");
                 LinkConditions(select.Conditions, select.TreeConditions, entity);
@@ -442,7 +436,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
 
                     if (Check.IsNullOrEmpty(map.Methods))
                     {
-                        sqlEntity.StrSqlValue.Append($" {map.TableName}{DBMDConst.Dot}{map.ColumnName} {DBMDConst.As} {map.AsColumnName}");
+                        sqlEntity.StrSqlValue.Append($" {DBMDConst.UnSingleQuotes}{map.TableName}{DBMDConst.UnSingleQuotes}{DBMDConst.Dot}{DBMDConst.UnSingleQuotes}{map.ColumnName}{DBMDConst.UnSingleQuotes} {DBMDConst.As} {map.AsColumnName}");
                     }
                     else
                     {
@@ -452,7 +446,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 }
 
             }
-
+            sqlEntity.StrSqlValue.Append("\n");
         }
         /// <summary>
         /// 
@@ -466,22 +460,28 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 throw new ArgumentException("");
             }
-            if (!Check.IsNull(joinInfos))
+            if (!Check.IsNullOrEmpty(joinInfos))
             {
                 foreach (var join in joinInfos)
                 {
                     if (join.TableType.Equals(eTableType.Master))
                     {
-                        sqlEntity.StrSqlValue.Append($" {DBMDConst.From} {join.DisplayName} ");
+                        sqlEntity.AddLineFeed();
+                        sqlEntity.AddHorizontalTAB();
+                        sqlEntity.StrSqlValue.Append($" {DBMDConst.From} {DBMDConst.UnSingleQuotes}{join.DisplayName}{DBMDConst.UnSingleQuotes} ");
                     }
                     else
                     {
                         sqlEntity.StrSqlValue.Append($" {MysqlConst.StrJoins[(int)join.JoinType]}" +
-                            $" {join.DisplayName} {DBMDConst.As} {join.AsName} {DBMDConst.On} ");
+                            $"{DBMDConst.UnSingleQuotes}{join.DisplayName}{DBMDConst.UnSingleQuotes} {DBMDConst.As} {join.AsName} {DBMDConst.On} ");
                         LinkConditions(join.Conditions, join.TreeConditions, sqlEntity);
                     }
                 }
+
+                
             }
+
+
         }
         /// <summary>
         /// 
@@ -554,6 +554,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     AddBrackets(StrValue,conditions[i].SignType);
                 }
             }
+
             sqlEntity.StrSqlValue.Append(StrValue.ToString());
         }
         /// <summary>

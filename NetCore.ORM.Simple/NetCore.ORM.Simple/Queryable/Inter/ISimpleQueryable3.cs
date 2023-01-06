@@ -16,30 +16,82 @@ using System.Threading.Tasks;
  * *******************************************************/
 namespace NetCore.ORM.Simple.Queryable
 {
-    public interface ISimpleQueryable<T1,T2,T3>:ISimpleQuery<T1> where T1 : class
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T1"></typeparam>
+    /// <typeparam name="T2"></typeparam>
+    /// <typeparam name="T3"></typeparam>
+    public interface ISimpleQueryable<T1, T2, T3> : ISimpleQuery<T1> where T1 : class
     {
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
         ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, TResult>> expression) where TResult : class;
-
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
         ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, T3, TResult>> expression) where TResult : class;
-       
-         ISimpleQueryable<T1, T2, T3> Where(Expression<Func<T1, T2, bool>> expression);
-
-         ISimpleQueryable<T1, T2, T3> Where(Expression<Func<T1, T2, T3, bool>> expression);
-        
-
-         ISimpleQueryable<T1, T2, T3> OrderBy<TOrder>(Expression<Func<T1, T2, TOrder>> expression);
-        
-         ISimpleQueryable<T1, T2, T3> OrderBy<TOrder>(Expression<Func<T1, T2, T3, TOrder>> expression);
-         ISimpleQueryable<T1, T2, T3> OrderByDescending<TOrder>(Expression<Func<T1, T2, TOrder>> expression);
-       
-         ISimpleQueryable<T1, T2, T3> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, TOrder>> expression);
-
-
-         ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, TGroup>> expression);
-        
-         ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, TGroup>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3> Where(Expression<Func<T1, T2, bool>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3> Where(Expression<Func<T1, T2, T3, bool>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3> OrderBy<TOrder>(Expression<Func<T1, T2, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3> OrderBy<TOrder>(Expression<Func<T1, T2, T3, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3> OrderByDescending<TOrder>(Expression<Func<T1, T2, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TOrder"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleQueryable<T1, T2, T3> OrderByDescending<TOrder>(Expression<Func<T1, T2, T3, TOrder>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TGroup"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, TGroup>> expression);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TGroup"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        ISimpleGroupByQueryable<T1, TGroup> GroupBy<TGroup>(Expression<Func<T1, T2, T3, TGroup>> expression);
 
 
     }

@@ -11,6 +11,7 @@ public static class Program
 {
     public static int Main(string []args)
     {
+
         //object o1 = new { UserName = 11 };
         //var b =Activator.CreateInstance(o1.GetType());
 
@@ -67,7 +68,7 @@ public static class Program
         SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
        // MysqlTest.MoreQuerTest();
         //MysqlTest.sqlTest();
-        //MysqlTest.InsertTest();
+        MysqlTest.InsertTest();
         //MysqlTest.UpdateTest();
         //MysqlTest.DeleteTest();
         //Console.WriteLine();

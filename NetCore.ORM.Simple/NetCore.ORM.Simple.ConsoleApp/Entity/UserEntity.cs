@@ -33,6 +33,26 @@ namespace NetCore.ORM.Simple.ConsoleApp
 
         public int IDDD;
     }
+
+
+
+    [MyTableAttrbute("usertable")]
+    public class UserEntity1
+    {
+        public int CompanyId { get; set; }
+        [MyColumnAttrbute(name: "Id", key: true, autoIncrease: true)]
+        public int Id1 { get; set; }
+
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public int RoleId { get; set; }
+        public Guid gIdColumn { get; set; }
+        public float Age { get; set; }
+        public DateTime Time1 { get; set; }
+        public DateTime Time2 { get; set; }
+
+        public int IDDD;
+    }
     [MyTableAttrbute("RoleTable")]
     public class RoleEntity
     {
