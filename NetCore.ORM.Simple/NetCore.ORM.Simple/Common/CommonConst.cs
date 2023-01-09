@@ -114,6 +114,14 @@ namespace NetCore.ORM.Simple.Common
             {
                 dataType = eDataType.SimpleDecimal;
             }
+            else if (type.Equals(typeof(DateTime)))
+            {
+                dataType = eDataType.SimpleTime;
+            }
+            else if (type.Equals(typeof(TimeSpan)))
+            {
+                dataType = eDataType.SimpleTimeSpan;
+            }
             else if (type.Equals(typeof(List<int>)))
             {
                 dataType = eDataType.SimpleListInt;
@@ -138,6 +146,14 @@ namespace NetCore.ORM.Simple.Common
             {
                 dataType = eDataType.SimpleListDecimal;
             }
+            else if (type.Equals(typeof(List<TimeSpan>)))
+            {
+                dataType = eDataType.SimpleTimeSpan;
+            }
+            else if (type.Equals(typeof(List<DateTime>)))
+            {
+                dataType = eDataType.SimpleTime;
+            }
             else if (type.Equals(typeof(int[])))
             {
                 dataType = eDataType.SimpleArrayInt;
@@ -161,13 +177,26 @@ namespace NetCore.ORM.Simple.Common
             else if (type.Equals(typeof(string[])))
             {
                 dataType = eDataType.SimpleArrayString;
-            }else if (type.IsArray)
+            }
+            else if (type.Equals(typeof(DateTime[])))
+            {
+                dataType = eDataType.SimpleArrayTime;
+            }
+            else if (type.Equals(typeof(TimeSpan[])))
+            {
+                dataType = eDataType.SimpleArrayTimeSpan;
+            }
+            else if (type.IsArray)
             {
                 dataType = eDataType.SimpleArray;
 
             }else if (type.Name.Contains("List`"))
             {
                 dataType=eDataType.SimpleList;
+            }
+            else if (type.IsEnum)
+            {
+                dataType = eDataType.SimpleEnum;
             }
             return dataType;
         }

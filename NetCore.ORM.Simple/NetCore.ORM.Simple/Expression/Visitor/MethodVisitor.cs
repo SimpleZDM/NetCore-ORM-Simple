@@ -1,11 +1,13 @@
 ﻿using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
+using NetCore.ORM.Simple.SqlBuilder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Xml.Linq;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.Visitor
@@ -25,6 +27,8 @@ namespace NetCore.ORM.Simple.Visitor
         private MemberEntity currentMember;
         private Dictionary<string, int> TableParams;
         private bool IsComplate;
+        private bool IsCompleteMember;
+
         private ContextSelect contextSelect;
 
         private ConditionVisitor conditionVisitor;
@@ -58,6 +62,7 @@ namespace NetCore.ORM.Simple.Visitor
             IsComplate = true;
             TableParams = _tables;
             methods = _methods;
+            IsCompleteMember = true;
             Visit(expression);
             return expression;
         }
@@ -68,7 +73,28 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            conditionVisitor.Modify(node, currentMethod.TreeConditions, currentMethod.Conditions, TableParams);
+            switch (node.NodeType)
+            {
+                case ExpressionType.ArrayIndex:
+                        if (IsCompleteMember)
+                        {
+                            currentMember = new MemberEntity();
+                            IsCompleteMember = false;
+                        }
+
+                    if (node.Right is ConstantExpression constant)
+                    {
+                        if (!Check.IsNull(currentMember))
+                        {
+                            currentMember.OParams.Add(constant.Value);
+                        }
+                    }
+                    base.VisitBinary(node);
+                    break;
+                default:
+                    conditionVisitor.Modify(node, currentMethod.TreeConditions, currentMethod.Conditions, TableParams);
+                    break;
+            }
             return node;
         }
         /// <summary>
@@ -93,6 +119,7 @@ namespace NetCore.ORM.Simple.Visitor
                 currentMethod = new MethodEntity();
                 IsComplate = false;
             }
+            AddMemberParameter(node);
             base.VisitMethodCall(node);
             CustomerVisitMethod(node);
             IsComplate = true;
@@ -144,16 +171,29 @@ namespace NetCore.ORM.Simple.Visitor
             if (Index >= 0 || contextSelect.MapInfos.Any(u => u.PropName == PropName))
             {
                 condition = contextSelect.GetCondition(PropName, Index);
+                currentMethod.Parameters.Add(condition);
             }
             else
             {
-                if (Check.IsNull(condition))
+                if (Check.IsNullOrEmpty(currentMethod.Parameters))
                 {
-                    condition = contextSelect.GetCondition(eConditionType.ColumnName);
+                    condition = contextSelect.GetCondition(eConditionType.Constant);
+                    currentMethod.Parameters.Add(condition);
+                }
+                else
+                {
+                    condition = currentMethod.Parameters[currentMethod.Parameters.Count() - 1];
+                    if (condition.ConditionType==eConditionType.ColumnName)
+                    {
+                        condition = contextSelect.GetCondition(eConditionType.Constant);
+                        currentMethod.Parameters.Add(condition);
+
+                    }
                 }
                 VisitMember(condition, node.Member);
             }
-            currentMethod.Parameters.Add(condition);
+            IsCompleteMember= true;
+            
         }
         /// <summary>
         /// 
@@ -167,7 +207,7 @@ namespace NetCore.ORM.Simple.Visitor
             {
 
 
-                if (Check.IsNull(currentMember))
+                if (IsCompleteMember|| Check.IsNull(currentMember))
                 {
                     currentMember = new MemberEntity();
                 }
@@ -185,29 +225,45 @@ namespace NetCore.ORM.Simple.Visitor
         /// <param name="node"></param>
         public void CustomerVisitMethod(MethodCallExpression node)
         {
+            if (!Check.IsNullOrEmpty(currentMethod.Name)&&currentMethod.Name!=node.Method.Name)
+            {
+                currentMember.OParams.Clear();
+            }
+            currentMethod.Name = node.Method.Name;
             if (Check.IsNull(currentMethod))
             {
                 currentMethod = new MethodEntity();
             }
-            currentMethod.Name = node.Method.Name;
-
-            if (!Check.IsNullOrEmpty(node.Arguments))
-            {
-                if (node.Arguments[0] is MethodCallExpression call)
-                {
-                    currentMember = new MemberEntity();
-                    currentMember.OParams.Add(call.Arguments[0]);
-                }
-                if (node.Arguments[0] is ConstantExpression constant)
-                {
-                    currentMember = new MemberEntity();
-                    currentMember.OParams.Add(constant.Value);
-                }
-            }
+           
             if (Check.IsNullOrEmpty(methods) || !object.ReferenceEquals(methods[methods.Count - 1], currentMethod))
             {
                 methods.Add(currentMethod);
             }
+        }
+
+        public void AddMemberParameter(MethodCallExpression node)
+        {
+
+            currentMethod.Name = node.Method.Name;
+            if (!MysqlConst.dicMethods.ContainsKey(node.Method.Name))
+            {
+                if (!Check.IsNullOrEmpty(node.Arguments))
+                {
+                    if (node.Arguments[0] is MethodCallExpression call)
+                    {
+                        currentMember = new MemberEntity();
+                        currentMember.OParams.Add(call.Arguments[0]);
+                        IsCompleteMember = false;
+                    }
+                    if (node.Arguments[0] is ConstantExpression constant)
+                    {
+                        currentMember = new MemberEntity();
+                        currentMember.OParams.Add(constant.Value);
+                        IsCompleteMember = false;
+                    }
+                }
+            }
+
         }
         /// <summary>
         /// 
@@ -225,15 +281,7 @@ namespace NetCore.ORM.Simple.Visitor
             if (node.Type.IsValueType)
             {
                 ConditionEntity condition = contextSelect.GetCondition(eConditionType.Constant);
-                if (node.Type.IsEnum)
-                {
-                    int.TryParse(node.Value.ToString(), out int value);
-                    condition.Value = node.Value;
-                }
-                else
-                {
-                    condition.DisplayName = node.Value.ToString();
-                }
+                condition.Value = node.Value;
                 currentMethod.Parameters.Add(condition);
             }
             else
@@ -241,6 +289,7 @@ namespace NetCore.ORM.Simple.Visitor
                 if (Check.IsNullOrEmpty(currentMethod.Parameters))
                 {
                     right = new ConditionEntity(eConditionType.Constant);
+                    currentMethod.Parameters.Add(right);
                 }
                 else
                 {

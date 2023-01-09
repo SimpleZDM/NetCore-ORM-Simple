@@ -57,6 +57,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
         dicMethods.Add(MethodConst._LeftContains, _LeftContains);
         dicMethods.Add(MethodConst._RightContains, _RightContains);
         dicMethods.Add(MethodConst._Now, _NOW);
+        dicMethods.Add(MethodConst._Year, _Year);
+
         dicMethods.Add(MethodConst._Month, _Month);
         dicMethods.Add(MethodConst._Day, _Day);
         dicMethods.Add(MethodConst._Hour, _Hour);
@@ -397,9 +399,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 throw new ArgumentException();
             }
-
-           
-            method.Parameters[0].DisplayName = method.Parameters[0].DisplayName.ToString().Replace("\'","\'\'");
+            
             value = $"{DBMDConst.Case} {DBMDConst.When}{DBMDConst.LeftBracket}{method.Extensions}{DBMDConst.RightBracket}{DBMDConst.Then} {method.Parameters[0].DisplayName}";
             if (method.Parameters.Count==2)
             {
@@ -414,10 +414,6 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 throw new ArgumentException();
             }
-
-
-            method.Parameters[0].DisplayName = method.Parameters[0].DisplayName.ToString().Replace("\'", "\'\'");
-
             value = $" {DBMDConst.When}{DBMDConst.LeftBracket}{method.Extensions}{DBMDConst.RightBracket}{DBMDConst.Then} {method.Parameters[0].DisplayName} ";
             return value;
         }
@@ -428,11 +424,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 throw new ArgumentException();
             }
-            method.Parameters[0].DisplayName = method.Parameters[0].DisplayName.ToString().Replace("\'", "\'\'");
             value = $" {DBMDConst.Else} {method.Parameters[0].DisplayName} {DBMDConst.End} ";
             return value;
         }
         #endregion
-
     }
 }

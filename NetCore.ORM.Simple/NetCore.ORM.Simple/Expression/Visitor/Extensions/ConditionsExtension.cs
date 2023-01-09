@@ -332,14 +332,7 @@ namespace NetCore.ORM.Simple.Visitor
                             value=GetValue(Property,m,value,node);
                         }
                     }
-                    if (value.GetType().IsValueType)
-                    {
-                        SetName(left,right,IsRight,value);
-                    }
-                    else
-                    {
                         SetValue(left,right,IsRight,value);
-                    }
                 }
                 else
                 {

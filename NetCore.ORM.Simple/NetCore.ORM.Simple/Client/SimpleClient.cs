@@ -73,7 +73,6 @@ namespace NetCore.ORM.Simple
             dbDrive.AOPSqlLog = action;
         }
 
-
         public void SetAttr(Type Table=null,Type Column=null)
         {
             ExtensionAttribute.SetAttr(Table, Column);
@@ -117,10 +116,6 @@ namespace NetCore.ORM.Simple
         }
         public ISimpleCommand<TEntity> Insert<TEntity>(List<TEntity> entitys) where TEntity : class, new()
         {
-            return Insert(entitys.ToArray());
-        }
-        public ISimpleCommand<TEntity> Insert<TEntity>(params TEntity[] entitys) where TEntity : class, new()
-        {
             var sql = builder.GetInsert(entitys, changeOffset);
             sql.DbCommandType = eDbCommandType.Insert;
             sqls.Add(sql);
@@ -144,18 +139,18 @@ namespace NetCore.ORM.Simple
         }
         public ISimpleCommand<TEntity> Update<TEntity>(List<TEntity> entitys) where TEntity : class, new()
         {
-            var sql = builder.GetUpdate(entitys,changeOffset);
-            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,dbType,sql, sqls, dbDrive);
-            changeOffset = entitys.Count()+ changeOffset;
+            var sql = builder.GetUpdate(entitys, changeOffset);
+            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, dbType, sql, sqls, dbDrive);
+            changeOffset = entitys.Count() + changeOffset;
             return command;
         }
         public ISimpleCommand<TEntity> Delete<TEntity>(Expression<Func<TEntity,bool>>expression) where TEntity : class, new()
         {
             Type type = typeof(TEntity);
-            ContextSelect contextSelect = new ContextSelect(type);
-            var Visitor = new ConditionVisitor(contextSelect);
-            Visitor.Modify(expression);
-            var sql = builder.GetDelete(type, contextSelect.Conditions,contextSelect.TreeConditions);
+            var Visitor = new SimpleVisitor(type);
+            Visitor.VisitorCondition<TEntity>(expression);
+            var contextSelect = Visitor.GetContextSelect();
+            var sql = builder.GetDelete(type,contextSelect.Conditions,contextSelect.TreeConditions);
             sqls.Add(sql);
             ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder,dbType, sql, sqls, dbDrive);
             return command;
@@ -190,7 +185,6 @@ namespace NetCore.ORM.Simple
             var Query = builder.GetSelect(sql, Params);
             return await dbDrive.ReadAsync<TEntity>(Query);
         }
-
         public async Task<TEntity> FirstOrDefaultAsync<TEntity>(string sql, Dictionary<string, object> Params) where TEntity : class, new()
         {
             var Query = builder.GetSelect(sql, Params);

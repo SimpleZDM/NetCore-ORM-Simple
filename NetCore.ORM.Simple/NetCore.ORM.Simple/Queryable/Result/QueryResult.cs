@@ -38,9 +38,9 @@ namespace NetCore.ORM.Simple.Queryable
         /// </summary>
         /// <param name="DbType"></param>
         /// <param name="tableNames"></param>
-        protected void Init(ISqlBuilder _builder,IDBDrive DbDrive,params Type[] typs)
+        protected void Init(ISqlBuilder _builder,IDBDrive DbDrive,params Type[] types)
         {
-            visitor = new SimpleVisitor(typs);
+            visitor = new SimpleVisitor(types);
             this.DbDrive = DbDrive;
             builder = _builder;
         }

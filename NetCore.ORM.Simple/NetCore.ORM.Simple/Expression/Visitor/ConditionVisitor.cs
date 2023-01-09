@@ -34,6 +34,7 @@ namespace NetCore.ORM.Simple.Visitor
         /// 单个等式是否解析完成
         /// </summary>
         private bool IsComplete;
+        private bool IsMultipleMap;
         /// <summary>
         /// 是否经过多次映射- 根据最后一次映射数据
         /// </summary>
@@ -100,7 +101,6 @@ namespace NetCore.ORM.Simple.Visitor
                 MethodVisitor.InitConditionVisitor();
             }
         }
-        
         /// <summary>
         /// 修改表达式树的形式
         /// </summary>
@@ -131,6 +131,16 @@ namespace NetCore.ORM.Simple.Visitor
         /// <returns></returns>
         public Expression Modify(Expression expression, List<TreeConditionEntity> _treeConditions, List<ConditionEntity> _conditions, Dictionary<string, int> _tables)
         {
+            if (Check.IsNullOrEmpty(_tables))
+            {
+                if (!Check.IsNull(expression.GetType().GetProperty("Parameters")))
+                {
+                    foreach (ParameterExpression item in ((dynamic)expression).Parameters)
+                    {
+                        TableParams.Add(item.Name, TableParams.Count);
+                    }
+                }
+            }
             TableParams = _tables;
             conditions = _conditions;
             treeConditions = _treeConditions;
@@ -138,6 +148,7 @@ namespace NetCore.ORM.Simple.Visitor
             Visit(expression);
             return expression;
         }
+        
         /// <summary>
         /// 表达式树的二元操作
         /// </summary>
@@ -266,15 +277,11 @@ namespace NetCore.ORM.Simple.Visitor
                     });
                     break;
                 case ExpressionType.ArrayIndex:
-                    if (Check.IsNull(currentMember))
-                    {
                         if (IsCompleteMember)
                         {
                             currentMember = new MemberEntity();
                             IsCompleteMember = false;
                         }
-
-                    }
                     if (node.Right is ConstantExpression constant)
                     {
                         if (!Check.IsNull(currentMember))
@@ -417,15 +424,7 @@ namespace NetCore.ORM.Simple.Visitor
             }
             if (node.Type.IsValueType)
             {
-                if (node.Type.IsEnum)
-                {
-                    int.TryParse(node.Value.ToString(), out int value);
-                    currentTree.RightCondition.DisplayName = value.ToString();
-                }
-                else
-                {
-                    currentTree.RightCondition.DisplayName = node.Value.ToString();
-                }
+                    currentTree.RightCondition.Value = node.Value;
             }
             else
             {
@@ -523,7 +522,7 @@ namespace NetCore.ORM.Simple.Visitor
                                 if (currentTree.RelationCondition.ConditionType == eConditionType.Method)
                                 {
                                     currentTree.RightCondition = contextSelect.GetCondition(eConditionType.Method);
-                                    item.CopyColumnProperty(currentTree.RelationCondition);
+                                    item.CopyColumnProperty(currentTree.RightCondition);
                                 }
 
                             }

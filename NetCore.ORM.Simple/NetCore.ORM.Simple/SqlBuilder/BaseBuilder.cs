@@ -44,7 +44,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             sql.StrSqlValue.Append($"{DBMDConst.Insert}{DBMDConst.Into} " +
                 $"{DBMDConst.UnSingleQuotes}{type.GetTableName()}{DBMDConst.UnSingleQuotes} ");
             sql.StrSqlValue.Append(DBMDConst.LeftBracket);
-            sql.StrSqlValue.Append(string.Join(DBMDConst.Comma.ToString(), Props.Select(p => 
+            sql.StrSqlValue.Append(string.Join(DBMDConst.Comma.ToString(), Props.Select(p =>
             $"{DBMDConst.UnSingleQuotes}{p.GetColName()}{DBMDConst.UnSingleQuotes}")));
             sql.StrSqlValue.Append(DBMDConst.RightBracket);
 
@@ -71,7 +71,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="sql"></param>
         /// <param name="Params"></param>
         /// <returns></returns>
-        public virtual SqlCommandEntity GetInsert(string sql,Dictionary<string,object> Params)
+        public virtual SqlCommandEntity GetInsert(string sql, Dictionary<string, object> Params)
         {
             SqlCommandEntity sqlCommand = new SqlCommandEntity(sql);
             if (!Check.IsNull(Params))
@@ -97,7 +97,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             SqlCommandEntity sql = new SqlCommandEntity();
             Type type = typeof(TData);
             var Props = type.GetNotKeyAndIgnore();
-            var pKey =type. GetKey();
+            var pKey = type.GetKey();
             if (Check.IsNull(pKey))
             {
                 throw new Exception(ErrorType.NotKey.GetErrorInfo());
@@ -124,7 +124,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     sqlCommand.AddParameter(DbType, item.Key, item.Value);
                 }
             }
-            sqlCommand.DbCommandType=eDbCommandType.Update;
+            sqlCommand.DbCommandType = eDbCommandType.Update;
             return sqlCommand;
         }
         /// <summary>
@@ -178,7 +178,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         $" {DBMDConst.UnSingleQuotes}{type.GetTableName()}" +
                         $"{DBMDConst.UnSingleQuotes} ");
                     sql.StrSqlValue.Append(DBMDConst.LeftBracket);
-                    sql.StrSqlValue.Append(string.Join(DBMDConst.Comma.ToString(), Props.Select(p => 
+                    sql.StrSqlValue.Append(string.Join(DBMDConst.Comma.ToString(), Props.Select(p =>
                     $"{DBMDConst.UnSingleQuotes}{p.GetColName()}{DBMDConst.UnSingleQuotes}")));
                     sql.StrSqlValue.Append(DBMDConst.RightBracket);
                     sql.AddLineFeed();
@@ -191,7 +191,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 sql.StrSqlValue.Append(string.Join(DBMDConst.Comma.ToString(),
                   Props.Select(p =>
                   {
-                      string key =GetParameterName(Index + offset,p.GetColName()) ;//$"{DBMDConst.AT}{GetColName(p)}{DBMDConst.DownLine}{Index + offset}";
+                      string key = GetParameterName(Index + offset, p.GetColName());//$"{DBMDConst.AT}{GetColName(p)}{DBMDConst.DownLine}{Index + offset}";
                       sql.AddParameter(DbType, key, p.GetValue(data));
                       return key;
                   })));
@@ -239,7 +239,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="sql"></param>
         /// <param name="Params"></param>
         /// <returns></returns>
-        public virtual QueryEntity GetSelect(string sql,Dictionary<string,object> Params)
+        public virtual QueryEntity GetSelect(string sql, Dictionary<string, object> Params)
         {
             QueryEntity sqlCommand = new QueryEntity(sql);
             if (!Check.IsNull(Params))
@@ -307,9 +307,9 @@ namespace NetCore.ORM.Simple.SqlBuilder
             entity.MapInfos = select.MapInfos.ToArray();
             LinkMapInfos(select.MapInfos, entity);
             //连接
-            LinkJoinInfos(select.JoinInfos.Values.ToArray(),entity);
+            LinkJoinInfos(select.JoinInfos.Values.ToArray(), entity);
             //条件
-            if (!Check.IsNull(select.TreeConditions) && select.TreeConditions.Count>CommonConst.Zero)
+            if (!Check.IsNull(select.TreeConditions) && select.TreeConditions.Count > CommonConst.Zero)
             {
                 entity.StrSqlValue.Append($" {DBMDConst.Where}");
                 LinkConditions(select.Conditions, select.TreeConditions, entity);
@@ -398,14 +398,14 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="sql"></param>
         /// <param name="Params"></param>
         /// <returns></returns>
-        public virtual SqlCommandEntity GetDelete(string sql,Dictionary<string,object> Params)
+        public virtual SqlCommandEntity GetDelete(string sql, Dictionary<string, object> Params)
         {
             SqlCommandEntity sqlCommand = new SqlCommandEntity(sql);
             if (!Check.IsNull(Params))
             {
                 foreach (var item in Params)
                 {
-                    sqlCommand.AddParameter(DbType,item.Key, item.Value);
+                    sqlCommand.AddParameter(DbType, item.Key, item.Value);
                 }
             }
             return sqlCommand;
@@ -440,6 +440,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     }
                     else
                     {
+                        SetName(map.Methods, sqlEntity, index);
                         sqlEntity.StrSqlValue.Append($" {MapMethod(map.Methods, sqlEntity)} {DBMDConst.As} {map.AsColumnName} ");
                     }
                     index++;
@@ -478,7 +479,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     }
                 }
 
-                
+
             }
 
 
@@ -490,7 +491,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="treeConditions"></param>
         /// <param name="sqlEntity"></param>
         /// <exception cref="Exception"></exception>
-        protected virtual void LinkConditions(List<ConditionEntity> conditions,List<TreeConditionEntity> treeConditions, SqlBase sqlEntity)
+        protected virtual void LinkConditions(List<ConditionEntity> conditions, List<TreeConditionEntity> treeConditions, SqlBase sqlEntity)
         {
             if (Check.IsNullOrEmpty(treeConditions))
             {
@@ -510,19 +511,21 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 AddBrackets(StrValue, treeConditions[i].LeftBracket);
                 string leftValue = string.Empty;
                 string rightValue = string.Empty;
-                SetName(treeConditions[i].LeftCondition,sqlEntity,i);
-                SetName(treeConditions[i].RightCondition,sqlEntity,i);
+                SetName(treeConditions[i].LeftCondition, sqlEntity, i);
+                SetName(treeConditions[i].RightCondition, sqlEntity, i);
                 leftValue = treeConditions[i].LeftCondition.DisplayName;
                 if (Check.IsNullOrEmpty(leftValue))
                 {
                     leftValue = treeConditions[i].RightCondition.DisplayName;
                 }
-                else if(!Check.IsNull(treeConditions[i].RightCondition))
+                else if (!Check.IsNull(treeConditions[i].RightCondition))
                 {
-                        rightValue = treeConditions[i].RightCondition.DisplayName;
+                    rightValue = treeConditions[i].RightCondition.DisplayName;
                 }
+
                 if (Check.IsNull(treeConditions[i].RelationCondition))
                 {
+
                     if (!Check.IsNullOrEmpty(rightValue) && rightValue.ToLower().Contains(DBMDConst.True))
                     {
                         StrValue.Append($" {DBMDConst.LeftBracket}{CommonConst.One}{DBMDConst.Equal}{CommonConst.One}{DBMDConst.RightBracket} ");
@@ -545,13 +548,13 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 }
                 else
                 {
-                    MapMethod(treeConditions[i],leftValue,rightValue);
+                    MapMethod(treeConditions[i], leftValue, rightValue);
                     StrValue.Append($"{leftValue}{MysqlConst.cStrSign[(int)treeConditions[i].RelationCondition.SignType]}{rightValue}");
                 }
                 AddBrackets(StrValue, treeConditions[i].RightBracket);
                 if (conditions.Count > i)
                 {
-                    AddBrackets(StrValue,conditions[i].SignType);
+                    AddBrackets(StrValue, conditions[i].SignType);
                 }
             }
 
@@ -634,7 +637,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             Props.Select(p =>
             {
                 string colName = $"{p.GetColName()}";
-                sql.AddParameter(DbType, $"{GetParameterName(index,colName)}", p.GetValue(data));
+                sql.AddParameter(DbType, $"{GetParameterName(index, colName)}", p.GetValue(data));
                 return $"{DBMDConst.UnSingleQuotes}{colName}{DBMDConst.UnSingleQuotes}{DBMDConst.Equal}{GetParameterName(index, colName)}";
             })));
             sql.StrSqlValue.Append($" {DBMDConst.Where} ");
@@ -648,7 +651,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
         /// <param name="Index"></param>
         /// <param name=""></param>
         /// <returns></returns>
-        protected string SetCondition(ConditionEntity condition,SqlBase sql,int Index)
+        protected string SetCondition(ConditionEntity condition, SqlBase sql, int Index, bool IsParams = false)
         {
             string value = null;
             if (Check.IsNull(condition))
@@ -665,20 +668,18 @@ namespace NetCore.ORM.Simple.SqlBuilder
                     value = condition.DisplayName;
                     break;
                 case eConditionType.Constant:
-                    value=GetRandomParaName(Index);
-                    if (!Check.IsNullOrEmpty(condition.DisplayName))
+                    if (!Check.IsNull(condition.Value))
                     {
-                        
-                        sql.AddParameter(DbType,value,condition.DisplayName);
-                        condition.DisplayName = value;
-                    }
-                    else
-                    {
-                        if (!Check.IsNull(condition.Value))
+                        if (IsParams)
                         {
-                            // sql.AddParameter(DbType,value,condition.DisplayName);
-                            GetConditionValue(condition,sql,value,Index);
-                            value=condition.DisplayName;
+                            value = GetRandomParaName(Index);
+                            sql.AddParameter(DbType, value, condition.DisplayName);
+                            condition.DisplayName = value;
+                        }
+                        else
+                        {
+                            GetConditionValue(condition, sql, value, Index);
+                            value = condition.DisplayName;
                         }
                     }
                     break;
@@ -705,18 +706,15 @@ namespace NetCore.ORM.Simple.SqlBuilder
             }
             return false;
         }
-        protected virtual void GetConditionValue(ConditionEntity condition, SqlBase entity, string key,int Index)
+        protected virtual void GetConditionValue(ConditionEntity condition, SqlBase entity, string key, int Index)
         {
             StringBuilder sValue = new StringBuilder();
+
             if (Check.IsNull(condition))
             {
                 throw new ArgumentNullException(nameof(condition));
             }
-            if (!Check.IsNullOrEmpty(condition.DisplayName))
-            {  
-                entity.AddParameter(DbType, key, condition.DisplayName);
-                return;
-            }
+
             if (Check.IsNull(condition.Value))
             {
                 return;
@@ -724,10 +722,13 @@ namespace NetCore.ORM.Simple.SqlBuilder
             condition.DataType = CommonConst.GetType(condition.Value.GetType());
             switch (condition.DataType)
             {
-                case eDataType.SimpleString:
-                case eDataType.SimpleInt:
-                case eDataType.SimpleGuid:
                 case eDataType.SimpleTime:
+                case eDataType.SimpleGuid:
+                case eDataType.SimpleString:
+                case eDataType.SimpleTimeSpan:
+                    sValue.Append($"{ReplaceSingleQuotes(condition.Value.ToString())}");
+                    break;
+                case eDataType.SimpleInt:
                 case eDataType.SimpleFloat:
                 case eDataType.SimpleDouble:
                 case eDataType.SimpleDecimal:
@@ -737,13 +738,15 @@ namespace NetCore.ORM.Simple.SqlBuilder
                 case eDataType.SimpleListString:
                 case eDataType.SimpleArrayGuid:
                 case eDataType.SimpleListGuid:
+                case eDataType.SimpleListTime:
+                case eDataType.SimpleListTimeSpan:
                     foreach (var item in (dynamic)condition.Value)
                     {
                         if (item.ToString() is string strValue)
                         {
-                            if (strValue.Contains(DBMDConst.SingleQuotes)) 
+                            if (strValue.Contains(DBMDConst.SingleQuotes))
                             {
-                                sValue.Append($"{DBMDConst.SingleQuotes}{strValue.Replace(DBMDConst.SingleQuotes.ToString(),$"{DBMDConst.SingleQuotes}{DBMDConst.SingleQuotes}")}{DBMDConst.SingleQuotes}{DBMDConst.Comma}");
+                                sValue.Append($"{DBMDConst.SingleQuotes}{ReplaceSingleQuotes(strValue)}{DBMDConst.SingleQuotes}{DBMDConst.Comma}");
                             }
                             else
                             {
@@ -773,35 +776,40 @@ namespace NetCore.ORM.Simple.SqlBuilder
             condition.DisplayName = sValue.ToString();
         }
 
-        public void MapMethod(TreeConditionEntity treeCondition,string left,string right)
+        protected string ReplaceSingleQuotes(string value)
+        {
+            return value.Replace("\'", "\'\'");
+        }
+
+        public void MapMethod(TreeConditionEntity treeCondition, string left, string right)
         {
             if (!Check.IsNullOrEmpty(treeCondition.LeftCondition.methods))
             {
-                left =MapMethod(treeCondition.LeftCondition.Methods);
+                left = MapMethod(treeCondition.LeftCondition.Methods);
             }
             if (!Check.IsNullOrEmpty(treeCondition.RightCondition.methods))
             {
                 left = MapMethod(treeCondition.RightCondition.Methods);
             }
         }
-        protected virtual string MapMethod(List<MethodEntity> methods,SqlBase sql=null)
+        protected virtual string MapMethod(List<MethodEntity> methods, SqlBase sql = null)
         {
             StringBuilder sbValue = new StringBuilder();// DBMDConst.Equal.ToString();
             foreach (var m in methods)
             {
-                if (m.MethodType==eMethodType.DataBase)
+                if (m.MethodType == eMethodType.DataBase)
                 {
                     if (MysqlConst.dicMethods.ContainsKey(m.Name))
                     {
-                        if (!Check.IsNullOrEmpty(m.TreeConditions)&& !Check.IsNull(sql))
+                        if (!Check.IsNullOrEmpty(m.TreeConditions) && !Check.IsNull(sql))
                         {
                             QueryEntity qsql = new QueryEntity();
-                            LinkConditions(m.Conditions,m.TreeConditions,sql);
+                            LinkConditions(m.Conditions, m.TreeConditions, sql);
                             if (!Check.IsNullOrEmpty(qsql.DbParams))
                             {
                                 sql.DbParams.AddRange(qsql.DbParams);
                             }
-                            m.Extensions= qsql.StrSqlValue.ToString();
+                            m.Extensions = qsql.StrSqlValue.ToString();
                         }
                         sbValue.Append(MysqlConst.dicMethods[m.Name].Invoke(m));
                     }
@@ -809,20 +817,20 @@ namespace NetCore.ORM.Simple.SqlBuilder
             }
             return sbValue.ToString();
         }
-        protected string GetRandomParaName(int index,int length=8)
+        protected string GetRandomParaName(int index, int length = 8)
         {
-            return $"{DBMDConst.AT}{MD5Encrypt.Encrypt(DateTime.Now.ToString(),length)}{index}";
+            return $"{DBMDConst.AT}{MD5Encrypt.Encrypt(DateTime.Now.ToString(), length)}{index}";
         }
         protected string GetRandomName(int index, int length = 8)
         {
             return $"{MD5Encrypt.Encrypt(DateTime.Now.ToString(), length)}{index}";
         }
 
-        protected string GetParameterName(int index,string name)
+        protected string GetParameterName(int index, string name)
         {
             return $"{DBMDConst.AT}{name}{DBMDConst.DownLine}{index}";
         }
-        protected  string AscendOrDescend(eOrderType OrderType)
+        protected string AscendOrDescend(eOrderType OrderType)
         {
             string value = string.Empty;
             switch (OrderType)
@@ -839,11 +847,11 @@ namespace NetCore.ORM.Simple.SqlBuilder
             return value;
         }
 
-        protected void AddBrackets(StringBuilder StrValue,List<eSignType>signTypes)
+        protected void AddBrackets(StringBuilder StrValue, List<eSignType> signTypes)
         {
-            AddBrackets(StrValue,signTypes.ToArray());
+            AddBrackets(StrValue, signTypes.ToArray());
         }
-        protected void AddBrackets(StringBuilder StrValue,  params eSignType[] signTypes)
+        protected void AddBrackets(StringBuilder StrValue, params eSignType[] signTypes)
         {
             foreach (var sign in signTypes)
             {
@@ -851,19 +859,44 @@ namespace NetCore.ORM.Simple.SqlBuilder
             }
         }
 
-        protected void SetName(ConditionEntity condition,SqlBase sqlEntity,int i)
+        protected void SetName(ConditionEntity condition, SqlBase sqlEntity, int i)
         {
-            if (!Check.IsNull(condition) && !Check.IsNullOrEmpty(condition.Methods))
+            if (!Check.IsNull(condition))
             {
-                foreach (var method in condition.Methods)
+                if (Check.IsNullOrEmpty(condition.Methods))
                 {
-                    foreach (var Params in method.Parameters)
-                    {
-                        SetCondition(Params, sqlEntity, i);
-                    }
+                    SetCondition(condition, sqlEntity, i,true);
+                }
+                else
+                {
+                    SetName(condition.Methods, sqlEntity, i);
                 }
             }
         }
+        protected void SetName(IEnumerable<MethodEntity> methods, SqlBase sqlEntity, int i)
+        {
+
+            foreach (var method in methods)
+            {
+                foreach (var Params in method.Parameters)
+                {
+                    bool IsParams = true;
+                    switch (method.Name)
+                    {
+                        case MethodConst._Contains:
+                        case MethodConst._RightContains:
+                        case MethodConst._LeftContains:
+                            IsParams = false;
+                            break;
+                        default:
+                            break;
+                    }
+                    SetCondition(Params, sqlEntity,i,IsParams);
+                }
+            }
+
+        }
+
 
     }
 }

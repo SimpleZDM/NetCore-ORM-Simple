@@ -194,7 +194,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
             {
                 if (m.MethodType == eMethodType.DataBase)
                 {
-                    if (MysqlConst.dicMethods.ContainsKey(m.Name))
+                    if (!Check.IsNullOrEmpty(m.Name)&&MysqlConst.dicMethods.ContainsKey(m.Name))
                     {
                         if (!Check.IsNullOrEmpty(m.TreeConditions) && !Check.IsNull(sql))
                         {

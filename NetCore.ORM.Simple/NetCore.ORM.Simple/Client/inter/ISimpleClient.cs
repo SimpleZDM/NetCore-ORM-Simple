@@ -38,21 +38,7 @@ namespace NetCore.ORM.Simple
         /// <param name="entitys"></param>
         /// <returns></returns>
         ISimpleCommand<TEntity> Insert<TEntity>(List<TEntity> entitys) where TEntity : class, new();
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TEntity"></typeparam>
-        /// <param name="entitys"></param>
-        /// <returns></returns>
-        ISimpleCommand<TEntity> Insert<TEntity>(params TEntity[] entitys) where TEntity : class, new()
-        {
-            var sql = builder.GetInsert(entitys, changeOffset);
-            sql.DbCommandType = eDbCommandType.Insert;
-            sqls.Add(sql);
-            ISimpleCommand<TEntity> command = new SimpleCommand<TEntity>(builder, dbType, sql, sqls, dbDrive);
-            changeOffset = entitys.Count() + changeOffset;
-            return command;
-        }
+       
         /// <summary>
         /// 
         /// </summary>

@@ -155,10 +155,10 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 user.IDDD = user.Id;
                 Dictionary<string, UserEntity> duser = new Dictionary<string, UserEntity>();
                 duser.Add("1", users[4]);
-                //var result0 = client.Delete<UserEntity>(d => d.Id.Equals(1503)).SaveChange();
-                //var result1 = client.Delete<UserEntity>(d => d.Id.Equals(id)).SaveChange();
-                //var result2 = client.Delete<UserEntity>(d => d.Id.Equals(user.Id)).SaveChange();
-                // var result14 = client.Delete<UserEntity>(d => d.Id.Equals(duser["1"].Id)).SaveChange();
+                var result0 = client.Delete<UserEntity>(d => d.Id.Equals(1503)).SaveChange();
+                var result1 = client.Delete<UserEntity>(d => d.Id.Equals(id)).SaveChange();
+                var result2 = client.Delete<UserEntity>(d => d.Id.Equals(user.Id)).SaveChange();
+                var result14 = client.Delete<UserEntity>(d => d.Id.Equals(duser["1"].Id)).SaveChange();
                 var result13 = client.Delete<UserEntity>(d => d.Id.Equals(users[3].IDDD)).SaveChange();
                 var result15 = client.Delete<UserEntity>(d => d.Id.Equals(user.IDDD)).SaveChange();
 
@@ -526,8 +526,10 @@ namespace NetCore.ORM.Simple.ConsoleApp
 
         public void TestCallMethod()
         {
-            string str = "111";
-            string[] names = new string[] { "111", "222", "333" };
+            string str = "111' or ";
+            int i = 10;
+            int[] ids = new int[] { 1, 2, 3 };
+            string[] names = new string[] { "ccc", "","" };
             var data = client.Queryable<UserEntity>().
                 //Where(
                 //u => u.Id == 3202 || Simple.LeftContains(u.Description, "asdfs")
@@ -536,16 +538,16 @@ namespace NetCore.ORM.Simple.ConsoleApp
                 //).
                 Select(u => new
                 {
-                    Name = u.Name,
-                    DateDiff = Simple.DateDiff(u.Time1, u.Time2, eDateType.Minute),
-                    CompanyId = u.CompanyId,
-                    Round = Simple.IF(u.RoleId==1, 2).ElseIF(u.RoleId==2,3).End(2),
+                    //Name = u.Name,
+                   //DateDiff = Simple.DateDiff(u.Time1, u.Time2, eDateType.Minute),
+                   //CompanyId = u.CompanyId,
+                    //Round = Simple.IF(u.Name == "sdf", names[0]).End("jhjhk"),
                     //Truncate = Simple.Truncate(u.Age, 2),
-                    //Now = Simple.Now(),
-                    //Year = Simple.Year(u.Time1),
-                    Month = Simple.Month(u.Time1),
-                    //Day = Simple.Day(u.Time1),
-                    BoolIs = Simple.IF(u.Time1>=u.Time2,1).End(2)
+                   //Now = Simple.Now(),
+                   // Year = Simple.Year(u.Time1),
+                   //Month = Simple.Month(u.Time1),
+                   //Day = Simple.Day(u.Time1),
+                    BoolIs = Simple.IF(u.Time1>=u.Time2,i).End(2)
                 }).ToList();
             List<UserEntity> left = client.Queryable<UserEntity>().Where(u =>Simple.LeftContains(u.Name,str)).ToList();
             

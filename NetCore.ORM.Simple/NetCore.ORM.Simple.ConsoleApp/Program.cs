@@ -11,7 +11,11 @@ public static class Program
 {
     public static int Main(string []args)
     {
-
+        List<object> objs = new List<object>();
+        objs.Add(new object());
+        objs.Add(new object());
+        object o= objs[0];
+        Console.WriteLine(object.ReferenceEquals(o, objs[0]));
         //object o1 = new { UserName = 11 };
         //var b =Activator.CreateInstance(o1.GetType());
 
@@ -68,11 +72,11 @@ public static class Program
         SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
        // MysqlTest.MoreQuerTest();
         //MysqlTest.sqlTest();
-        MysqlTest.InsertTest();
+        //MysqlTest.InsertTest();
         //MysqlTest.UpdateTest();
-        //MysqlTest.DeleteTest();
+        MysqlTest.DeleteTest();
         //Console.WriteLine();
-        MysqlTest.QueryTest();
+         MysqlTest.QueryTest();
         //MysqlTest.Transaction();
         MysqlTest.TestCallMethod();
         //SimpleSqliteTest sqliteTest = new SimpleSqliteTest();

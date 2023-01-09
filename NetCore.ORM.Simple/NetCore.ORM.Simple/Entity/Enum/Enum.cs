@@ -96,6 +96,7 @@ namespace NetCore.ORM.Simple
         SimpleInt,//字符串
         SimpleGuid,//字符串
         SimpleTime,//字符串
+        SimpleTimeSpan,
         SimpleFloat,//字符串
         SimpleDouble,//字符串
         SimpleDecimal,//字符串
@@ -105,14 +106,19 @@ namespace NetCore.ORM.Simple
         SimpleArrayDouble,
         SimpleArrayFloat,
         SimpleArrayDecimal,
+        SimpleArrayTime,
+        SimpleArrayTimeSpan,
         SimpleListInt,
         SimpleListString,
         SimpleListGuid,
         SimpleListFloat,
         SimpleListDouble,
         SimpleListDecimal,
+        SimpleListTime,
+        SimpleListTimeSpan,
         SimpleArray,
         SimpleList,
+        SimpleEnum,
         NuKnow
     }
 
