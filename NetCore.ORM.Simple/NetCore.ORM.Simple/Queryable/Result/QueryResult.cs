@@ -44,6 +44,17 @@ namespace NetCore.ORM.Simple.Queryable
             this.DbDrive = DbDrive;
             builder = _builder;
         }
+        protected void SimpleInit(ISqlBuilder _builder, IDBDrive DbDrive,SimpleVisitor _visitor, params Type[] types)
+        {
+            if (Check.IsNull(_visitor))
+            {
+                throw new ArgumentException(nameof(_visitor));
+            }
+            visitor = _visitor;
+            visitor.AppendTable(types);
+            this.DbDrive = DbDrive;
+            builder = _builder;
+        }
         /// <summary>
         /// 
         /// </summary>

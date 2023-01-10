@@ -31,7 +31,7 @@ namespace NetCore.ORM.Simple.Entity
         /// <summary>
         /// table 中包含表的实际名称
         /// </summary>
-        public string[] TableNames { get { return tableNames; } private set { tableNames = value; } }
+        public List<string> TableNames { get { return tableNames; } private set { tableNames = value; } }
 
 
         public ContextTableEntity(params Type[] types)
@@ -41,15 +41,16 @@ namespace NetCore.ORM.Simple.Entity
                 throw new ArgumentException(nameof(types));
             }
             DicTables=new Dictionary<string,TableEntity>();
-            TableNames=new string[types.Length];
+            TableNames = new List<string>();
             for (int i = 0; i <types.Length; i++)
             {
                 AddTableName(types[i],i);
             }
            
         }
+        
         private Dictionary<string, TableEntity> dicTable;
-        private string[] tableNames;
+        private List<string> tableNames;
         /// <summary>
         /// 
         /// </summary>
@@ -70,12 +71,12 @@ namespace NetCore.ORM.Simple.Entity
                 var entity=DicTables[newEity.DisplayNmae];
              
                     newEity.AsName=$"{newEity.DisplayNmae}{CommonConst.Letters[entity.Count]}";
-                    TableNames[index] = newEity.AsName;
+                TableNames.Add(newEity.AsName);
                 entity.Count++;
             }
             else
             {
-                TableNames[index]=newEity.DisplayNmae;
+                TableNames.Add(newEity.DisplayNmae);
                 newEity.AsName = newEity.DisplayNmae;
             }
             DicTables.Add(TableNames[index],newEity);
@@ -86,38 +87,66 @@ namespace NetCore.ORM.Simple.Entity
         /// </summary>
         public TableEntity GetName(int index)
         {
-            if (index>=TableNames.Length)
+            if (index>=TableNames.Count())
             {
                 throw new Exception("超出索引界限!");
             }
             return DicTables[TableNames[index]];
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="propName"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public PropertyInfo GetProperty(int index,string propName)
         {
-            if (index >= TableNames.Length)
+            if (index >= TableNames.Count())
             {
                 throw new Exception("超出索引界限!");
             }
             return DicTables[TableNames[index]].ClassType.GetProperty(propName);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="PropName"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public  string GetColumnName(int index, string PropName)
         {
-            if (TableNames.Length > index)
+            if (TableNames.Count()> index)
             {
                 return DicTables[TableNames[index]].ClassType.GetProperty(PropName).GetColName();
             }
             throw new Exception("表不存在!");
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public  string GetAsTableName(int index)
         {
-            if (TableNames.Length > index)
+            if (TableNames.Count() > index)
             {
                 var nameEntity = GetName(index);
                 return nameEntity.AsName;
             }
             throw new Exception("表不存在!");
+        }
+
+        public  void AppendTable(params Type[] types)
+        {
+            int index=TableNames.Count();
+            foreach (var type in types)
+            {
+                AddTableName(type,index);
+                index++;
+            }
         }
     }
 }

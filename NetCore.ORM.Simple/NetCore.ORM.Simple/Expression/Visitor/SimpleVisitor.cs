@@ -42,7 +42,6 @@ namespace NetCore.ORM.Simple.Visitor
             conditionVisitor = new ConditionVisitor(contextSelect);
             conditionVisitor.InitMethodVisitor();
         }
-
         /// <summary>
         /// 
         /// </summary>
@@ -51,6 +50,11 @@ namespace NetCore.ORM.Simple.Visitor
         public ContextSelect GetContextSelect()
         {
             return contextSelect;
+        }
+
+        public void AppendTable(params Type[] types)
+        {
+            contextSelect.Table.AppendTable(types);
         }
 
         /// <summary>
@@ -255,7 +259,6 @@ namespace NetCore.ORM.Simple.Visitor
             mapVisitor.Modify(expression, contextSelect.LastAnonymity);
         }
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -271,11 +274,33 @@ namespace NetCore.ORM.Simple.Visitor
         /// </summary>
         /// <typeparam name="T1"></typeparam>
         /// <typeparam name="T2"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="joinType"></param>
+        public void VisitJoin<T1, T2>(Expression<Func<T1,T2,bool>>expression,eJoinType joinType)
+        {
+            joinVisitor.Modify(expression,joinType);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
         /// <typeparam name="T3"></typeparam>
         /// <param name="expression"></param>
         public void VisitJoin<T1, T2, T3>(Expression<Func<T1, T2, T3, JoinInfoEntity>> expression)
         {
             joinVisitor.Modify(expression);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <param name="expression"></param>
+        public void VisitJoin<T1, T2, T3>(Expression<Func<T1, T2, T3,bool>> expression,eJoinType joinType)
+        {
+            joinVisitor.Modify(expression,joinType);
         }
         /// <summary>
         /// 
@@ -296,11 +321,36 @@ namespace NetCore.ORM.Simple.Visitor
         /// <typeparam name="T2"></typeparam>
         /// <typeparam name="T3"></typeparam>
         /// <typeparam name="T4"></typeparam>
+        /// <param name="expression"></param>
+        public void VisitJoin<T1, T2, T3, T4>(Expression<Func<T1, T2, T3, T4, bool>> expression,eJoinType joinType)
+        {
+            joinVisitor.Modify(expression,joinType);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
         /// <typeparam name="T5"></typeparam>
         /// <param name="expression"></param>
         public void VisitJoin<T1, T2, T3, T4, T5>(Expression<Func<T1, T2, T3, T4, T5, JoinInfoEntity>> expression)
         {
             joinVisitor.Modify(expression);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <param name="expression"></param>
+        public void VisitJoin<T1, T2, T3, T4, T5>(Expression<Func<T1, T2, T3, T4, T5, bool>> expression,eJoinType joinType)
+        {
+            joinVisitor.Modify(expression,joinType);
         }
         /// <summary>
         /// 
@@ -325,11 +375,42 @@ namespace NetCore.ORM.Simple.Visitor
         /// <typeparam name="T4"></typeparam>
         /// <typeparam name="T5"></typeparam>
         /// <typeparam name="T6"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="joinType"></param>
+        public void VisitJoin<T1, T2, T3, T4, T5, T6>(Expression<Func<T1, T2, T3, T4, T5, T6, bool>> expression,eJoinType joinType)
+        {
+            joinVisitor.Modify(expression,joinType);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
         /// <typeparam name="T7"></typeparam>
         /// <param name="expression"></param>
         public void VisitJoin<T1, T2, T3, T4, T5, T6,T7>(Expression<Func<T1, T2, T3, T4, T5, T6,T7, JoinInfoEntity>> expression)
         {
             joinVisitor.Modify(expression);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <typeparam name="T7"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="joinType"></param>
+        public void VisitJoin<T1, T2, T3, T4, T5, T6, T7>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, bool>> expression,eJoinType joinType)
+        {
+            joinVisitor.Modify(expression,joinType);
         }
         /// <summary>
         /// /
@@ -348,6 +429,23 @@ namespace NetCore.ORM.Simple.Visitor
             joinVisitor.Modify(expression);
         }
         /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <typeparam name="T7"></typeparam>
+        /// <typeparam name="T8"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="joinType"></param>
+        public void VisitJoin<T1, T2, T3, T4, T5, T6, T7, T8>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, bool>> expression, eJoinType joinType)
+        {
+            joinVisitor.Modify(expression,joinType);
+        }
+        /// <summary>
         /// /
         /// </summary>
         /// <typeparam name="T1"></typeparam>
@@ -363,6 +461,11 @@ namespace NetCore.ORM.Simple.Visitor
         public void VisitJoin<T1, T2, T3, T4, T5, T6, T7, T8,T9>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8,T9, JoinInfoEntity>> expression)
         {
             joinVisitor.Modify(expression);
+        }
+
+        public void VisitJoin<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, bool>> expression,eJoinType joinType)
+        {
+            joinVisitor.Modify(expression,joinType);
         }
         /// <summary>
         /// 
@@ -381,6 +484,24 @@ namespace NetCore.ORM.Simple.Visitor
         public void VisitJoin<T1, T2, T3, T4, T5, T6, T7, T8, T9,T10>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9,T10, JoinInfoEntity>> expression)
         {
             joinVisitor.Modify(expression);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <typeparam name="T7"></typeparam>
+        /// <typeparam name="T8"></typeparam>
+        /// <typeparam name="T9"></typeparam>
+        /// <typeparam name="T10"></typeparam>
+        /// <param name="expression"></param>
+        public void VisitJoin<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,bool>> expression,eJoinType joinType)
+        {
+            joinVisitor.Modify(expression,joinType);
         }
         /// <summary>
         /// 
@@ -414,12 +535,34 @@ namespace NetCore.ORM.Simple.Visitor
         /// <typeparam name="T8"></typeparam>
         /// <typeparam name="T9"></typeparam>
         /// <typeparam name="T10"></typeparam>
+        /// <param name="expression"></param>
+        public void VisitJoin<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10,T11, bool>> expression,eJoinType joinType)
+        {
+            joinVisitor.Modify(expression,joinType);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T3"></typeparam>
+        /// <typeparam name="T4"></typeparam>
+        /// <typeparam name="T5"></typeparam>
+        /// <typeparam name="T6"></typeparam>
+        /// <typeparam name="T7"></typeparam>
+        /// <typeparam name="T8"></typeparam>
+        /// <typeparam name="T9"></typeparam>
+        /// <typeparam name="T10"></typeparam>
         /// <typeparam name="T11"></typeparam>
         /// <typeparam name="T12"></typeparam>
         /// <param name="expression"></param>
         public void VisitJoin<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11,T12>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11,T12, JoinInfoEntity>> expression)
         {
             joinVisitor.Modify(expression);
+        }
+        public void VisitJoin<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(Expression<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, bool>> expression,eJoinType joinType)
+        {
+            joinVisitor.Modify(expression,joinType);
         }
 
         /// <summary>

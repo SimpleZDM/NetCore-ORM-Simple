@@ -27,10 +27,17 @@ namespace NetCore.ORM.Simple.Queryable
             Type tableName=ReflectExtension.GetType<T>();
             Init(builder,dbDrive,tableName);
         }
-
-        ISimpleQueryable<T> ISimpleQueryable<T>.SimpleQueryable()
+        public ISimpleQueryable<T,T2> LeftJoin<T2>(Expression<Func<T,T2,bool>> expression)
         {
-            return this;
+            return new SimpleQueryable<T,T2>(expression,builder,this.DbDrive,this.visitor,eJoinType.Left);
+        }
+        public ISimpleQueryable<T,T2> RightJoin<T2>(Expression<Func<T, T2, bool>> expression)
+        {
+            return new SimpleQueryable<T, T2>(expression, builder, this.DbDrive, this.visitor, eJoinType.Right);
+        }
+        public ISimpleQueryable<T,T2> InnerJoin<T2>(Expression<Func<T, T2, bool>> expression)
+        {
+            return new SimpleQueryable<T, T2>(expression, builder, this.DbDrive, this.visitor, eJoinType.Right);
         }
     }
 }

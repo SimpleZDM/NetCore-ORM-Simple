@@ -11,23 +11,7 @@ public static class Program
 {
     public static int Main(string []args)
     {
-        List<object> objs = new List<object>();
-        objs.Add(new object());
-        objs.Add(new object());
-        object o= objs[0];
-        Console.WriteLine(object.ReferenceEquals(o, objs[0]));
-        //object o1 = new { UserName = 11 };
-        //var b =Activator.CreateInstance(o1.GetType());
-
-        //Anonymity anonymity = new Anonymity();
-
-        //string[] namelist = new string[] { "UserName", "UserId" };
-        //Dictionary<string, Type> dic = new Dictionary<string, Type>();
-        //dic.Add("UserName", typeof(string));
-        //dic.Add("UserId", typeof(int));
-        //var o =anonymity.Test1(dic);
         //UserEntity u = new UserEntity();
-        //ProductTest productTest = new ProductTest();
         //productTest.StartTest1(new MissionDetailParameter
         //{
         //    ClassID = Guid.Parse("08da0008-e513-4291-8e5d-abbcce797617"),
@@ -38,21 +22,10 @@ public static class Program
         //    ClassID = Guid.Parse("08da0008-e513-4291-8e5d-abbcce797617"),
         //    UserID = Guid.Parse("f906b8ad-2f57-4236-90bd-08b7acc428d2")
         //});
-        //Console.WriteLine(typeof(List<int>).IsArray);
-        // Console.WriteLine(typeof(Dictionary<int,int>).IsD);
-        //Console.WriteLine(typeof(int[]).IsArray);
-        // StartTast("server=49.233.33.36;database=virtualsoftplatformdb;user=root;pwd=[Txy*!14@msql*^];SSL Mode=None");
+        Console.WriteLine(typeof(List<int>).IsGenericType);
+        Console.WriteLine(typeof(int[]).IsArray);
 
         //Console.WriteLine();
-        //object o = 1;
-        //object o2 = "232";
-        //object o3 = 1.1;
-        //Console.WriteLine(o);
-        //Console.WriteLine(o2);
-        //Console.WriteLine($"{o3}");
-        //Console.WriteLine($"{o}");
-        //Console.WriteLine($"{o2}");
-
         //Console.WriteLine(typeof(List<object>).FullName);
         //Console.WriteLine(typeof(object[]).FullName);
         //Console.WriteLine(typeof(List<object>).Name);
@@ -60,25 +33,16 @@ public static class Program
 
         //SimpleExpressionTest test = new SimpleExpressionTest();
         ////test.Select();
-        //test.Where();
-        // SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
-        // SimpleExpressionTest test = new SimpleExpressionTest();
-        //test.Select();
-        // test.Where();
-        UserEntity u = new UserEntity();
-        List<UserEntity> users = new List<UserEntity>();
-        users.Add(u);
-        Console.WriteLine(object.ReferenceEquals(users[0],u));
         SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
        // MysqlTest.MoreQuerTest();
         //MysqlTest.sqlTest();
         //MysqlTest.InsertTest();
         //MysqlTest.UpdateTest();
-        MysqlTest.DeleteTest();
+        //MysqlTest.DeleteTest();
         //Console.WriteLine();
          MysqlTest.QueryTest();
         //MysqlTest.Transaction();
-        MysqlTest.TestCallMethod();
+        //MysqlTest.TestCallMethod();
         //SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
         //sqliteTest.InsertTest();
 

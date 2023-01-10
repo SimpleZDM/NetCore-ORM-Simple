@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetCore.ORM.Simple.SqlBuilder;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -24,6 +25,11 @@ namespace NetCore.ORM.Simple.Queryable
     /// <typeparam name="T3"></typeparam>
     public interface ISimpleQueryable<T1, T2, T3> : ISimpleQuery<T1> where T1 : class
     {
+        public ISimpleQueryable<T1, T2, T3, T4> LeftJoin<T4>(Expression<Func<T1, T2, T3, T4, bool>> expression);
+
+        public ISimpleQueryable<T1, T2, T3, T4> RightJoin<T4>(Expression<Func<T1, T2, T3, T4, bool>> expression);
+        public ISimpleQueryable<T1, T2, T3, T4> InnerJoin<T4>(Expression<Func<T1, T2, T3, T4, bool>> expression);
+      
         /// <summary>
         /// 
         /// </summary>

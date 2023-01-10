@@ -140,7 +140,7 @@ namespace NetCore.ORM.Simple.Entity
             ConditionEntity condition = GetCondition(eConditionType.ColumnName);
 
 
-            if (Index >= 0 && Index < table.TableNames.Length)
+            if (Index >= 0 && Index < table.TableNames.Count())
             {
                 var Prop = table.GetProperty(Index, PropName);
                 var NameEntity = table.GetName(Index);

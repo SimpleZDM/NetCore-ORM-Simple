@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using NetCore.ORM.Simple.SqlBuilder;
+using NetCore.ORM.Simple.Visitor;
 
 /*********************************************************
  * 命名空间 NetCore.ORM.Simple.Queryable
@@ -27,6 +28,26 @@ namespace NetCore.ORM.Simple.Queryable
             Type[] types=ReflectExtension.GetType<T1,T2,T3,T4>();
             Init(builder, dBDrive, types);
             visitor.VisitJoin(expression);
+        }
+
+        public SimpleQueryable(Expression<Func<T1, T2, T3,T4, bool>> expression, ISqlBuilder builder, IDBDrive dbDrive, SimpleVisitor _visitor, eJoinType joinType)
+        {
+            Type types = ReflectExtension.GetType<T4>();
+            SimpleInit(builder, dbDrive, _visitor, types);
+            visitor.VisitJoin(expression, joinType);
+        }
+
+        public ISimpleQueryable<T1, T2, T3, T4,T5> LeftJoin<T5>(Expression<Func<T1, T2, T3, T4,T5, bool>> expression)
+        {
+            return new SimpleQueryable<T1, T2, T3, T4,T5>(expression, builder, this.DbDrive, this.visitor, eJoinType.Left);
+        }
+        public ISimpleQueryable<T1, T2, T3, T4,T5> RightJoin<T5>(Expression<Func<T1, T2, T3, T4,T5, bool>> expression)
+        {
+            return new SimpleQueryable<T1, T2, T3, T4,T5>(expression, builder, this.DbDrive, this.visitor, eJoinType.Right);
+        }
+        public ISimpleQueryable<T1, T2, T3, T4,T5> InnerJoin<T5>(Expression<Func<T1, T2, T3, T4,T5, bool>> expression)
+        {
+            return new SimpleQueryable<T1, T2, T3, T4,T5>(expression, builder, this.DbDrive, this.visitor, eJoinType.Inner);
         }
         public ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, TResult>> expression) where TResult : class
         {

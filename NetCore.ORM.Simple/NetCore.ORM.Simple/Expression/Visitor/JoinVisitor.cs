@@ -58,6 +58,13 @@ namespace NetCore.ORM.Simple.Visitor
             return expression;
         }
 
+        public Expression Modify(Expression expression,eJoinType joinType)
+        {
+            CurrentJoinTable = JoinExtension.CreateJoinEntity(eTableType.Slave);
+            CurrentJoinTable.JoinType = joinType;
+            return Modify(expression);
+        }
+
         /// <summary>
         /// 表达式树的二元操作
         /// </summary>

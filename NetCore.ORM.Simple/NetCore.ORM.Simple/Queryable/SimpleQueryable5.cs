@@ -1,6 +1,7 @@
 ﻿using NetCore.ORM.Simple.Common;
 using NetCore.ORM.Simple.Entity;
 using NetCore.ORM.Simple.SqlBuilder;
+using NetCore.ORM.Simple.Visitor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,25 @@ namespace NetCore.ORM.Simple.Queryable
             Type[] types = ReflectExtension.GetType<T1,T2,T3,T4,T5>();
             Init(builder, dBDrive, types);
             visitor.VisitJoin(expression);
+        }
+
+        public SimpleQueryable(Expression<Func<T1, T2, T3, T4,T5, bool>> expression, ISqlBuilder builder, IDBDrive dbDrive, SimpleVisitor _visitor, eJoinType joinType)
+        {
+            Type types = ReflectExtension.GetType<T5>();
+            SimpleInit(builder, dbDrive, _visitor, types);
+            visitor.VisitJoin(expression, joinType);
+        }
+        public ISimpleQueryable<T1, T2, T3, T4, T5,T6> LeftJoin<T6>(Expression<Func<T1, T2, T3, T4, T5,T6, bool>> expression)
+        {
+            return new SimpleQueryable<T1, T2, T3, T4, T5,T6>(expression, builder, this.DbDrive, this.visitor, eJoinType.Left);
+        }
+        public ISimpleQueryable<T1, T2, T3, T4, T5,T6> RightJoin<T6>(Expression<Func<T1, T2, T3, T4, T5,T6, bool>> expression)
+        {
+            return new SimpleQueryable<T1, T2, T3, T4, T5,T6>(expression, builder, this.DbDrive, this.visitor, eJoinType.Right);
+        }
+        public ISimpleQueryable<T1, T2, T3, T4, T5,T6> InnerJoin<T6>(Expression<Func<T1, T2, T3, T4, T5,T6, bool>> expression)
+        {
+            return new SimpleQueryable<T1, T2, T3, T4, T5,T6>(expression, builder, this.DbDrive, this.visitor, eJoinType.Inner);
         }
         public ISimpleQuery<TResult> Select<TResult>(Expression<Func<T1, T2, TResult>> expression)where TResult:class
         {
