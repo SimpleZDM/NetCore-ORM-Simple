@@ -29,4 +29,10 @@ namespace NetCore.ORM.Simple.ConsoleApp
         public virtual DateTime DeletionTime { get; set; }
 
     }
+
+    public class TestEntity
+    {
+        public int MyProperty { get; set; }
+    }
+
 }

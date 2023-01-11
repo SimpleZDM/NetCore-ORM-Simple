@@ -355,12 +355,28 @@ namespace NetCore.ORM.Simple.Visitor
                 if (menber.KeyMember is PropertyInfo PropKey)
                 {
                     var Key = PropKey.GetValue(value);
-                    value = ((dynamic)field.GetValue(value))[(dynamic)Key];
+                    value =field.GetValue(value);
+                    try
+                    {
+                        value = ((dynamic)value)[(dynamic)Key];
+                    }
+                    catch (Exception ex)
+                    {
+                        value = GetExceptionValue(ex,value,Key);
+                    }
                 }
                 else if (menber.KeyMember is FieldInfo fieldKey)
                 {
                     var Key = fieldKey.GetValue(node.Value);
-                    value = ((dynamic)field.GetValue(value))[(dynamic)Key];
+                    value = field.GetValue(value);
+                    try
+                    {
+                        value = ((dynamic)value)[(dynamic)Key];
+                    }
+                    catch (Exception ex)
+                    {
+                        GetExceptionValue(ex,value,Key);
+                    }
                 }
             }
             else
@@ -384,12 +400,28 @@ namespace NetCore.ORM.Simple.Visitor
                 if (menber.KeyMember is PropertyInfo PropKey)
                 {
                     var Key = PropKey.GetValue(node.Value);
-                    value = ((dynamic)Property.GetValue(value))[(dynamic)Key];
+                    value = Property.GetValue(value);
+                    try
+                    {
+                        value = ((dynamic)value)[(dynamic)Key];
+                    }
+                    catch (Exception ex)
+                    {
+                        value = GetExceptionValue(ex,value,Key);
+                    }
                 }
                 else if (menber.KeyMember is FieldInfo fieldKey)
                 {
                     var Key = fieldKey.GetValue(node.Value);
-                    value = ((dynamic)Property.GetValue(value))[(dynamic)Key];
+                    value = Property.GetValue(value);
+                    try
+                    {
+                        value = ((dynamic)value)[(dynamic)Key];
+                    }
+                    catch (Exception ex)
+                    {
+                        value = GetExceptionValue(ex, value, Key);
+                    }
                 }
             }
             else
@@ -408,8 +440,15 @@ namespace NetCore.ORM.Simple.Visitor
             for (int i = length; i>=0; i--)
             {
                 dynamic dyValue = value;
-                dynamic dyParams=objects[i];
-                value = ((dynamic)value)[dyParams];
+                try
+                {
+                    dynamic dyParams = objects[i];
+                    value = ((dynamic)value)[dyParams];
+                }
+                catch (Exception ex)
+                {
+                        value = GetExceptionValue(ex,dyValue,objects[i]);
+                }
             }
             return value;
         }
@@ -417,15 +456,87 @@ namespace NetCore.ORM.Simple.Visitor
         public static object GetValue(object value, FieldInfo field,params object[] objects)
         {
             int length = objects.Length - 1;
-            value = ((dynamic)field.GetValue(value))[objects[length]];
+            value = (field.GetValue(value));
+            try
+            {
+                value= ((dynamic)value)[objects[length]];
+            }
+            catch (Exception ex)
+            {
+              value = GetValue(ex,(dynamic)value, objects[length]);
+            }
             return GetValue(value,length-1,objects);
         }
         public static object GetValue(object value, PropertyInfo Property, params object[] objects)
         {
             int length = objects.Length - 1;
             dynamic dValue = Property.GetValue(value);
-            value = dValue[(dynamic)objects[length]];
+            try
+            {
+                value = dValue[(dynamic)objects[length]];
+            }
+            catch (Exception ex)
+            {
+                value = GetExceptionValue(ex, dValue, objects[length]);
+            }
+            
             return GetValue(value, length-1, objects); ;
+        }
+
+        public static object GetExceptionValue(Exception ex,dynamic dyValue,object Params)
+        {
+            object value = null;
+            int index = 0;
+            if (ex.Message == "Cannot apply indexing with [] to an expression of type 'object'")
+            {
+                foreach (var item in dyValue)
+                {
+                    if (item.GetType() is Type type)
+                    {
+                        if (type.IsDcitionary())
+                        {
+                            if (item.GetType().GetProperty("Key") is PropertyInfo key)
+                            {
+                                object keyValue = key.GetValue(item);
+                                if (keyValue.GetType().IsValueType)
+                                {
+                                    if (keyValue.ToString() == Params.ToString())
+                                    {
+                                        if (item.GetType().GetProperty("Value") is PropertyInfo Value)
+                                        {
+                                            value=Value.GetValue(item);
+                                        }
+
+                                    }
+                                }
+                                else
+                                {
+                                    if (keyValue.Equals(Params))
+                                    {
+                                        if (item.GetType().GetProperty("Value") is PropertyInfo Value)
+                                        {
+                                            value = Value.GetValue(item);
+                                        }
+                                    }
+                                }
+                                
+                            }
+                        }
+                        else
+                        {
+                            int.TryParse(Params.ToString(), out int i);
+                            if (index == i)
+                            {
+                                value = item;
+                            }
+                        }
+                        index++;
+                    }
+                }
+
+            }
+          
+            return value;
         }
 
         public static void SetValue(ConditionEntity left, ConditionEntity right,bool IsRight,object value)

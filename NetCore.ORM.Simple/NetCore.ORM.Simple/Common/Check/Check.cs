@@ -59,7 +59,17 @@ namespace NetCore.ORM.Simple.Common
             }
             return false;
         }
-       
+
+        public static bool IsDcitionary(this Type type)
+        {
+           
+            if (type.FullName.StartsWith("System.Collections.Generic.KeyValuePair"))
+            {
+                return true;
+            }
+            return false;
+        }
+
         public static bool IsMethodMultiParams(string methodName)
         {
             if (Check.IsNullOrEmpty(methodName))

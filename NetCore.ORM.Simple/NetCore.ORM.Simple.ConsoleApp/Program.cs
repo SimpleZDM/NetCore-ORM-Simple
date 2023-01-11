@@ -41,10 +41,10 @@ public static class Program
         //MysqlTest.UpdateTest();
         //MysqlTest.DeleteTest();
         //Console.WriteLine();
-        // MysqlTest.QueryTest();
+        MysqlTest.QueryTest();
        // Console.ReadLine(); 
         //MysqlTest.Transaction();
-        MysqlTest.JoinTest();
+        //MysqlTest.JoinTest();
         //SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
         //sqliteTest.InsertTest();
 

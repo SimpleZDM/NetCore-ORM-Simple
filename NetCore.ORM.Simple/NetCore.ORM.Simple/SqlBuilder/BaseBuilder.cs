@@ -568,9 +568,8 @@ namespace NetCore.ORM.Simple.SqlBuilder
         {
             if (IsPage(sqlEntity))
             {
-                sqlEntity.StrSqlValue.Append($" {DBMDConst.Limit} {DBMDConst.AT}{DBMDConst.SkipNumber}{DBMDConst.Comma}{DBMDConst.AT}{DBMDConst.TakeNumber}");
-                sqlEntity.AddParameter(DbType, $"{DBMDConst.AT}{DBMDConst.SkipNumber}", (sqlEntity.PageNumber - 1) * sqlEntity.PageSize);
-                sqlEntity.AddParameter(DbType, $"{DBMDConst.AT}{DBMDConst.TakeNumber}", sqlEntity.PageSize);
+                int SkipNumber = (sqlEntity.PageNumber - 1) * sqlEntity.PageSize;
+                sqlEntity.StrSqlValue.Append($" {DBMDConst.Limit} {SkipNumber}{DBMDConst.Comma}{sqlEntity.PageSize}");
             }
         }
         protected virtual bool IsPage(QueryEntity sqlEntity)
