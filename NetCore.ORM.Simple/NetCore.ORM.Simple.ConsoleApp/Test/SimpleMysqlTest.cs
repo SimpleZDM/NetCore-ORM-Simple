@@ -435,8 +435,8 @@ namespace NetCore.ORM.Simple.ConsoleApp
             for (int i = 0; i < 100; i++)
             {
                 var data5 = client.Queryable<UserEntity>().
-             LeftJoin<RoleEntity>((u, r) => u.RoleId == r.Id).
-             LeftJoin<RoleEntity>((u, r, r2) => u.RoleId == r2.Id).
+             InnerJoin<RoleEntity>((u, r) => u.RoleId == r.Id).
+             RightJoin<RoleEntity>((u, r, r2) => u.RoleId == r2.Id).
              LeftJoin<RoleEntity>((u, r, r2, r3) => u.RoleId == r3.Id).
              LeftJoin<RoleEntity>((u, r, r2, r3, r4) => u.RoleId == r4.Id).
              LeftJoin<RoleEntity>((u, r, r2, r3, r4, r5) => u.RoleId == r5.Id).

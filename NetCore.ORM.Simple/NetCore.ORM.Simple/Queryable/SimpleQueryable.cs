@@ -37,7 +37,7 @@ namespace NetCore.ORM.Simple.Queryable
         }
         public ISimpleQueryable<T,T2> InnerJoin<T2>(Expression<Func<T, T2, bool>> expression)
         {
-            return new SimpleQueryable<T, T2>(expression, builder, this.DbDrive, this.visitor, eJoinType.Right);
+            return new SimpleQueryable<T, T2>(expression, builder, this.DbDrive, this.visitor, eJoinType.Inner);
         }
     }
 }

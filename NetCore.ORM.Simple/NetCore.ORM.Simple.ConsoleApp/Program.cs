@@ -35,16 +35,16 @@ public static class Program
         ////test.Select();
         //Console.ReadLine();
         SimpleMysqlTest MysqlTest = new SimpleMysqlTest();
-        // MysqlTest.MoreQuerTest();
+         //MysqlTest.MoreQuerTest();
         //MysqlTest.sqlTest();
         //MysqlTest.InsertTest();
-        //MysqlTest.UpdateTest();
+       // MysqlTest.UpdateTest();
         //MysqlTest.DeleteTest();
         //Console.WriteLine();
-        MysqlTest.QueryTest();
+        //MysqlTest.QueryTest();
        // Console.ReadLine(); 
         //MysqlTest.Transaction();
-        //MysqlTest.JoinTest();
+        MysqlTest.JoinTest();
         //SimpleSqliteTest sqliteTest = new SimpleSqliteTest();
         //sqliteTest.InsertTest();
 
