@@ -1,6 +1,6 @@
 # NetCore-ORM-Simple
 It's the about net core orm<br>
-这是一个关于.net core 的 orm 框架。<br>
+这是一个关于.net core 的 生成sql语句的 框架。<br>
 
 支持数据库：Mysql,Sqlite,SqlService
 
@@ -9,6 +9,7 @@ It's the about net core orm<br>
 更加详细的中文介绍地址：https://blog.csdn.net/weixin_45394846/article/details/127154931
 
 例子：简单配置只需要配置连接字符串就好了
+
         '''var simpleClient = new SimpleClient(
             new DataBaseConfiguration(false,
             new ConnectionEntity("链接字符串!") 
@@ -19,6 +20,8 @@ It's the about net core orm<br>
                 ReadWeight=5,
                 WriteReadType=eWriteOrReadType.ReadOrWrite
             }));
+配置需要使用的数据库（它仅仅只是一个生成sql语句的工具）
+DataBaseConfiguration.DBDrives.Add(eDBType.Mysql,Tuple.Create(typeof(MySqlConnection),typeof(MySqlParameter)));
 
         var command=simpleClient.Insert(
             new UserEntity() {

@@ -673,7 +673,7 @@ namespace NetCore.ORM.Simple.SqlBuilder
                         if (IsParams)
                         {
                             value = GetRandomParaName(Index);
-                            sql.AddParameter(DbType, value, condition.DisplayName);
+                            sql.AddParameter(DbType, value, condition.Value);
                             condition.DisplayName = value;
                         }
                         else
