@@ -63,3 +63,5 @@ DataBaseConfiguration.DBDrives.Add(eDBType.Mysql,Tuple.Create(typeof(MySqlConnec
 这里提供了一简单的实现，尽管代码比较粗糙<br>
 Basic use is no problem.<br>
 现在呢基本使用已经没有问题了。<br>
+写这个玩意呢其实更重要的可能是一个学习的过程，慢慢的完善一些功能和修改其中存在的问题。
+
